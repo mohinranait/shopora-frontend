@@ -1,0 +1,182 @@
+export interface IProduct {
+  id: number;
+  name: string;
+  slug: string;
+  category: string;
+  brand: string;
+  seller: {
+    name: string;
+    isOfficial: boolean;
+  };
+  basePrice: number;
+  comparePrice?: number;
+  rating: number;
+  reviewCount: number;
+  stock: number;
+  image: string;
+  isHot?: boolean;
+  isNew?: boolean;
+  discountPercent?: number;
+}
+
+export const mockProducts: IProduct[] = [
+  {
+    id: 1,
+    name: "Kieslect Kr Pro Amoled Calling Smartwatch with Double Straps",
+    slug: "kieslect-kr-pro-amoled-smartwatch",
+    category: "Smartwatches",
+    brand: "Kieslect",
+    seller: {
+      name: "Shopora Direct",
+      isOfficial: true,
+    },
+    basePrice: 5499,
+    comparePrice: 6999,
+    rating: 4.9,
+    reviewCount: 148,
+    stock: 24,
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80",
+    isHot: true,
+    discountPercent: 21,
+  },
+  {
+    id: 2,
+    name: "Anker Soundcore Life P2i True Wireless Earbuds with 28H Playtime",
+    slug: "anker-soundcore-life-p2i-earbuds",
+    category: "Audio & TWS",
+    brand: "Anker",
+    seller: {
+      name: "ByteTech Official",
+      isOfficial: true,
+    },
+    basePrice: 2299,
+    comparePrice: 2850,
+    rating: 4.8,
+    reviewCount: 96,
+    stock: 58,
+    image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&auto=format&fit=crop&q=80",
+    isNew: true,
+    discountPercent: 19,
+  },
+  {
+    id: 3,
+    name: "Premium Slim-Fit Breathable Casual Cotton Oxford Shirt",
+    slug: "premium-slim-fit-casual-cotton-shirt",
+    category: "Men Fashion",
+    brand: "Urban Weave",
+    seller: {
+      name: "Apparel Studio BD",
+      isOfficial: false,
+    },
+    basePrice: 1250,
+    comparePrice: 1650,
+    rating: 4.7,
+    reviewCount: 64,
+    stock: 45,
+    image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=600&auto=format&fit=crop&q=80",
+    isHot: true,
+    discountPercent: 24,
+  },
+  {
+    id: 4,
+    name: "Logitech MX Master 3S Wireless Ergonomic Mouse Quiet Click",
+    slug: "logitech-mx-master-3s-mouse",
+    category: "Computer Accessories",
+    brand: "Logitech",
+    seller: {
+      name: "Shopora Direct",
+      isOfficial: true,
+    },
+    basePrice: 10499,
+    comparePrice: 12500,
+    rating: 5.0,
+    reviewCount: 312,
+    stock: 12,
+    image: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=600&auto=format&fit=crop&q=80",
+    discountPercent: 16,
+  },
+  {
+    id: 5,
+    name: "Baseus Blade 100W Power Bank 20000mAh Ultra Thin Fast Charger",
+    slug: "baseus-blade-100w-power-bank",
+    category: "Power Banks",
+    brand: "Baseus",
+    seller: {
+      name: "Apex Gadgets",
+      isOfficial: true,
+    },
+    basePrice: 6200,
+    comparePrice: 7500,
+    rating: 4.8,
+    reviewCount: 83,
+    stock: 18,
+    image: "https://images.unsplash.com/photo-1609592807908-012b1d3ef2ff?w=600&auto=format&fit=crop&q=80",
+    isHot: true,
+    discountPercent: 17,
+  },
+  {
+    id: 6,
+    name: "Redragon K552 Kumara RGB Mechanical Gaming Keyboard Blue Switches",
+    slug: "redragon-k552-mechanical-keyboard",
+    category: "Computer Accessories",
+    brand: "Redragon",
+    seller: {
+      name: "Gamer Hub BD",
+      isOfficial: false,
+    },
+    basePrice: 3250,
+    comparePrice: 3800,
+    rating: 4.6,
+    reviewCount: 114,
+    stock: 30,
+    image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80",
+    discountPercent: 14,
+  },
+  {
+    id: 7,
+    name: "Minimalist Full-Grain Genuine Leather Bi-Fold Wallet for Men",
+    slug: "genuine-leather-bifold-wallet",
+    category: "Leather Goods",
+    brand: "Artisan Crafts",
+    seller: {
+      name: "Heritage Leather",
+      isOfficial: true,
+    },
+    basePrice: 950,
+    comparePrice: 1350,
+    rating: 4.9,
+    reviewCount: 78,
+    stock: 85,
+    image: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=600&auto=format&fit=crop&q=80",
+    isNew: true,
+    discountPercent: 30,
+  },
+  {
+    id: 8,
+    name: "JBL Flip 6 Portable Waterproof Bluetooth Speaker with Deep Bass",
+    slug: "jbl-flip-6-portable-speaker",
+    category: "Audio & TWS",
+    brand: "JBL",
+    seller: {
+      name: "Shopora Direct",
+      isOfficial: true,
+    },
+    basePrice: 11800,
+    comparePrice: 13500,
+    rating: 4.9,
+    reviewCount: 220,
+    stock: 9,
+    image: "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=600&auto=format&fit=crop&q=80",
+    isHot: true,
+    discountPercent: 12,
+  },
+];
+
+export const mockCategories = [
+  { name: "Smartwatches", count: "1,240+ Products", icon: "Watch" },
+  { name: "Audio & TWS", count: "890+ Products", icon: "Headphones" },
+  { name: "Men Fashion", count: "3,400+ Products", icon: "Shirt" },
+  { name: "Computer Accessories", count: "1,850+ Products", icon: "Laptop" },
+  { name: "Power Banks", count: "420+ Products", icon: "BatteryCharging" },
+  { name: "Home & Lifestyle", count: "2,100+ Products", icon: "Home" },
+];

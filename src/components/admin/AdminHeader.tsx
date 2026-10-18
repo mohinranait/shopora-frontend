@@ -1,0 +1,379 @@
+"use client";
+
+import React, { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import {
+  Menu,
+  Search,
+  Bell,
+  Plus,
+  ExternalLink,
+  ChevronDown,
+  User,
+  Settings,
+  Shield,
+  LogOut,
+  Package,
+  Layers,
+  TicketPercent,
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
+  Store,
+  DollarSign,
+  Activity,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+interface AdminHeaderProps {
+  onMobileToggle: () => void;
+}
+
+export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const profileRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
+  const createRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
+      ) {
+        setProfileOpen(false);
+      }
+      if (
+        notifRef.current &&
+        !notifRef.current.contains(event.target as Node)
+      ) {
+        setNotificationOpen(false);
+      }
+      if (
+        createRef.current &&
+        !createRef.current.contains(event.target as Node)
+      ) {
+        setCreateOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const notifications = [
+    {
+      id: "1",
+      title: "New Order #SHP-8921",
+      desc: "Rahim Chowdhury placed an order for Kieslect Ks Pro (৳ 4,699)",
+      time: "4m ago",
+      icon: Package,
+      unread: true,
+      type: "order",
+    },
+    {
+      id: "2",
+      title: "Seller KYC Submitted",
+      desc: "ByteTech Official uploaded trade license and TIN for verification",
+      time: "25m ago",
+      icon: Store,
+      unread: true,
+      type: "vendor",
+    },
+    {
+      id: "3",
+      title: "Low Stock Alert",
+      desc: "Anker Soundcore Life Q30 has reached low stock limit (4 units)",
+      time: "1h ago",
+      icon: AlertTriangle,
+      unread: true,
+      type: "alert",
+    },
+    {
+      id: "4",
+      title: "Payout Request",
+      desc: "Apex Tech & Gadgets requested ৳ 45,000 wallet payout via bKash",
+      time: "3h ago",
+      icon: DollarSign,
+      unread: false,
+      type: "finance",
+    },
+  ];
+
+  return (
+    <header className="sticky top-0 z-30 h-16 bg-slate-950/85 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-6 flex items-center justify-between gap-4 select-none">
+      {/* Left: Mobile Toggle & Search */}
+      <div className="flex items-center gap-3 flex-1 max-w-xl">
+        <button
+          onClick={onMobileToggle}
+          className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-850 transition"
+          aria-label="Open mobile navigation"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+
+        {/* Global Search Bar */}
+        <div className="relative w-full hidden sm:block">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search products, orders, sellers, customers... (Press ⌘K)"
+            className="w-full h-9 rounded-lg border border-slate-700/80 bg-slate-900/90 pl-9 pr-14 text-xs text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand transition"
+          />
+          <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded bg-slate-800 border border-slate-700 px-1.5 py-0.5 text-[10px] font-mono text-slate-400">
+            ⌘K
+          </kbd>
+        </div>
+      </div>
+
+      {/* Right Controls */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Live System Health Badge */}
+        <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px] text-slate-300">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span className="font-semibold text-emerald-400">Live API</span>
+          <span className="text-slate-400">|</span>
+          <span className="text-slate-400">Prisma 8 Connected</span>
+        </div>
+
+        {/* Quick Create Dropdown */}
+        <div className="relative" ref={createRef}>
+          <Button
+            size="sm"
+            variant="brand"
+            onClick={() => setCreateOpen(!createOpen)}
+            className="gap-1.5 text-xs shadow-md shadow-brand/20"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Create</span>
+            <ChevronDown className="h-3 w-3 opacity-80" />
+          </Button>
+
+          {createOpen && (
+            <div className="absolute right-0 mt-2 w-48 rounded-xl bg-slate-900 border border-slate-700/80 shadow-2xl py-1 text-xs z-50 animate-in fade-in zoom-in-95 duration-100">
+              <Link
+                href="/admin/products/new"
+                onClick={() => setCreateOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 transition"
+              >
+                <Package className="h-3.5 w-3.5 text-sky-400" />
+                Add New Product
+              </Link>
+              <Link
+                href="/admin/categories/new"
+                onClick={() => setCreateOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 transition"
+              >
+                <Layers className="h-3.5 w-3.5 text-emerald-400" />
+                Add Category
+              </Link>
+              <Link
+                href="/admin/coupons/new"
+                onClick={() => setCreateOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 transition"
+              >
+                <TicketPercent className="h-3.5 w-3.5 text-amber-400" />
+                Create Coupon
+              </Link>
+              <div className="my-1 border-t border-slate-800" />
+              <Link
+                href="/admin/sellers/invite"
+                onClick={() => setCreateOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 transition"
+              >
+                <Store className="h-3.5 w-3.5 text-purple-400" />
+                Invite Vendor
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* View Storefront Shortcut */}
+        <Link
+          href="/"
+          target="_blank"
+          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-700/80 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-900 transition"
+          title="Open Customer Storefront in New Tab"
+        >
+          <ExternalLink className="h-3.5 w-3.5 text-sky-400" />
+          <span>Storefront</span>
+        </Link>
+
+        {/* Notifications Dropdown */}
+        <div className="relative" ref={notifRef}>
+          <button
+            onClick={() => setNotificationOpen(!notificationOpen)}
+            className="relative p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900 border border-transparent hover:border-slate-800 transition"
+            aria-label="View notifications"
+          >
+            <Bell className="h-4 w-4" />
+            <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+            </span>
+          </button>
+
+          {notificationOpen && (
+            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-xl bg-slate-900 border border-slate-750 shadow-2xl text-xs z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+              <div className="flex items-center justify-between p-3.5 border-b border-slate-800 bg-slate-950/50">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-white">Notifications</span>
+                  <Badge variant="destructive" className="h-4 px-1.5 text-[10px]">
+                    3 New
+                  </Badge>
+                </div>
+                <button className="text-[11px] text-sky-400 hover:underline">
+                  Mark all read
+                </button>
+              </div>
+
+              <div className="max-h-80 overflow-y-auto divide-y divide-slate-800/80">
+                {notifications.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div
+                      key={item.id}
+                      className={`p-3 flex items-start gap-3 hover:bg-slate-850 transition cursor-pointer ${
+                        item.unread ? "bg-slate-850/40" : ""
+                      }`}
+                    >
+                      <div className="h-8 w-8 rounded-lg bg-slate-800 flex items-center justify-center text-sky-400 shrink-0 mt-0.5">
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-1">
+                          <p className="font-bold text-slate-100 truncate">
+                            {item.title}
+                          </p>
+                          <span className="text-[10px] text-slate-400 whitespace-nowrap">
+                            {item.time}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-2 leading-relaxed">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="p-2 border-t border-slate-800 bg-slate-950/60 text-center">
+                <Link
+                  href="/admin/notifications"
+                  onClick={() => setNotificationOpen(false)}
+                  className="text-xs text-sky-400 font-semibold hover:underline"
+                >
+                  View all 18 notifications →
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Admin Profile Dropdown */}
+        <div className="relative" ref={profileRef}>
+          <button
+            onClick={() => setProfileOpen(!profileOpen)}
+            className="flex items-center gap-2.5 p-1 sm:pl-2 sm:pr-3 rounded-full sm:rounded-lg hover:bg-slate-900 border border-transparent hover:border-slate-800 transition"
+          >
+            <div className="relative">
+              <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-brand to-indigo-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-slate-800">
+                SA
+              </div>
+              <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-slate-950" />
+            </div>
+
+            <div className="hidden md:flex flex-col text-left">
+              <span className="text-xs font-bold text-white leading-tight">
+                Super Admin
+              </span>
+              <span className="text-[10px] text-sky-400 font-medium">
+                Full Access
+              </span>
+            </div>
+
+            <ChevronDown className="hidden sm:block h-3.5 w-3.5 text-slate-400" />
+          </button>
+
+          {profileOpen && (
+            <div className="absolute right-0 mt-2 w-64 rounded-xl bg-slate-900 border border-slate-750 shadow-2xl py-2 text-xs z-50 animate-in fade-in zoom-in-95 duration-100">
+              {/* User Header */}
+              <div className="px-4 py-3 border-b border-slate-800">
+                <p className="font-bold text-white text-sm">Super Admin</p>
+                <p className="text-slate-400 text-xs">admin@shopora.com</p>
+                <div className="mt-2 flex items-center gap-1.5">
+                  <Badge variant="brand" className="text-[10px] px-1.5 py-0">
+                    Platform Owner
+                  </Badge>
+                  <span className="text-[10px] text-emerald-400 flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3" /> 2FA Active
+                  </span>
+                </div>
+              </div>
+
+              {/* Menu Links */}
+              <div className="py-1">
+                <Link
+                  href="/admin/profile"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-800 transition"
+                >
+                  <User className="h-4 w-4 text-slate-400" />
+                  Administrator Profile
+                </Link>
+                <Link
+                  href="/admin/settings"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-800 transition"
+                >
+                  <Settings className="h-4 w-4 text-slate-400" />
+                  Store & Commission Settings
+                </Link>
+                <Link
+                  href="/admin/security"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-800 transition"
+                >
+                  <Shield className="h-4 w-4 text-slate-400" />
+                  Security & Audit Logs
+                </Link>
+                <Link
+                  href="/admin/activity"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-800 transition"
+                >
+                  <Activity className="h-4 w-4 text-slate-400" />
+                  Live System Activity
+                </Link>
+              </div>
+
+              <div className="my-1 border-t border-slate-800" />
+
+              <div className="px-2 pt-1">
+                <Link
+                  href="/auth/logout"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition font-semibold"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+}
