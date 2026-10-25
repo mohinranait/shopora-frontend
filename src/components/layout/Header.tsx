@@ -20,10 +20,14 @@ import {
   ShieldCheck,
   Truck,
   RotateCcw,
+  LogOut,
+  LayoutDashboard,
 } from "lucide-react";
 import { CartDrawer } from "../cart/CartDrawer";
+import { useAuth } from "@/context/AuthContext";
 
 export const Header: React.FC = () => {
+  const { user, isAuthenticated, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -165,7 +169,9 @@ export const Header: React.FC = () => {
                 className="inline-flex items-center gap-1.5 rounded-md bg-brand-deep px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand shadow-xs"
               >
                 <User className="h-4 w-4" />
-                <span>Account</span>
+                <span className="max-w-[100px] truncate">
+                  {isAuthenticated && user ? user.name.split(" ")[0] : "Account"}
+                </span>
                 <ChevronDown
                   className={`h-3.5 w-3.5 transition-transform duration-200 ${
                     isAccountOpen ? "rotate-180" : ""
@@ -175,48 +181,107 @@ export const Header: React.FC = () => {
 
               {isAccountOpen && (
                 <div
-                  className="absolute right-0 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-2 shadow-xl z-50 animate-fade-up text-sm"
+                  className="absolute right-0 mt-2 w-60 rounded-xl border border-slate-200 bg-white p-2 shadow-xl z-50 text-sm animate-in fade-in duration-100"
                   onMouseLeave={() => setIsAccountOpen(false)}
                 >
-                  <div className="px-3 py-2 border-b border-slate-100">
-                    <p className="text-xs text-slate-500">Welcome to Shopora</p>
-                    <p className="font-bold text-slate-900">Guest User</p>
-                  </div>
-                  <div className="py-1 space-y-0.5">
-                    <Link
-                      href="/auth/login"
-                      onClick={() => setIsAccountOpen(false)}
-                      className="flex items-center gap-2 rounded-md px-3 py-2 text-slate-700 hover:bg-sky-50 hover:text-brand transition"
-                    >
-                      <User className="h-4 w-4 text-brand" />
-                      Customer Login / Sign Up
-                    </Link>
-                    <Link
-                      href="/orders"
-                      onClick={() => setIsAccountOpen(false)}
-                      className="flex items-center gap-2 rounded-md px-3 py-2 text-slate-700 hover:bg-sky-50 hover:text-brand transition"
-                    >
-                      <ShoppingBag className="h-4 w-4 text-brand" />
-                      My Orders
-                    </Link>
-                    <Link
-                      href="/wishlist"
-                      onClick={() => setIsAccountOpen(false)}
-                      className="flex items-center gap-2 rounded-md px-3 py-2 text-slate-700 hover:bg-sky-50 hover:text-brand transition"
-                    >
-                      <Heart className="h-4 w-4 text-brand" />
-                      My Wishlist
-                    </Link>
-                    <div className="border-t border-slate-100 my-1" />
-                    <Link
-                      href="/seller/login"
-                      onClick={() => setIsAccountOpen(false)}
-                      className="flex items-center gap-2 rounded-md px-3 py-2 text-brand-deep font-semibold bg-sky-50/80 hover:bg-sky-100 transition"
-                    >
-                      <Store className="h-4 w-4 text-brand-deep" />
-                      Seller Portal Login
-                    </Link>
-                  </div>
+                  {isAuthenticated && user ? (
+                    <>
+                      <div className="px-3 py-2 border-b border-slate-100">
+                        <div className="flex items-center justify-between">
+                          <p className="font-bold text-slate-900 truncate max-w-[140px]">
+                            {user.name}
+                          </p>
+                          <span className="rounded bg-sky-100 text-brand-deep text-[10px] font-bold px-1.5 py-0.5">
+                            {user.role}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                      </div>
+
+                      <div className="py-1 space-y-0.5">
+                        {(user.role === "ADMIN" || user.role === "SELLER") && (
+                          <Link
+                            href="/admin"
+                            onClick={() => setIsAccountOpen(false)}
+                            className="flex items-center gap-2 rounded-md px-3 py-2 text-brand-deep font-semibold bg-sky-50 hover:bg-sky-100 transition"
+                          >
+                            <LayoutDashboard className="h-4 w-4 text-brand-deep" />
+                            {user.role === "ADMIN" ? "Admin Control Center" : "Seller Dashboard"}
+                          </Link>
+                        )}
+                        <Link
+                          href="/orders"
+                          onClick={() => setIsAccountOpen(false)}
+                          className="flex items-center gap-2 rounded-md px-3 py-2 text-slate-700 hover:bg-sky-50 hover:text-brand transition"
+                        >
+                          <ShoppingBag className="h-4 w-4 text-brand" />
+                          My Orders
+                        </Link>
+                        <Link
+                          href="/wishlist"
+                          onClick={() => setIsAccountOpen(false)}
+                          className="flex items-center gap-2 rounded-md px-3 py-2 text-slate-700 hover:bg-sky-50 hover:text-brand transition"
+                        >
+                          <Heart className="h-4 w-4 text-brand" />
+                          My Wishlist
+                        </Link>
+                        <div className="border-t border-slate-100 my-1" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsAccountOpen(false);
+                            logout();
+                          }}
+                          className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-rose-600 hover:bg-rose-50 transition text-left font-medium"
+                        >
+                          <LogOut className="h-4 w-4" />
+                          Sign Out
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="px-3 py-2 border-b border-slate-100">
+                        <p className="text-xs text-slate-500">Welcome to Shopora</p>
+                        <p className="font-bold text-slate-900">Sign in to your account</p>
+                      </div>
+                      <div className="py-1 space-y-0.5">
+                        <Link
+                          href="/login"
+                          onClick={() => setIsAccountOpen(false)}
+                          className="flex items-center gap-2 rounded-md px-3 py-2 text-brand-deep font-bold bg-sky-50 hover:bg-sky-100 transition"
+                        >
+                          <User className="h-4 w-4 text-brand-deep" />
+                          Customer Sign In
+                        </Link>
+                        <Link
+                          href="/register"
+                          onClick={() => setIsAccountOpen(false)}
+                          className="flex items-center gap-2 rounded-md px-3 py-2 text-slate-700 hover:bg-slate-50 transition"
+                        >
+                          <Sparkles className="h-4 w-4 text-amber-500" />
+                          Create New Account
+                        </Link>
+                        <div className="border-t border-slate-100 my-1" />
+                        <Link
+                          href="/register"
+                          onClick={() => setIsAccountOpen(false)}
+                          className="flex items-center gap-2 rounded-md px-3 py-2 text-purple-700 hover:bg-purple-50 transition font-semibold"
+                        >
+                          <Store className="h-4 w-4 text-purple-600" />
+                          Register as a Vendor
+                        </Link>
+                        <Link
+                          href="/admin-login"
+                          onClick={() => setIsAccountOpen(false)}
+                          className="flex items-center gap-2 rounded-md px-3 py-1.5 text-slate-500 hover:text-slate-800 text-xs transition"
+                        >
+                          <ShieldCheck className="h-3.5 w-3.5 text-slate-400" />
+                          Admin Portal Login
+                        </Link>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -292,7 +357,7 @@ export const Header: React.FC = () => {
             {/* "Be a Vendor" Button (Preserved exactly as requested) */}
             <div className="ml-auto flex shrink-0 items-center py-1 pl-4">
               <Link
-                href="/seller/register"
+                href="/register"
                 className="group inline-flex items-center justify-center gap-1.5 rounded-md border border-brand/40 bg-gradient-to-b from-sky-50 to-white px-3.5 py-1.5 text-[13px] font-semibold text-brand-deep shadow-xs transition hover:border-brand hover:from-sky-100/80 hover:to-sky-50 hover:text-brand"
               >
                 <Store className="h-4 w-4 text-brand transition group-hover:scale-110 group-hover:text-brand-deep" />

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Package,
@@ -15,8 +15,9 @@ import {
   Store,
   Tag,
   AlertTriangle,
-  ArrowUpDown,
-  MoreHorizontal,
+  RefreshCw,
+  Loader2,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,123 +28,76 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { productApi, IProductItem, getApiErrorMessage } from "@/services/api";
+import { toast } from "sonner";
 
 export default function AdminProductsPage() {
+  const [products, setProducts] = useState<IProductItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
     "all" | "platform" | "vendor" | "pending" | "low_stock"
   >("all");
   const [search, setSearch] = useState("");
 
-  const products = [
-    {
-      id: "prod-1",
-      name: "Kieslect Ks Pro Calling Smartwatch",
-      slug: "kieslect-ks-pro",
-      sku: "KIES-KS-PRO-BLK",
-      category: "Smartwatches",
-      brand: "Kieslect",
-      seller: "Shopora Direct (Self)",
-      isPlatform: true,
-      price: 4699,
-      discountPrice: 4299,
-      stock: 45,
-      status: "active",
-      approvalStatus: "approved",
-      image:
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=300&q=80",
-    },
-    {
-      id: "prod-2",
-      name: "Anker Soundcore Life Q30 Hybrid ANC",
-      slug: "anker-soundcore-life-q30",
-      sku: "ANK-Q30-BLK",
-      category: "Headphones",
-      brand: "Anker",
-      seller: "Apex Tech & Gadgets",
-      isPlatform: false,
-      price: 7499,
-      discountPrice: 6899,
-      stock: 4, // low stock!
-      status: "active",
-      approvalStatus: "approved",
-      image:
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&q=80",
-    },
-    {
-      id: "prod-3",
-      name: "Baseus 65W GaN5 Pro Fast Charger",
-      slug: "baseus-65w-gan5-pro",
-      sku: "BAS-65W-GAN",
-      category: "Mobile Accessories",
-      brand: "Baseus",
-      seller: "Apex Tech & Gadgets",
-      isPlatform: false,
-      price: 2850,
-      discountPrice: 2550,
-      stock: 30,
-      status: "pending_review",
-      approvalStatus: "pending",
-      image:
-        "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=300&q=80",
-    },
-    {
-      id: "prod-4",
-      name: "Logitech MX Master 3S Wireless Mouse",
-      slug: "logitech-mx-master-3s",
-      sku: "LOGI-MX-3S-GRY",
-      category: "Computer Accessories",
-      brand: "Logitech",
-      seller: "ByteTech Official",
-      isPlatform: false,
-      price: 11500,
-      discountPrice: 10800,
-      stock: 18,
-      status: "active",
-      approvalStatus: "approved",
-      image:
-        "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=300&q=80",
-    },
-    {
-      id: "prod-5",
-      name: "Premium Linen Long Sleeve Casual Shirt",
-      slug: "premium-linen-long-sleeve-shirt",
-      sku: "APP-LINEN-WHT-L",
-      category: "Men's Fashion",
-      brand: "Urban Weave",
-      seller: "Apparel Studio BD",
-      isPlatform: false,
-      price: 1850,
-      discountPrice: 1550,
-      stock: 50,
-      status: "active",
-      approvalStatus: "approved",
-      image:
-        "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=300&q=80",
-    },
-    {
-      id: "prod-6",
-      name: "Redragon K552 Kumara RGB Mechanical Keyboard",
-      slug: "redragon-k552-kumara",
-      sku: "RED-K552-RGB",
-      category: "Gaming Gear",
-      brand: "Redragon",
-      seller: "ByteTech Official",
-      isPlatform: false,
-      price: 3650,
-      discountPrice: 3250,
-      stock: 2, // low stock!
-      status: "active",
-      approvalStatus: "approved",
-      image:
-        "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=300&q=80",
-    },
-  ];
+  const loadProducts = async () => {
+    try {
+      setLoading(true);
+      const res = await productApi.getAll({ limit: 50 });
+      setProducts(res.products);
+    } catch (err: unknown) {
+      console.error("Failed to load products:", err);
+      toast.error(getApiErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const handleApprove = async (id: number) => {
+    try {
+      await productApi.reviewApproval(id, "APPROVED");
+      setProducts((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, approvalStatus: "APPROVED" } : p))
+      );
+      toast.success("Product approved and published successfully.");
+    } catch (err: unknown) {
+      toast.error(getApiErrorMessage(err));
+    }
+  };
+
+  const handleReject = async (id: number) => {
+    const reason = prompt("Enter rejection reason:");
+    if (!reason) return;
+    try {
+      await productApi.reviewApproval(id, "REJECTED", reason);
+      setProducts((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, approvalStatus: "REJECTED" } : p))
+      );
+      toast.info("Product marked as rejected.");
+    } catch (err: unknown) {
+      toast.error(getApiErrorMessage(err));
+    }
+  };
+
+  const handleDelete = async (prod: IProductItem) => {
+    if (!confirm(`Are you sure you want to delete product "${prod.name}"?`)) return;
+    try {
+      await productApi.delete(prod.id);
+      setProducts((prev) => prev.filter((p) => p.id !== prod.id));
+      toast.success(`Product "${prod.name}" deleted successfully.`);
+    } catch (err: unknown) {
+      toast.error(getApiErrorMessage(err));
+    }
+  };
 
   const filteredProducts = products.filter((prod) => {
-    if (activeTab === "platform" && !prod.isPlatform) return false;
-    if (activeTab === "vendor" && prod.isPlatform) return false;
-    if (activeTab === "pending" && prod.approvalStatus !== "pending") return false;
-    if (activeTab === "low_stock" && prod.stock > 5) return false;
+    if (activeTab === "platform" && !prod.isPlatformOwned) return false;
+    if (activeTab === "vendor" && prod.isPlatformOwned) return false;
+    if (activeTab === "pending" && prod.approvalStatus !== "PENDING") return false;
+    if (activeTab === "low_stock" && prod.stock > prod.lowStockThreshold) return false;
     if (
       search &&
       !prod.name.toLowerCase().includes(search.toLowerCase()) &&
@@ -153,24 +107,44 @@ export default function AdminProductsPage() {
     return true;
   });
 
+  const platformCount = products.filter((p) => p.isPlatformOwned).length;
+  const vendorCount = products.filter((p) => !p.isPlatformOwned).length;
+  const pendingCount = products.filter((p) => p.approvalStatus === "PENDING").length;
+  const lowStockCount = products.filter((p) => p.stock <= p.lowStockThreshold).length;
+
   return (
     <div className="space-y-6">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
-            Products & Catalog Management
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-black text-white tracking-tight">
+              Products & Catalog Management
+            </h1>
+            <Badge variant="brand" className="text-[10px] uppercase font-bold">
+              Dynamic Database Live
+            </Badge>
+          </div>
           <p className="text-xs text-slate-400 mt-1">
             Manage your retail inventory, multi-vendor submissions, attributes, and stock levels.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <Link href="/admin/products/new">
-            <Button size="sm" variant="brand" className="gap-1.5 text-xs">
-              <Plus className="h-4 w-4" />
-              <span>Add Product</span>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={loadProducts}
+            disabled={loading}
+            className="text-xs gap-1.5"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-sky-400" : ""}`} />
+            <span>Refresh</span>
+          </Button>
+
+          <Link href="/admin/attributes">
+            <Button size="sm" variant="outline" className="gap-1.5 text-xs">
+              <span>Variant Generator</span>
             </Button>
           </Link>
         </div>
@@ -188,7 +162,7 @@ export default function AdminProductsPage() {
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            All ({products.length})
+            All Products ({products.length})
           </button>
           <button
             onClick={() => setActiveTab("platform")}
@@ -198,7 +172,7 @@ export default function AdminProductsPage() {
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            Shopora Direct (1)
+            Shopora Direct ({platformCount})
           </button>
           <button
             onClick={() => setActiveTab("vendor")}
@@ -208,7 +182,7 @@ export default function AdminProductsPage() {
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            Vendor Products (5)
+            Vendor Products ({vendorCount})
           </button>
           <button
             onClick={() => setActiveTab("pending")}
@@ -219,8 +193,8 @@ export default function AdminProductsPage() {
             }`}
           >
             <span>Pending Review</span>
-            <span className="h-4 px-1 rounded-full bg-amber-400/20 text-[10px] font-bold">
-              1
+            <span className="h-4 px-1.5 rounded-full bg-amber-400/20 text-[10px] font-bold">
+              {pendingCount}
             </span>
           </button>
           <button
@@ -232,8 +206,8 @@ export default function AdminProductsPage() {
             }`}
           >
             <span>Low Stock</span>
-            <span className="h-4 px-1 rounded-full bg-rose-500/20 text-[10px] font-bold">
-              2
+            <span className="h-4 px-1.5 rounded-full bg-rose-500/20 text-[10px] font-bold">
+              {lowStockCount}
             </span>
           </button>
         </div>
@@ -258,106 +232,157 @@ export default function AdminProductsPage() {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-900/80 text-slate-400 font-semibold border-b border-slate-800">
                 <tr>
-                  <th className="py-3 px-4">Product</th>
+                  <th className="py-3 px-4">Product Details</th>
                   <th className="py-3 px-4">SKU / Brand</th>
                   <th className="py-3 px-4">Source / Seller</th>
-                  <th className="py-3 px-4">Price</th>
+                  <th className="py-3 px-4">Price (BDT)</th>
                   <th className="py-3 px-4">Stock</th>
-                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4">Approval Status</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/80 text-slate-300">
-                {filteredProducts.map((prod) => (
-                  <tr
-                    key={prod.id}
-                    className="hover:bg-slate-900/50 transition-colors"
-                  >
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-3">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={prod.image}
-                          alt={prod.name}
-                          className="h-10 w-10 rounded-lg object-cover border border-slate-700 bg-slate-900 shrink-0"
-                        />
-                        <div className="min-w-0">
-                          <p className="font-bold text-white truncate max-w-xs">
-                            {prod.name}
-                          </p>
-                          <p className="text-[11px] text-slate-400">
-                            {prod.category}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <p className="font-mono text-slate-300 font-semibold">
-                        {prod.sku}
-                      </p>
-                      <p className="text-[11px] text-slate-400">{prod.brand}</p>
-                    </td>
-                    <td className="py-3 px-4">
-                      {prod.isPlatform ? (
-                        <Badge variant="brand" className="text-[10px]">
-                          Shopora Direct
-                        </Badge>
-                      ) : (
-                        <div className="flex items-center gap-1 font-semibold text-slate-200">
-                          <Store className="h-3 w-3 text-purple-400" />
-                          <span>{prod.seller}</span>
-                        </div>
-                      )}
-                    </td>
-                    <td className="py-3 px-4">
-                      <p className="font-bold text-white font-mono">
-                        ৳ {prod.discountPrice.toLocaleString()}
-                      </p>
-                      {prod.price > prod.discountPrice && (
-                        <p className="text-[10px] text-slate-400 line-through">
-                          ৳ {prod.price.toLocaleString()}
-                        </p>
-                      )}
-                    </td>
-                    <td className="py-3 px-4">
-                      {prod.stock <= 5 ? (
-                        <span className="inline-flex items-center gap-1 font-bold text-rose-400">
-                          <AlertTriangle className="h-3 w-3" />
-                          {prod.stock} units
-                        </span>
-                      ) : (
-                        <span className="font-semibold text-slate-200">
-                          {prod.stock} units
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4">
-                      {prod.approvalStatus === "pending" ? (
-                        <Badge variant="warning">Pending Review</Badge>
-                      ) : (
-                        <Badge variant="success">Active</Badge>
-                      )}
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <Link
-                          href={`/products/${prod.slug}`}
-                          target="_blank"
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-                          title="Preview on Storefront"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Link>
-                        <button
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-sky-400 hover:bg-slate-800 transition"
-                          title="Edit Product"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </button>
-                      </div>
+                {loading ? (
+                  <tr>
+                    <td colSpan={7} className="py-12 text-center text-slate-400">
+                      <Loader2 className="h-6 w-6 text-sky-400 animate-spin mx-auto mb-2" />
+                      Loading catalog from database...
                     </td>
                   </tr>
-                ))}
+                ) : filteredProducts.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-12 text-center text-slate-500">
+                      No products found matching your criteria.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredProducts.map((prod) => (
+                    <tr
+                      key={prod.id}
+                      className="hover:bg-slate-900/50 transition-colors"
+                    >
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-3">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={prod.mainImage}
+                            alt={prod.name}
+                            className="h-11 w-11 rounded-lg object-cover border border-slate-700 bg-slate-900 shrink-0"
+                          />
+                          <div className="min-w-0">
+                            <p className="font-bold text-white truncate max-w-xs sm:max-w-sm">
+                              {prod.name}
+                            </p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-[11px] text-slate-400">
+                                {prod.category?.name || "General"}
+                              </span>
+                              {prod.mainImageUseMediaId && (
+                                <Badge variant="brand" className="text-[9px] font-mono py-0 px-1">
+                                  UseMedia #{prod.mainImageUseMediaId}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td className="py-3 px-4">
+                        <p className="font-mono text-slate-300 font-semibold">
+                          {prod.sku}
+                        </p>
+                        <p className="text-[11px] text-slate-400">
+                          {prod.brand?.name || "Unbranded"}
+                        </p>
+                      </td>
+
+                      <td className="py-3 px-4">
+                        {prod.isPlatformOwned ? (
+                          <Badge variant="brand" className="text-[10px]">
+                            Shopora Direct
+                          </Badge>
+                        ) : (
+                          <div className="flex items-center gap-1 font-semibold text-slate-200">
+                            <Store className="h-3 w-3 text-purple-400" />
+                            <span>{prod.seller?.storeName || "Vendor"}</span>
+                          </div>
+                        )}
+                      </td>
+
+                      <td className="py-3 px-4">
+                        <p className="font-bold text-white font-mono text-sm">
+                          ৳ {prod.basePrice.toLocaleString()}
+                        </p>
+                        {prod.comparePrice && prod.comparePrice > prod.basePrice && (
+                          <p className="text-[10px] text-slate-400 line-through">
+                            ৳ {prod.comparePrice.toLocaleString()}
+                          </p>
+                        )}
+                      </td>
+
+                      <td className="py-3 px-4">
+                        {prod.stock <= prod.lowStockThreshold ? (
+                          <span className="inline-flex items-center gap-1 font-bold text-rose-400">
+                            <AlertTriangle className="h-3 w-3" />
+                            {prod.stock} units
+                          </span>
+                        ) : (
+                          <span className="font-semibold text-slate-200">
+                            {prod.stock} units
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="py-3 px-4">
+                        {prod.approvalStatus === "PENDING" ? (
+                          <Badge variant="warning">Pending Review</Badge>
+                        ) : prod.approvalStatus === "APPROVED" ? (
+                          <Badge variant="success">Approved</Badge>
+                        ) : (
+                          <Badge variant="destructive">Rejected</Badge>
+                        )}
+                      </td>
+
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {prod.approvalStatus === "PENDING" && (
+                            <>
+                              <button
+                                onClick={() => handleApprove(prod.id)}
+                                className="p-1.5 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 transition"
+                                title="Approve Product"
+                              >
+                                <CheckCircle2 className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleReject(prod.id)}
+                                className="p-1.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition"
+                                title="Reject Product"
+                              >
+                                <XCircle className="h-4 w-4" />
+                              </button>
+                            </>
+                          )}
+                          <Link
+                            href={`/products/${prod.slug}`}
+                            target="_blank"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                            title="Preview on Storefront"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(prod)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
+                            title="Delete Product"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
