@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Search,
   ShoppingBag,
@@ -15,18 +16,18 @@ import {
   TrendingUp,
   Headphones,
   Menu,
-  X,
   ChevronDown,
   ShieldCheck,
   Truck,
-  RotateCcw,
   LogOut,
   LayoutDashboard,
 } from "lucide-react";
 import { CartDrawer } from "../cart/CartDrawer";
+import { MobileNavDrawer } from "./MobileNavDrawer";
 import { useAuth } from "@/context/AuthContext";
 
 export const Header: React.FC = () => {
+  const router = useRouter();
   const { user, isAuthenticated, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -45,6 +46,13 @@ export const Header: React.FC = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   return (
     <>
@@ -102,14 +110,9 @@ export const Header: React.FC = () => {
             </div>
           </Link>
 
-          {/* Search Bar (DropShop Inspired) */}
+          {/* Search Bar (Desktop only) */}
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (searchQuery.trim()) {
-                window.location.href = `/products?search=${encodeURIComponent(searchQuery)}`;
-              }
-            }}
+            onSubmit={handleSearchSubmit}
             className="relative mx-auto hidden md:block w-full max-w-xl"
           >
             <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -122,13 +125,13 @@ export const Header: React.FC = () => {
             />
             <button
               type="submit"
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded bg-brand-deep px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand transition shadow-2xs"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded bg-brand-deep px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand transition shadow-2xs cursor-pointer"
             >
               Search
             </button>
           </form>
 
-          {/* Right Ecommerce Actions (Wishlist, Cart, Account) */}
+          {/* Right Ecommerce Actions (Wishlist, Cart, Account - Desktop only) */}
           <div className="ml-auto hidden md:flex items-center gap-3 shrink-0">
             {/* Wishlist Button */}
             <Link
@@ -146,7 +149,7 @@ export const Header: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsCartOpen(true)}
-              className="relative flex items-center gap-2.5 rounded-md border border-slate-200 px-3 py-2 text-slate-700 hover:border-brand hover:text-brand-deep hover:bg-sky-50/50 transition group"
+              className="relative flex items-center gap-2.5 rounded-md border border-slate-200 px-3 py-2 text-slate-700 hover:border-brand hover:text-brand-deep hover:bg-sky-50/50 transition group cursor-pointer"
               title="Shopping Cart"
             >
               <div className="relative">
@@ -166,7 +169,7 @@ export const Header: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsAccountOpen(!isAccountOpen)}
-                className="inline-flex items-center gap-1.5 rounded-md bg-brand-deep px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand shadow-xs"
+                className="inline-flex items-center gap-1.5 rounded-md bg-brand-deep px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand shadow-xs cursor-pointer"
               >
                 <User className="h-4 w-4" />
                 <span className="max-w-[100px] truncate">
@@ -232,7 +235,7 @@ export const Header: React.FC = () => {
                             setIsAccountOpen(false);
                             logout();
                           }}
-                          className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-rose-600 hover:bg-rose-50 transition text-left font-medium"
+                          className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-rose-600 hover:bg-rose-50 transition text-left font-medium cursor-pointer"
                         >
                           <LogOut className="h-4 w-4" />
                           Sign Out
@@ -264,7 +267,7 @@ export const Header: React.FC = () => {
                         </Link>
                         <div className="border-t border-slate-100 my-1" />
                         <Link
-                          href="/register"
+                          href="/seller/register"
                           onClick={() => setIsAccountOpen(false)}
                           className="flex items-center gap-2 rounded-md px-3 py-2 text-purple-700 hover:bg-purple-50 transition font-semibold"
                         >
@@ -287,29 +290,34 @@ export const Header: React.FC = () => {
             </div>
           </div>
 
-          {/* Mobile Right Controls */}
+          {/* Mobile Right Controls: Cart & Hamburger Button */}
           <div className="ml-auto flex items-center gap-2 md:hidden">
             <button
+              type="button"
               onClick={() => setIsCartOpen(true)}
-              className="relative p-2 text-slate-700 hover:bg-slate-100 rounded-md"
+              className="relative p-2 text-slate-700 hover:bg-slate-100 rounded-md cursor-pointer"
+              aria-label="Open cart"
             >
               <ShoppingBag className="h-5 w-5 text-brand" />
               <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-deep text-[10px] font-bold text-white">
                 2
               </span>
             </button>
+
+            {/* Hamburger Icon Button to open Mobile Drawer */}
             <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="rounded-md p-2 text-slate-700 hover:bg-slate-100"
-              aria-label="Toggle menu"
+              type="button"
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="rounded-md p-2 text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+              aria-label="Open navigation menu drawer"
             >
-              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              <Menu className="h-6 w-6" />
             </button>
           </div>
         </div>
 
-        {/* Secondary Navigation Row (DropShop Styled) */}
-        <div className="border-t border-slate-200/80 bg-white/95">
+        {/* Secondary Navigation Row: VISIBLE ON DESKTOP ONLY (hidden on mobile as requested) */}
+        <div className="hidden md:block border-t border-slate-200/80 bg-white/95">
           <nav className="max-w-7xl mx-auto flex items-center gap-1 overflow-x-auto px-4 sm:px-6 lg:px-8 py-0.5">
             <Link
               href="/products"
@@ -354,10 +362,10 @@ export const Header: React.FC = () => {
               Trending
             </Link>
 
-            {/* "Be a Vendor" Button (Preserved exactly as requested) */}
+            {/* "Be a Vendor" Button */}
             <div className="ml-auto flex shrink-0 items-center py-1 pl-4">
               <Link
-                href="/register"
+                href="/seller/register"
                 className="group inline-flex items-center justify-center gap-1.5 rounded-md border border-brand/40 bg-gradient-to-b from-sky-50 to-white px-3.5 py-1.5 text-[13px] font-semibold text-brand-deep shadow-xs transition hover:border-brand hover:from-sky-100/80 hover:to-sky-50 hover:text-brand"
               >
                 <Store className="h-4 w-4 text-brand transition group-hover:scale-110 group-hover:text-brand-deep" />
@@ -367,17 +375,9 @@ export const Header: React.FC = () => {
           </nav>
         </div>
 
-        {/* Mobile Search Bar */}
+        {/* Mobile Search Bar (Preserved as requested: exactly in place on mobile) */}
         <div className="border-t border-slate-100 px-4 py-2.5 md:hidden bg-slate-50/50">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (searchQuery.trim()) {
-                window.location.href = `/products?search=${encodeURIComponent(searchQuery)}`;
-              }
-            }}
-            className="relative"
-          >
+          <form onSubmit={handleSearchSubmit} className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
@@ -388,50 +388,13 @@ export const Header: React.FC = () => {
             />
           </form>
         </div>
-
-        {/* Mobile Drawer Menu */}
-        {isMobileMenuOpen && (
-          <div className="border-t border-slate-200 bg-white px-4 py-4 md:hidden shadow-lg animate-fade-up">
-            <div className="flex flex-col gap-2">
-              <Link
-                href="/products"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-800 rounded-md hover:bg-slate-100"
-              >
-                <LayoutGrid className="h-4 w-4 text-brand" /> All Products
-              </Link>
-              <Link
-                href="/categories"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-800 rounded-md hover:bg-slate-100"
-              >
-                <FolderTree className="h-4 w-4 text-brand" /> All Categories
-              </Link>
-              <Link
-                href="/products?sort=hot"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-800 rounded-md hover:bg-slate-100"
-              >
-                <Flame className="h-4 w-4 text-rose-500" /> Hot Deals
-              </Link>
-              <Link
-                href="/wishlist"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-800 rounded-md hover:bg-slate-100"
-              >
-                <Heart className="h-4 w-4 text-rose-500" /> Wishlist (3)
-              </Link>
-              <Link
-                href="/seller/register"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 rounded-md bg-sky-50 border border-brand/30 py-2.5 text-sm font-bold text-brand-deep hover:bg-sky-100 mt-2"
-              >
-                <Store className="h-4 w-4" /> Be a Vendor
-              </Link>
-            </div>
-          </div>
-        )}
       </header>
+
+      {/* Slide-over Mobile Navigation Drawer */}
+      <MobileNavDrawer
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+      />
 
       {/* Slide-over Cart Drawer */}
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />

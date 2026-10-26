@@ -49,7 +49,7 @@ export function ProductDetailsView({
       {/* Top 2-Column Product Showcase (Gallery + Details) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
         {/* Left Column: Gallery (5 cols on lg) */}
-        <div className="lg:col-span-6 xl:col-span-5 sticky top-24">
+        <div className="lg:col-span-6 xl:col-span-5 max-w-lg lg:max-w-max lg:sticky top-24">
           <ProductGallery
             product={product}
             selectedVariantImage={activeVariant?.image}

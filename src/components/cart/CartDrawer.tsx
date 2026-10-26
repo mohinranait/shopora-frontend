@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { X, ShoppingBag, ArrowRight, Trash2, Plus, Minus } from "lucide-react";
 
@@ -30,6 +30,42 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     },
   ]);
 
+  // Lock body scroll when cart drawer is open without layout shift
+  useEffect(() => {
+    if (isOpen) {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      const isScrollbarGutterSupported =
+        typeof window !== "undefined" &&
+        window.CSS &&
+        CSS.supports("scrollbar-gutter", "stable");
+
+      document.body.style.overflow = "hidden";
+
+      // If browser does not support scrollbar-gutter, apply exact pixel compensation
+      if (!isScrollbarGutterSupported && scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
+    };
+  }, [isOpen]);
+
+  // Close drawer on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const updateQuantity = (id: number, delta: number) => {
@@ -50,20 +86,29 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-      {/* Backdrop */}
+    <div
+      className={`fixed inset-0 z-50 transition-all duration-300 ${
+        isOpen ? "visible" : "invisible pointer-events-none"
+      }`}
+      aria-hidden={!isOpen}
+    >
+      {/* Backdrop with Blur */}
       <div
-        className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity duration-300"
+        className={`fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300 ${
+          isOpen ? "opacity-100" : "opacity-0"
+        }`}
         onClick={onClose}
       />
 
-      {/* Drawer Panel */}
-      <div className="relative z-10 flex h-full w-full max-w-md flex-col bg-white shadow-2xl transition-transform duration-300">
+      {/* Drawer Panel: Smooth slide-in from right */}
+      <div
+        className={`fixed inset-y-0 right-0 z-10 flex h-full w-full max-w-md flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 bg-slate-50/70">
           <div className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5 text-brand" />
             <h2 className="text-base font-bold text-slate-900">
@@ -71,8 +116,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             </h2>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200/70 hover:text-slate-700 transition cursor-pointer"
             aria-label="Close cart"
           >
             <X className="h-5 w-5" />
@@ -85,7 +131,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Cart Items List */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 divide-y divide-slate-100">
+        <div className="flex-1 overflow-y-auto px-5 py-4 divide-y divide-slate-100 scrollbar-thin">
           {items.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center py-12">
               <ShoppingBag className="h-16 w-16 text-slate-300 mb-3" />
@@ -94,8 +140,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                 Explore our catalog to find hot deals and trending products.
               </p>
               <button
+                type="button"
                 onClick={onClose}
-                className="mt-5 inline-flex items-center justify-center rounded-md bg-brand-deep px-5 py-2 text-xs font-semibold text-white hover:bg-brand transition"
+                className="mt-5 inline-flex items-center justify-center rounded-xl bg-brand-deep px-5 py-2.5 text-xs font-semibold text-white hover:bg-brand transition cursor-pointer"
               >
                 Start Shopping
               </button>
@@ -116,10 +163,12 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                     <p className="text-[11px] text-slate-500 mt-0.5">{item.variant}</p>
                   </div>
                   <div className="flex items-center justify-between mt-2">
-                    <div className="flex items-center rounded-md border border-slate-200 bg-slate-50">
+                    <div className="flex items-center rounded-lg border border-slate-200 bg-slate-50 p-0.5">
                       <button
+                        type="button"
                         onClick={() => updateQuantity(item.id, -1)}
-                        className="p-1 hover:text-brand text-slate-600 transition"
+                        className="p-1 hover:text-brand text-slate-600 transition cursor-pointer"
+                        aria-label="Decrease quantity"
                       >
                         <Minus className="h-3.5 w-3.5" />
                       </button>
@@ -127,8 +176,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                         {item.quantity}
                       </span>
                       <button
+                        type="button"
                         onClick={() => updateQuantity(item.id, 1)}
-                        className="p-1 hover:text-brand text-slate-600 transition"
+                        className="p-1 hover:text-brand text-slate-600 transition cursor-pointer"
+                        aria-label="Increase quantity"
                       >
                         <Plus className="h-3.5 w-3.5" />
                       </button>
@@ -139,8 +190,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                         ৳{(item.price * item.quantity).toLocaleString()}
                       </span>
                       <button
+                        type="button"
                         onClick={() => removeItem(item.id)}
-                        className="text-slate-400 hover:text-rose-500 transition p-1"
+                        className="text-slate-400 hover:text-rose-500 transition p-1 cursor-pointer"
                         aria-label="Remove item"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -164,7 +216,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             </div>
             <div className="flex justify-between text-xs text-slate-500">
               <span>Estimated Delivery</span>
-              <span className="text-green-600 font-semibold">FREE</span>
+              <span className="text-emerald-600 font-semibold">FREE</span>
             </div>
             <div className="border-t border-slate-200 pt-2 flex justify-between text-sm font-extrabold text-slate-900">
               <span>Total Amount</span>
@@ -177,14 +229,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               <Link
                 href="/cart"
                 onClick={onClose}
-                className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white py-2.5 text-xs font-semibold text-slate-700 hover:border-brand hover:text-brand-deep transition"
+                className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white py-2.5 text-xs font-semibold text-slate-700 hover:border-brand hover:text-brand-deep transition shadow-2xs"
               >
                 View Cart
               </Link>
               <Link
                 href="/checkout"
                 onClick={onClose}
-                className="inline-flex items-center justify-center gap-1.5 rounded-md bg-brand-deep py-2.5 text-xs font-semibold text-white hover:bg-brand transition shadow-xs"
+                className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-brand-deep py-2.5 text-xs font-semibold text-white hover:bg-brand transition shadow-xs"
               >
                 Checkout <ArrowRight className="h-3.5 w-3.5" />
               </Link>
