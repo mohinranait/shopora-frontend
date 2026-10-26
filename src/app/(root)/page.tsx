@@ -6,7 +6,10 @@ import {
   CategorySection,
   CategorySectionSkeleton,
 } from "@/components/home/CategorySection";
-import { HomeProductsSection } from "@/components/home/HomeProductsSection";
+import {
+  HomeProductsSection,
+  HomeProductsSectionSkeleton,
+} from "@/components/home/HomeProductsSection";
 
 /**
  * Next.js App Router Server Component - HomePage
@@ -25,8 +28,10 @@ export default async function HomePage() {
         <CategorySection />
       </Suspense>
 
-      {/* 3. Curated Products Showcase Section */}
-      <HomeProductsSection />
+      {/* 3. Dynamic Curated Products Showcase Section */}
+      <Suspense fallback={<HomeProductsSectionSkeleton />}>
+        <HomeProductsSection />
+      </Suspense>
 
       {/* 4. Multi-Vendor Marketplace Opportunity Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

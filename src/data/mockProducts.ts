@@ -1,8 +1,8 @@
-import { IProduct } from "@/types";
+import { IMockProduct, IProduct } from "@/types";
 
-export type { IProduct };
+export type { IProduct, IMockProduct };
 
-export const mockProducts: IProduct[] = [
+export const mockProducts: IMockProduct[] = [
   {
     id: 1,
     name: "Kieslect Kr Pro Amoled Calling Smartwatch with Double Straps",

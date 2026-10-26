@@ -1,5 +1,6 @@
 import { IUseMediaItem } from "./media.type";
 import { IPaginationMeta } from "./common.type";
+import { IReviewItem } from "./review.type";
 
 export type ProductType = "SIMPLE" | "VARIABLE";
 export type ProductStatus = "PUBLISHED" | "UNPUBLISHED" | "ARCHIVED";
@@ -94,6 +95,7 @@ export interface IProductItem {
   images?: IProductImageItem[];
   variants?: IProductVariantItem[];
   selectedAttributes?: IProductSelectedAttributeItem[];
+  reviews?: IReviewItem[];
   tags?: string[];
   warranty?: string | null;
   weightKg?: number | null;
@@ -213,4 +215,4 @@ export interface IMockProduct {
   discountPercent?: number;
 }
 
-export type IProduct = IMockProduct;
+export type IProduct = IProductItem | IMockProduct;
