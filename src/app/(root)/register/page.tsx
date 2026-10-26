@@ -22,8 +22,6 @@ import {
   ArrowRight,
   Sparkles,
   Loader2,
-  ShieldCheck,
-  CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";

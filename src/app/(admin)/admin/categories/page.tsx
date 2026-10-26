@@ -27,9 +27,10 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { categoryApi, ICategory, getApiErrorMessage } from "@/services/api";
+import { categoryApi, getApiErrorMessage } from "@/services/api";
+import { ICategory, ImageValue } from "@/types";
 import { toast } from "sonner";
-import { ImageUploadField, ImageValue } from "@/components/media/ImageUploadField";
+import { ImageUploadField } from "@/components/media/ImageUploadField";
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<ICategory[]>([]);

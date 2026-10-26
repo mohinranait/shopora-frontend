@@ -1,33 +1,24 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { authApi, IAuthUser, ILoginResponse } from "@/services/api";
+import { authApi } from "@/services/api";
+import {
+  IAuthUser,
+  ILoginResponse,
+  UserRole,
+  IRegisterCustomerPayload,
+  IRegisterSellerPayload,
+} from "@/types";
 
 interface AuthContextType {
   user: IAuthUser | null;
-  role: "ADMIN" | "SELLER" | "CUSTOMER" | null;
+  role: UserRole | null;
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<ILoginResponse>;
-  registerCustomer: (payload: {
-    name: string;
-    email: string;
-    password: string;
-    phone?: string;
-  }) => Promise<ILoginResponse>;
-  registerSeller: (payload: {
-    name: string;
-    email: string;
-    password: string;
-    phone: string;
-    storeName: string;
-    businessAddress: string;
-    storeDescription?: string;
-    taxNumber?: string;
-    nidOrTradeLicense?: string;
-    bkashOrNagad?: string;
-  }) => Promise<ILoginResponse>;
+  registerCustomer: (payload: IRegisterCustomerPayload) => Promise<ILoginResponse>;
+  registerSeller: (payload: IRegisterSellerPayload) => Promise<ILoginResponse>;
   logout: () => void;
 }
 

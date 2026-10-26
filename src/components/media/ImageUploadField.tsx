@@ -12,14 +12,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MediaLibraryModal, SelectedMediaPayload } from "./MediaLibraryModal";
+import { MediaLibraryModal } from "./MediaLibraryModal";
+import { ImageValue, SelectedMediaPayload } from "@/types";
 
-export interface ImageValue {
-  url: string;
-  useMediaId?: number | null;
-  alt?: string;
-  description?: string;
-}
+export type { ImageValue };
 
 interface ImageUploadFieldProps {
   label?: string;

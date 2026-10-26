@@ -1,17 +1,37 @@
+import {
+  IPaginationMeta,
+  IErrorSource,
+  IMediaItem,
+  IUseMediaItem,
+  ICreateUseMediaPayload,
+  IBrand,
+  ICreateBrandPayload,
+  IUpdateBrandPayload,
+  ICategory,
+  ICreateCategoryPayload,
+  IUpdateCategoryPayload,
+  IAttribute,
+  IAttributeValue,
+  ICreateAttributePayload,
+  IUpdateAttributePayload,
+  ICreateAttributeValuePayload,
+  IUpdateAttributeValuePayload,
+  IGenerateCombinationsPayload,
+  IGenerateCombinationsResponse,
+  IProductItem,
+  ICreateProductPayload,
+  IUpdateProductPayload,
+  IProductListResponse,
+  IAuthUser,
+  ILoginResponse,
+  ILoginPayload,
+  IRegisterCustomerPayload,
+  IRegisterSellerPayload,
+} from "@/types";
+
+export * from "@/types";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
-
-export interface IPaginationMeta {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages?: number;
-  totalPage?: number;
-}
-
-export interface IErrorSource {
-  path: string | number;
-  message: string;
-}
 
 export class ApiError extends Error {
   statusCode: number;
@@ -48,20 +68,19 @@ async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<{ success: boolean; message?: string; data: T; meta?: IPaginationMeta }> {
-  const url = endpoint.startsWith("http") ? endpoint : `${API_BASE_URL}${endpoint}`;
+  const url = `${API_BASE_URL}${endpoint}`;
+  const headers = new Headers(options.headers || {});
 
-  const headers: Record<string, string> = {
-    ...(options.headers as Record<string, string>),
-  };
-
-  if (!(options.body instanceof FormData)) {
-    headers["Content-Type"] = "application/json";
+  // If request contains body and isn't FormData, default to application/json
+  if (options.body && !(options.body instanceof FormData) && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
   }
 
+  // Auto-attach JWT Authorization token if present in localStorage (client-side)
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("shopora_token");
-    if (token && !headers["Authorization"]) {
-      headers["Authorization"] = `Bearer ${token}`;
+    if (token && !headers.has("Authorization")) {
+      headers.set("Authorization", `Bearer ${token}`);
     }
   }
 
@@ -69,55 +88,29 @@ async function fetchApi<T>(
     const res = await fetch(url, {
       ...options,
       headers,
-      cache: "no-store",
     });
 
-    const json = await res.json().catch(() => ({}));
+    const json = await res.json().catch(() => null);
+
     if (!res.ok) {
-      const errorMsg =
-        json.errorSources?.[0]?.message ||
-        json.message ||
-        `Request failed with status ${res.status}`;
-      throw new ApiError(errorMsg, res.status, json.errorSources);
+      const errorMessage =
+        json?.message || `Request failed with HTTP status ${res.status}`;
+      throw new ApiError(errorMessage, res.status, json?.errorSources);
     }
 
     return json;
-  } catch (err: unknown) {
-    if (err instanceof ApiError) {
-      throw err;
+  } catch (error: unknown) {
+    if (error instanceof ApiError) {
+      throw error;
     }
-    if (err instanceof Error) {
-      throw new ApiError(err.message, 500);
-    }
-    throw new ApiError("Network request failed", 500);
+    const message = error instanceof Error ? error.message : "Network error. Failed to reach server.";
+    throw new ApiError(message, 500);
   }
 }
 
 // ==========================================
-// 1. MEDIA & USE-MEDIA APIS
+// 1. MEDIA APIS (Cloudinary & UseMedia)
 // ==========================================
-
-export interface IMediaItem {
-  id: number;
-  url: string;
-  publicId: string;
-  format?: string | null;
-  bytes?: number | null;
-  width?: number | null;
-  height?: number | null;
-  originalFilename?: string | null;
-  folder?: string | null;
-  createdAt: string;
-}
-
-export interface IUseMediaItem {
-  id: number;
-  mediaId: number;
-  alt?: string | null;
-  description?: string | null;
-  media?: IMediaItem;
-  createdAt: string;
-}
 
 export const mediaApi = {
   // Fetch media library items
@@ -144,7 +137,7 @@ export const mediaApi = {
   },
 
   // Create UseMedia record from selected mediaId with SEO alt and description
-  createUseMedia: async (payload: { mediaId: number; alt?: string; description?: string }) => {
+  createUseMedia: async (payload: ICreateUseMediaPayload) => {
     const res = await fetchApi<IUseMediaItem>("/media/use-media", {
       method: "POST",
       body: JSON.stringify(payload),
@@ -165,39 +158,18 @@ export const mediaApi = {
 // 2. BRAND APIS
 // ==========================================
 
-export interface IBrand {
-  id: number;
-  name: string;
-  slug: string;
-  logo?: string | null;
-  website?: string | null;
-  description?: string | null;
-  useMediaId?: number | null;
-  useMedia?: IUseMediaItem | null;
-  isActive: boolean;
-  createdAt: string;
-  _count?: { products: number };
-}
-
 export const brandApi = {
   getAll: async (includeInactive = true) => {
     const res = await fetchApi<IBrand[]>(`/brands?includeInactive=${includeInactive}`);
     return Array.isArray(res.data) ? res.data : [];
   },
 
-  getById: async (slug: string) => {
-    const res = await fetchApi<IBrand>(`/brands/${slug}`);
+  getById: async (id: number) => {
+    const res = await fetchApi<IBrand>(`/brands/${id}`);
     return res.data;
   },
 
-  create: async (payload: {
-    name: string;
-    logo?: string;
-    useMediaId?: number | null;
-    description?: string;
-    website?: string;
-    isActive?: boolean;
-  }) => {
+  create: async (payload: ICreateBrandPayload) => {
     const res = await fetchApi<IBrand>("/brands", {
       method: "POST",
       body: JSON.stringify(payload),
@@ -205,17 +177,7 @@ export const brandApi = {
     return res.data;
   },
 
-  update: async (
-    id: number,
-    payload: {
-      name?: string;
-      logo?: string;
-      useMediaId?: number | null;
-      description?: string;
-      website?: string;
-      isActive?: boolean;
-    }
-  ) => {
+  update: async (id: number, payload: IUpdateBrandPayload) => {
     const res = await fetchApi<IBrand>(`/brands/${id}`, {
       method: "PATCH",
       body: JSON.stringify(payload),
@@ -224,7 +186,7 @@ export const brandApi = {
   },
 
   delete: async (id: number) => {
-    const res = await fetchApi<{ message: string }>(`/brands/${id}`, {
+    const res = await fetchApi<{ message: string; id: number }>(`/brands/${id}`, {
       method: "DELETE",
     });
     return res.data;
@@ -234,23 +196,6 @@ export const brandApi = {
 // ==========================================
 // 3. CATEGORY APIS
 // ==========================================
-
-export interface ICategory {
-  id: number;
-  name: string;
-  slug: string;
-  description?: string | null;
-  image?: string | null;
-  icon?: string | null;
-  parentId?: number | null;
-  useMediaId?: number | null;
-  useMedia?: IUseMediaItem | null;
-  isActive: boolean;
-  displayOrder: number;
-  children?: ICategory[];
-  parent?: ICategory | null;
-  createdAt: string;
-}
 
 export const categoryApi = {
   getAll: async () => {
@@ -263,16 +208,12 @@ export const categoryApi = {
     return Array.isArray(res.data) ? res.data : [];
   },
 
-  create: async (payload: {
-    name: string;
-    description?: string;
-    image?: string;
-    useMediaId?: number | null;
-    icon?: string;
-    parentId?: number | null;
-    displayOrder?: number;
-    isActive?: boolean;
-  }) => {
+  getById: async (id: number) => {
+    const res = await fetchApi<ICategory>(`/categories/${id}`);
+    return res.data;
+  },
+
+  create: async (payload: ICreateCategoryPayload) => {
     const res = await fetchApi<ICategory>("/categories", {
       method: "POST",
       body: JSON.stringify(payload),
@@ -280,19 +221,7 @@ export const categoryApi = {
     return res.data;
   },
 
-  update: async (
-    id: number,
-    payload: {
-      name?: string;
-      description?: string;
-      image?: string;
-      useMediaId?: number | null;
-      icon?: string;
-      parentId?: number | null;
-      displayOrder?: number;
-      isActive?: boolean;
-    }
-  ) => {
+  update: async (id: number, payload: IUpdateCategoryPayload) => {
     const res = await fetchApi<ICategory>(`/categories/${id}`, {
       method: "PATCH",
       body: JSON.stringify(payload),
@@ -301,7 +230,7 @@ export const categoryApi = {
   },
 
   delete: async (id: number) => {
-    const res = await fetchApi<{ message: string }>(`/categories/${id}`, {
+    const res = await fetchApi<{ message: string; id: number }>(`/categories/${id}`, {
       method: "DELETE",
     });
     return res.data;
@@ -309,40 +238,84 @@ export const categoryApi = {
 };
 
 // ==========================================
-// 4. PRODUCT APIS
+// 4. ATTRIBUTE APIS
 // ==========================================
 
-export interface IProductItem {
-  id: number;
-  name: string;
-  slug: string;
-  sku: string;
-  shortDescription?: string | null;
-  description: string;
-  categoryId: number;
-  category?: { id: number; name: string; slug: string };
-  brandId?: number | null;
-  brand?: { id: number; name: string; slug: string; logo?: string } | null;
-  sellerId?: number | null;
-  seller?: { id: number; storeName: string; storeSlug: string } | null;
-  isPlatformOwned: boolean;
-  approvalStatus: "DRAFT" | "PENDING" | "APPROVED" | "REJECTED";
-  status: "PUBLISHED" | "UNPUBLISHED" | "ARCHIVED";
-  productType: "SIMPLE" | "VARIABLE";
-  basePrice: number;
-  comparePrice?: number | null;
-  stock: number;
-  lowStockThreshold: number;
-  mainImage: string;
-  mainImageUseMediaId?: number | null;
-  ratingAverage: number;
-  ratingCount: number;
-  totalSold: number;
-  createdAt: string;
-}
+export const attributeApi = {
+  getAll: async (includeInactive = true) => {
+    const res = await fetchApi<IAttribute[]>(`/attributes?includeInactive=${includeInactive}`);
+    return Array.isArray(res.data) ? res.data : [];
+  },
+
+  getById: async (id: number) => {
+    const res = await fetchApi<IAttribute>(`/attributes/${id}`);
+    return res.data;
+  },
+
+  create: async (payload: ICreateAttributePayload) => {
+    const res = await fetchApi<IAttribute>("/attributes", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return res.data;
+  },
+
+  update: async (id: number, payload: IUpdateAttributePayload) => {
+    const res = await fetchApi<IAttribute>(`/attributes/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
+    return res.data;
+  },
+
+  delete: async (id: number) => {
+    const res = await fetchApi<{ message: string; id: number }>(`/attributes/${id}`, {
+      method: "DELETE",
+    });
+    return res.data;
+  },
+
+  createValue: async (attributeId: number, payload: ICreateAttributeValuePayload) => {
+    const res = await fetchApi<IAttributeValue>(`/attributes/${attributeId}/values`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return res.data;
+  },
+
+  updateValue: async (valueId: number, payload: IUpdateAttributeValuePayload) => {
+    const res = await fetchApi<IAttributeValue>(`/attributes/values/${valueId}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
+    return res.data;
+  },
+
+  deleteValue: async (valueId: number) => {
+    const res = await fetchApi<{ message: string; valueId: number }>(
+      `/attributes/values/${valueId}`,
+      {
+        method: "DELETE",
+      }
+    );
+    return res.data;
+  },
+
+  generateCombinations: async (payload: IGenerateCombinationsPayload) => {
+    const res = await fetchApi<IGenerateCombinationsResponse>("/attributes/generate-combinations", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return res.data;
+  },
+};
+
+// ==========================================
+// 5. PRODUCT APIS
+// ==========================================
 
 export const productApi = {
-  getAll: async (params?: Record<string, string | number | boolean | undefined>) => {
+  getAll: async (params?: Record<string, string | number | boolean | undefined>): Promise<IProductListResponse> => {
     const query = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, val]) => {
@@ -358,10 +331,36 @@ export const productApi = {
     };
   },
 
+  getById: async (id: number) => {
+    const res = await fetchApi<IProductItem>(`/products/${id}`);
+    return res.data;
+  },
+
+  getBySlug: async (slug: string) => {
+    const res = await fetchApi<IProductItem>(`/products/detail/${slug}`);
+    return res.data;
+  },
+
+  create: async (payload: ICreateProductPayload) => {
+    const res = await fetchApi<IProductItem>("/products", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return res.data;
+  },
+
+  update: async (id: number, payload: IUpdateProductPayload) => {
+    const res = await fetchApi<IProductItem>(`/products/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
+    return res.data;
+  },
+
   reviewApproval: async (id: number, status: "APPROVED" | "REJECTED", rejectionReason?: string) => {
     const res = await fetchApi<IProductItem>(`/products/admin/${id}/approval`, {
       method: "PATCH",
-      body: JSON.stringify({ approvalStatus: status, rejectionReason }),
+      body: JSON.stringify({ status, rejectionReason }),
     });
     return res.data;
   },
@@ -375,32 +374,11 @@ export const productApi = {
 };
 
 // ==========================================
-// 5. AUTHENTICATION APIS
+// 6. AUTHENTICATION APIS
 // ==========================================
 
-export interface IAuthUser {
-  id: number;
-  name: string;
-  email: string;
-  role: "ADMIN" | "SELLER" | "CUSTOMER";
-  phone?: string | null;
-  avatar?: string | null;
-  sellerProfile?: {
-    id: number;
-    storeName: string;
-    storeSlug: string;
-    status: string;
-  } | null;
-}
-
-export interface ILoginResponse {
-  user: IAuthUser;
-  accessToken: string;
-  refreshToken: string;
-}
-
 export const authApi = {
-  login: async (payload: { email: string; password: string }) => {
+  login: async (payload: ILoginPayload) => {
     const res = await fetchApi<ILoginResponse>("/auth/login", {
       method: "POST",
       body: JSON.stringify(payload),
@@ -408,12 +386,7 @@ export const authApi = {
     return res.data;
   },
 
-  registerCustomer: async (payload: {
-    name: string;
-    email: string;
-    password: string;
-    phone?: string;
-  }) => {
+  registerCustomer: async (payload: IRegisterCustomerPayload) => {
     const res = await fetchApi<ILoginResponse>("/auth/register/customer", {
       method: "POST",
       body: JSON.stringify(payload),
@@ -421,18 +394,7 @@ export const authApi = {
     return res.data;
   },
 
-  registerSeller: async (payload: {
-    name: string;
-    email: string;
-    password: string;
-    phone: string;
-    storeName: string;
-    businessAddress: string;
-    storeDescription?: string;
-    taxNumber?: string;
-    nidOrTradeLicense?: string;
-    bkashOrNagad?: string;
-  }) => {
+  registerSeller: async (payload: IRegisterSellerPayload) => {
     const res = await fetchApi<ILoginResponse>("/auth/register/seller", {
       method: "POST",
       body: JSON.stringify(payload),
@@ -445,4 +407,3 @@ export const authApi = {
     return res.data;
   },
 };
-

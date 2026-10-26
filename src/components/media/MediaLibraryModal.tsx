@@ -17,16 +17,11 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { mediaApi, IMediaItem, IUseMediaItem, getApiErrorMessage } from "@/services/api";
+import { mediaApi, getApiErrorMessage } from "@/services/api";
+import { IMediaItem, IUseMediaItem, SelectedMediaPayload } from "@/types";
 import { toast } from "sonner";
 
-export interface SelectedMediaPayload {
-  useMediaId: number;
-  url: string;
-  alt: string;
-  description: string;
-  mediaId: number;
-}
+export type { SelectedMediaPayload };
 
 interface MediaLibraryModalProps {
   isOpen: boolean;

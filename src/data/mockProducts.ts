@@ -1,23 +1,6 @@
-export interface IProduct {
-  id: number;
-  name: string;
-  slug: string;
-  category: string;
-  brand: string;
-  seller: {
-    name: string;
-    isOfficial: boolean;
-  };
-  basePrice: number;
-  comparePrice?: number;
-  rating: number;
-  reviewCount: number;
-  stock: number;
-  image: string;
-  isHot?: boolean;
-  isNew?: boolean;
-  discountPercent?: number;
-}
+import { IProduct } from "@/types";
+
+export type { IProduct };
 
 export const mockProducts: IProduct[] = [
   {

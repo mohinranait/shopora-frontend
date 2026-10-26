@@ -25,16 +25,33 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 interface AdminHeaderProps {
   onMobileToggle: () => void;
 }
 
 export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
+  const { user, logout } = useAuth();
   const [profileOpen, setProfileOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const getInitials = (name?: string) => {
+    if (!name) return "SA";
+    const parts = name.trim().split(" ");
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  const handleSignOut = () => {
+    toast.success("Signed out successfully.");
+    logout();
+  };
 
   const profileRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -281,25 +298,33 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
           )}
         </div>
 
-        {/* Admin Profile Dropdown */}
+        {/* Dynamic Authenticated Admin Profile Dropdown */}
         <div className="relative" ref={profileRef}>
           <button
             onClick={() => setProfileOpen(!profileOpen)}
             className="flex items-center gap-2.5 p-1 sm:pl-2 sm:pr-3 rounded-full sm:rounded-lg hover:bg-slate-900 border border-transparent hover:border-slate-800 transition"
           >
             <div className="relative">
-              <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-brand to-indigo-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-slate-800">
-                SA
-              </div>
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  className="h-8 w-8 rounded-full object-cover ring-2 ring-slate-800"
+                />
+              ) : (
+                <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-brand to-indigo-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-slate-800">
+                  {getInitials(user?.name)}
+                </div>
+              )}
               <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-slate-950" />
             </div>
 
             <div className="hidden md:flex flex-col text-left">
               <span className="text-xs font-bold text-white leading-tight">
-                Super Admin
+                {user?.name || "Administrator"}
               </span>
               <span className="text-[10px] text-sky-400 font-medium">
-                Full Access
+                {user?.role === "ADMIN" ? "Super Admin (Full Access)" : user?.sellerProfile?.storeName || "Verified Vendor"}
               </span>
             </div>
 
@@ -308,16 +333,16 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
 
           {profileOpen && (
             <div className="absolute right-0 mt-2 w-64 rounded-xl bg-slate-900 border border-slate-750 shadow-2xl py-2 text-xs z-50 animate-in fade-in zoom-in-95 duration-100">
-              {/* User Header */}
+              {/* Dynamic User Header */}
               <div className="px-4 py-3 border-b border-slate-800">
-                <p className="font-bold text-white text-sm">Super Admin</p>
-                <p className="text-slate-400 text-xs">admin@shopora.com</p>
+                <p className="font-bold text-white text-sm truncate">{user?.name || "Super Admin"}</p>
+                <p className="text-slate-400 text-xs truncate">{user?.email || "admin@shopora.com"}</p>
                 <div className="mt-2 flex items-center gap-1.5">
                   <Badge variant="brand" className="text-[10px] px-1.5 py-0">
-                    Platform Owner
+                    {user?.role === "ADMIN" ? "Platform Owner" : user?.role === "SELLER" ? "Merchant Partner" : "Shopper"}
                   </Badge>
-                  <span className="text-[10px] text-emerald-400 flex items-center gap-1">
-                    <CheckCircle2 className="h-3 w-3" /> 2FA Active
+                  <span className="text-[10px] text-emerald-400 flex items-center gap-1 font-medium">
+                    <CheckCircle2 className="h-3 w-3" /> Active Session
                   </span>
                 </div>
               </div>
@@ -361,14 +386,17 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
               <div className="my-1 border-t border-slate-800" />
 
               <div className="px-2 pt-1">
-                <Link
-                  href="/auth/logout"
-                  onClick={() => setProfileOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition font-semibold"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    handleSignOut();
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition font-semibold text-left"
                 >
                   <LogOut className="h-4 w-4" />
                   Sign Out
-                </Link>
+                </button>
               </div>
             </div>
           )}

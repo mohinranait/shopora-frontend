@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Star, ShoppingBag, Heart, Check, Store } from "lucide-react";
-import type { IProduct } from "../../data/mockProducts";
+import type { IProduct } from "@/types";
 
 interface ProductCardProps {
   product: IProduct;

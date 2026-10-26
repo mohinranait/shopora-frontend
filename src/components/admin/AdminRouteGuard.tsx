@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { ShieldAlert, Loader2, Sparkles, Lock } from "lucide-react";
+import { Loader2, Sparkles, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 interface AdminRouteGuardProps {
   children: React.ReactNode;
 }
 
-export function AdminRouteGuard({ children }: AdminRouteGuardProps) {
+function AdminRouteGuardInner({ children }: AdminRouteGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -63,4 +63,18 @@ export function AdminRouteGuard({ children }: AdminRouteGuardProps) {
   }
 
   return <>{children}</>;
+}
+
+export function AdminRouteGuard({ children }: AdminRouteGuardProps) {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 text-sky-400 animate-spin" />
+        </div>
+      }
+    >
+      <AdminRouteGuardInner>{children}</AdminRouteGuardInner>
+    </Suspense>
+  );
 }

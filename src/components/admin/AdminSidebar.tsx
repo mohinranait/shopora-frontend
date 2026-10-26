@@ -31,6 +31,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 interface NavItem {
   label: string;
@@ -148,6 +150,21 @@ interface AdminSidebarProps {
 export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const { user, logout } = useAuth();
+
+  const getInitials = (name?: string) => {
+    if (!name) return "SA";
+    const parts = name.trim().split(" ");
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  const handleSignOut = () => {
+    toast.success("Signed out successfully.");
+    logout();
+  };
 
   return (
     <>
@@ -293,40 +310,49 @@ export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps)
             )}
           </Link>
 
-          {/* User Status Bar */}
+          {/* Dynamic Authenticated User Status Bar */}
           <div
             className={cn(
-              "flex items-center justify-between p-2 rounded-lg bg-slate-900/50 border border-slate-850",
+              "flex items-center justify-between p-2 rounded-lg bg-slate-900/50 border border-slate-800",
               collapsed && "justify-center"
             )}
           >
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="relative">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-slate-800">
-                  SA
-                </div>
+                {user?.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="h-8 w-8 rounded-full object-cover ring-2 ring-slate-800"
+                  />
+                ) : (
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-slate-800">
+                    {getInitials(user?.name)}
+                  </div>
+                )}
                 <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-slate-950" />
               </div>
               {!collapsed && (
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-bold text-white truncate">
-                    Super Admin
+                    {user?.name || "Administrator"}
                   </p>
                   <p className="text-[10px] text-slate-400 truncate">
-                    admin@shopora.com
+                    {user?.email || "admin@shopora.com"}
                   </p>
                 </div>
               )}
             </div>
 
             {!collapsed && (
-              <Link
-                href="/auth/logout"
+              <button
+                type="button"
+                onClick={handleSignOut}
                 title="Sign Out"
                 className="text-slate-400 hover:text-rose-400 p-1.5 rounded-md hover:bg-slate-800 transition"
               >
                 <LogOut className="h-4 w-4" />
-              </Link>
+              </button>
             )}
           </div>
         </div>

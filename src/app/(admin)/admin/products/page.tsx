@@ -18,6 +18,8 @@ import {
   RefreshCw,
   Loader2,
   ExternalLink,
+  SlidersHorizontal,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +30,8 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { productApi, IProductItem, getApiErrorMessage } from "@/services/api";
+import { productApi, getApiErrorMessage } from "@/services/api";
+import { IProductItem } from "@/types";
 import { toast } from "sonner";
 
 export default function AdminProductsPage() {
@@ -144,7 +147,15 @@ export default function AdminProductsPage() {
 
           <Link href="/admin/attributes">
             <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-              <span>Variant Generator</span>
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              <span>Attributes</span>
+            </Button>
+          </Link>
+
+          <Link href="/admin/products/new">
+            <Button size="sm" variant="brand" className="text-xs gap-1.5 shadow-md shadow-brand/20 font-bold">
+              <Plus className="h-3.5 w-3.5" />
+              <span>Create Product</span>
             </Button>
           </Link>
         </div>
@@ -273,13 +284,24 @@ export default function AdminProductsPage() {
                             <p className="font-bold text-white truncate max-w-xs sm:max-w-sm">
                               {prod.name}
                             </p>
-                            <div className="flex items-center gap-2 mt-0.5">
+                            <div className="flex items-center gap-1.5 mt-1">
+                              {prod.productType === "VARIABLE" ? (
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                                  <Sparkles className="h-2.5 w-2.5" />
+                                  <span>Variable ({prod.variants?.length || 0})</span>
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                                  <Package className="h-2.5 w-2.5" />
+                                  <span>Simple</span>
+                                </span>
+                              )}
                               <span className="text-[11px] text-slate-400">
                                 {prod.category?.name || "General"}
                               </span>
                               {prod.mainImageUseMediaId && (
                                 <Badge variant="brand" className="text-[9px] font-mono py-0 px-1">
-                                  UseMedia #{prod.mainImageUseMediaId}
+                                  Media #{prod.mainImageUseMediaId}
                                 </Badge>
                               )}
                             </div>
@@ -311,7 +333,11 @@ export default function AdminProductsPage() {
 
                       <td className="py-3 px-4">
                         <p className="font-bold text-white font-mono text-sm">
-                          ৳ {prod.basePrice.toLocaleString()}
+                          {prod.productType === "VARIABLE" && prod.variants && prod.variants.length > 0 ? (
+                            <>৳ {Math.min(...prod.variants.map((v) => v.price)).toLocaleString()}</>
+                          ) : (
+                            <>৳ {prod.basePrice.toLocaleString()}</>
+                          )}
                         </p>
                         {prod.comparePrice && prod.comparePrice > prod.basePrice && (
                           <p className="text-[10px] text-slate-400 line-through">
@@ -363,6 +389,13 @@ export default function AdminProductsPage() {
                               </button>
                             </>
                           )}
+                          <Link
+                            href={`/admin/products/${prod.id}/edit`}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                            title="Edit Product"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Link>
                           <Link
                             href={`/products/${prod.slug}`}
                             target="_blank"

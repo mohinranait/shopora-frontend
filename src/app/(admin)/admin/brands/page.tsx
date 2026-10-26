@@ -27,9 +27,10 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { brandApi, IBrand, getApiErrorMessage } from "@/services/api";
+import { brandApi, getApiErrorMessage } from "@/services/api";
+import { IBrand, ImageValue } from "@/types";
 import { toast } from "sonner";
-import { ImageUploadField, ImageValue } from "@/components/media/ImageUploadField";
+import { ImageUploadField } from "@/components/media/ImageUploadField";
 
 export default function AdminBrandsPage() {
   const [brands, setBrands] = useState<IBrand[]>([]);

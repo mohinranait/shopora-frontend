@@ -1,0 +1,47 @@
+export type UserRole = "ADMIN" | "SELLER" | "CUSTOMER";
+
+export interface IAuthUser {
+  id: number;
+  name: string;
+  email: string;
+  role: UserRole;
+  phone?: string | null;
+  avatar?: string | null;
+  sellerProfile?: {
+    id: number;
+    storeName: string;
+    storeSlug: string;
+    status: string;
+  } | null;
+}
+
+export interface ILoginResponse {
+  user: IAuthUser;
+  accessToken: string;
+  refreshToken?: string;
+}
+
+export interface ILoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface IRegisterCustomerPayload {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+}
+
+export interface IRegisterSellerPayload {
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  storeName: string;
+  businessAddress: string;
+  storeDescription?: string;
+  taxNumber?: string;
+  nidOrTradeLicense?: string;
+  bkashOrNagad?: string;
+}
