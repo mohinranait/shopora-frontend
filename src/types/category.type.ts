@@ -29,4 +29,4 @@ export interface ICreateCategoryPayload {
   displayOrder?: number;
 }
 
-export interface IUpdateCategoryPayload extends Partial<ICreateCategoryPayload> {}
+export type IUpdateCategoryPayload = Partial<ICreateCategoryPayload>;

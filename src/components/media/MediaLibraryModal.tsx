@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
   X,
   Upload,
@@ -17,8 +17,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { mediaApi, getApiErrorMessage } from "@/services/api";
-import { IMediaItem, IUseMediaItem, SelectedMediaPayload } from "@/types";
+import {
+  useGetMediaLibraryQuery,
+  useUploadFileMutation,
+  useCreateUseMediaMutation,
+  useDeleteMediaMutation,
+} from "@/redux";
+import { getApiErrorMessage } from "@/services/api";
+import { IMediaItem, SelectedMediaPayload } from "@/types";
 import { toast } from "sonner";
 
 export type { SelectedMediaPayload };
@@ -39,64 +45,55 @@ export function MediaLibraryModal({
   initialAlt = "",
 }: MediaLibraryModalProps) {
   const [activeTab, setActiveTab] = useState<"library" | "upload">("library");
-  const [mediaList, setMediaList] = useState<IMediaItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState("");
 
-  // Selected Media in Library
-  const [selectedMedia, setSelectedMedia] = useState<IMediaItem | null>(null);
-  const [altText, setAltText] = useState(initialAlt);
+  const {
+    data: mediaData,
+    isLoading: loading,
+    isFetching,
+    refetch,
+  } = useGetMediaLibraryQuery({ limit: 100 }, { skip: !isOpen });
+
+  const [uploadFileMutation, { isLoading: uploading }] = useUploadFileMutation();
+  const [createUseMediaMutation, { isLoading: submitting }] = useCreateUseMediaMutation();
+  const [deleteMediaMutation] = useDeleteMediaMutation();
+
+  const mediaList = mediaData?.items || [];
+
+  // Selected Media in Library (derived or user selected)
+  const [userSelectedMedia, setUserSelectedMedia] = useState<IMediaItem | null>(null);
+  const [customAltText, setCustomAltText] = useState<string | null>(null);
   const [description, setDescription] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch Media Library on Open
-  const loadLibrary = async () => {
-    try {
-      setLoading(true);
-      const res = await mediaApi.getMediaLibrary(1, 100);
-      setMediaList(res.items);
-      if (res.items.length > 0 && !selectedMedia) {
-        setSelectedMedia(res.items[0]);
-        setAltText(res.items[0].originalFilename || initialAlt);
-      }
-    } catch (err: unknown) {
-      console.error("Failed to load media library:", err);
-      toast.error(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      loadLibrary();
-    }
-  }, [isOpen]);
+  const selectedMedia = userSelectedMedia || (mediaList.length > 0 ? mediaList[0] : null);
+  const altText =
+    customAltText !== null
+      ? customAltText
+      : selectedMedia?.originalFilename
+      ? selectedMedia.originalFilename.replace(/-/g, " ")
+      : initialAlt;
 
   // Handle Image Selection in Grid
   const handleSelectMedia = (item: IMediaItem) => {
-    setSelectedMedia(item);
-    setAltText(item.originalFilename ? item.originalFilename.replace(/-/g, " ") : initialAlt);
+    setUserSelectedMedia(item);
+    setCustomAltText(item.originalFilename ? item.originalFilename.replace(/-/g, " ") : initialAlt);
     setDescription("");
   };
 
   // Handle File Upload to Cloudinary & Media Model
   const handleFileUpload = async (file: File) => {
     try {
-      setUploading(true);
-      const uploaded = await mediaApi.uploadFile(file);
-      setMediaList((prev) => [uploaded, ...prev]);
-      setSelectedMedia(uploaded);
-      setAltText(uploaded.originalFilename || file.name.replace(/\.[^/.]+$/, ""));
+      const formData = new FormData();
+      formData.append("file", file);
+      const uploaded = await uploadFileMutation(formData).unwrap();
+      setUserSelectedMedia(uploaded);
+      setCustomAltText(uploaded.originalFilename || file.name.replace(/\.[^/.]+$/, ""));
       setActiveTab("library");
       toast.success("File uploaded to Cloudinary & Media model successfully!");
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -105,12 +102,11 @@ export function MediaLibraryModal({
     if (!selectedMedia) return;
 
     try {
-      setSubmitting(true);
-      const useMedia = await mediaApi.createUseMedia({
+      const useMedia = await createUseMediaMutation({
         mediaId: selectedMedia.id,
         alt: altText.trim() || selectedMedia.originalFilename || "Shopora media",
         description: description.trim(),
-      });
+      }).unwrap();
 
       onSelect({
         useMediaId: useMedia.id,
@@ -124,8 +120,6 @@ export function MediaLibraryModal({
       onClose();
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -133,10 +127,10 @@ export function MediaLibraryModal({
   const handleDeleteMedia = async (id: number) => {
     if (!confirm("Are you sure you want to permanently delete this media asset?")) return;
     try {
-      await mediaApi.deleteMedia(id);
-      setMediaList((prev) => prev.filter((m) => m.id !== id));
-      if (selectedMedia?.id === id) {
-        setSelectedMedia(null);
+      await deleteMediaMutation(id).unwrap();
+      if (userSelectedMedia?.id === id) {
+        setUserSelectedMedia(null);
+        setCustomAltText(null);
       }
       toast.success("Media asset deleted.");
     } catch (err: unknown) {
@@ -224,12 +218,12 @@ export function MediaLibraryModal({
                 />
               </div>
               <button
-                onClick={loadLibrary}
-                disabled={loading}
+                onClick={() => refetch()}
+                disabled={loading || isFetching}
                 className="p-2 rounded-lg bg-slate-950 border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 transition"
                 title="Refresh media list"
               >
-                <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-sky-400" : ""}`} />
+                <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin text-sky-400" : ""}`} />
               </button>
             </div>
           )}
@@ -420,7 +414,7 @@ export function MediaLibraryModal({
                         <input
                           type="text"
                           value={altText}
-                          onChange={(e) => setAltText(e.target.value)}
+                          onChange={(e) => setCustomAltText(e.target.value)}
                           placeholder="e.g. Anker Soundcore Life P2i Earbuds Black"
                           className="mt-1 w-full h-8 px-2.5 text-xs bg-slate-900 border border-slate-700 rounded-lg text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand"
                         />

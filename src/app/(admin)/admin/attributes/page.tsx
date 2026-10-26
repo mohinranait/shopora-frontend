@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   SlidersHorizontal,
   Plus,
@@ -11,16 +11,11 @@ import {
   Tag,
   Palette,
   CheckCircle2,
-  XCircle,
   X,
   Layers,
   ChevronRight,
   Loader2,
   Search,
-  Check,
-  HelpCircle,
-  Hash,
-  MoveVertical,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,13 +26,28 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { attributeApi, getApiErrorMessage } from "@/services/api";
+import {
+  useGetAttributesQuery,
+  useCreateAttributeMutation,
+  useUpdateAttributeMutation,
+  useDeleteAttributeMutation,
+  useCreateAttributeValueMutation,
+  useUpdateAttributeValueMutation,
+  useDeleteAttributeValueMutation,
+} from "@/redux";
+import { getApiErrorMessage } from "@/services/api";
 import { IAttribute, IAttributeValue, AttributeDisplayType } from "@/types";
 import { toast } from "sonner";
 
 export default function AdminAttributesPage() {
-  const [attributes, setAttributes] = useState<IAttribute[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: attributes = [], isLoading: loading, isFetching, refetch } = useGetAttributesQuery(true);
+  const [createAttribute] = useCreateAttributeMutation();
+  const [updateAttribute] = useUpdateAttributeMutation();
+  const [deleteAttribute] = useDeleteAttributeMutation();
+  const [createAttributeValue] = useCreateAttributeValueMutation();
+  const [updateAttributeValue] = useUpdateAttributeValueMutation();
+  const [deleteAttributeValue] = useDeleteAttributeValueMutation();
+
   const [search, setSearch] = useState("");
   const [selectedAttributeId, setSelectedAttributeId] = useState<number | null>(null);
 
@@ -61,26 +71,6 @@ export default function AdminAttributesPage() {
   const [valueFormColor, setValueFormColor] = useState("#000000");
   const [valueFormDisplayOrder, setValueFormDisplayOrder] = useState<number>(0);
   const [valueSubmitting, setValueSubmitting] = useState(false);
-
-  // Load Attributes from Backend
-  const loadAttributes = async () => {
-    try {
-      setLoading(true);
-      const data = await attributeApi.getAll(true);
-      setAttributes(data);
-      if (data.length > 0 && !selectedAttributeId) {
-        setSelectedAttributeId(data[0].id);
-      }
-    } catch (err: unknown) {
-      toast.error(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadAttributes();
-  }, []);
 
   // Selected Attribute
   const selectedAttribute = attributes.find((a) => a.id === selectedAttributeId) || attributes[0] || null;
@@ -153,31 +143,32 @@ export default function AdminAttributesPage() {
               }))
           : [];
 
-        const created = await attributeApi.create({
+        const created = await createAttribute({
           name: attrFormName.trim(),
           type: attrFormType,
           description: attrFormDescription.trim() || undefined,
           displayOrder: attrFormDisplayOrder,
           isActive: attrFormIsActive,
           values: parsedValues.length > 0 ? parsedValues : undefined,
-        });
+        }).unwrap();
 
         toast.success(`Attribute "${created.name}" created successfully!`);
         setIsAttrModalOpen(false);
-        await loadAttributes();
         setSelectedAttributeId(created.id);
       } else if (editingAttr) {
-        await attributeApi.update(editingAttr.id, {
-          name: attrFormName.trim(),
-          type: attrFormType,
-          description: attrFormDescription.trim() || undefined,
-          displayOrder: attrFormDisplayOrder,
-          isActive: attrFormIsActive,
-        });
+        await updateAttribute({
+          id: editingAttr.id,
+          body: {
+            name: attrFormName.trim(),
+            type: attrFormType,
+            description: attrFormDescription.trim() || undefined,
+            displayOrder: attrFormDisplayOrder,
+            isActive: attrFormIsActive,
+          },
+        }).unwrap();
 
         toast.success(`Attribute "${attrFormName}" updated successfully!`);
         setIsAttrModalOpen(false);
-        await loadAttributes();
       }
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
@@ -194,9 +185,8 @@ export default function AdminAttributesPage() {
     }
 
     try {
-      await attributeApi.delete(attr.id);
+      await deleteAttribute(attr.id).unwrap();
       toast.success(`Attribute "${attr.name}" removed.`);
-      setAttributes((prev) => prev.filter((a) => a.id !== attr.id));
       if (selectedAttributeId === attr.id) {
         const remaining = attributes.filter((a) => a.id !== attr.id);
         setSelectedAttributeId(remaining.length > 0 ? remaining[0].id : null);
@@ -240,25 +230,29 @@ export default function AdminAttributesPage() {
       setValueSubmitting(true);
 
       if (valueModalMode === "create") {
-        const newVal = await attributeApi.createValue(selectedAttribute.id, {
-          value: valueFormText.trim(),
-          colorCode: selectedAttribute.type === "COLOR" ? valueFormColor : undefined,
-          displayOrder: valueFormDisplayOrder,
-        });
+        const newVal = await createAttributeValue({
+          attributeId: selectedAttribute.id,
+          body: {
+            value: valueFormText.trim(),
+            colorCode: selectedAttribute.type === "COLOR" ? valueFormColor : undefined,
+            displayOrder: valueFormDisplayOrder,
+          },
+        }).unwrap();
 
         toast.success(`Value "${newVal.value}" added to ${selectedAttribute.name}!`);
         setIsValueModalOpen(false);
-        await loadAttributes();
       } else if (editingValue) {
-        await attributeApi.updateValue(editingValue.id, {
-          value: valueFormText.trim(),
-          colorCode: selectedAttribute.type === "COLOR" ? valueFormColor : undefined,
-          displayOrder: valueFormDisplayOrder,
-        });
+        await updateAttributeValue({
+          valueId: editingValue.id,
+          body: {
+            value: valueFormText.trim(),
+            colorCode: selectedAttribute.type === "COLOR" ? valueFormColor : undefined,
+            displayOrder: valueFormDisplayOrder,
+          },
+        }).unwrap();
 
         toast.success(`Value "${valueFormText}" updated!`);
         setIsValueModalOpen(false);
-        await loadAttributes();
       }
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
@@ -272,9 +266,8 @@ export default function AdminAttributesPage() {
     if (!confirm(`Are you sure you want to delete value "${val.value}"?`)) return;
 
     try {
-      await attributeApi.deleteValue(val.id);
+      await deleteAttributeValue(val.id).unwrap();
       toast.success(`Value "${val.value}" deleted.`);
-      await loadAttributes();
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
     }
@@ -336,11 +329,11 @@ export default function AdminAttributesPage() {
           <Button
             size="sm"
             variant="outline"
-            onClick={loadAttributes}
-            disabled={loading}
+            onClick={() => refetch()}
+            disabled={loading || isFetching}
             className="text-xs gap-1.5"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-sky-400" : ""}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin text-sky-400" : ""}`} />
             <span>Refresh</span>
           </Button>
 

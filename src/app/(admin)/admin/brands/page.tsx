@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
+import React, { useState } from "react";
 import {
   Tag,
   Plus,
@@ -10,31 +9,29 @@ import {
   Edit,
   Trash2,
   ExternalLink,
-  CheckCircle2,
-  XCircle,
   X,
-  Layers,
-  Sparkles,
   Loader2,
-  Image as ImageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import { brandApi, getApiErrorMessage } from "@/services/api";
+  useGetBrandsQuery,
+  useCreateBrandMutation,
+  useUpdateBrandMutation,
+  useDeleteBrandMutation,
+} from "@/redux";
+import { getApiErrorMessage } from "@/services/api";
 import { IBrand, ImageValue } from "@/types";
 import { toast } from "sonner";
 import { ImageUploadField } from "@/components/media/ImageUploadField";
 
 export default function AdminBrandsPage() {
-  const [brands, setBrands] = useState<IBrand[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: brands = [], isLoading: loading, isFetching, refetch } = useGetBrandsQuery(true);
+  const [createBrand] = useCreateBrandMutation();
+  const [updateBrand] = useUpdateBrandMutation();
+  const [deleteBrand] = useDeleteBrandMutation();
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
 
@@ -50,24 +47,6 @@ export default function AdminBrandsPage() {
   const [formIsActive, setFormIsActive] = useState(true);
   const [formLogo, setFormLogo] = useState<ImageValue | null>(null);
   const [formSubmitting, setFormSubmitting] = useState(false);
-
-  // Load brands from backend
-  const loadBrands = async () => {
-    try {
-      setLoading(true);
-      const data = await brandApi.getAll(true);
-      setBrands(data);
-    } catch (err: unknown) {
-      console.error("Failed to load brands:", err);
-      toast.error(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadBrands();
-  }, []);
 
   // Open Create Modal
   const handleOpenCreate = () => {
@@ -108,7 +87,7 @@ export default function AdminBrandsPage() {
   const handleSaveBrand = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim()) {
-      alert("Brand name is required");
+      toast.error("Brand name is required");
       return;
     }
 
@@ -124,19 +103,14 @@ export default function AdminBrandsPage() {
       };
 
       if (modalMode === "create") {
-        const created = await brandApi.create(payload);
-        setBrands((prev) => [created, ...prev]);
+        await createBrand(payload).unwrap();
+        toast.success("Brand created successfully!");
       } else if (editingBrand) {
-        const updated = await brandApi.update(editingBrand.id, payload);
-        setBrands((prev) =>
-          prev.map((b) => (b.id === editingBrand.id ? { ...b, ...updated } : b))
-        );
+        await updateBrand({ id: editingBrand.id, body: payload }).unwrap();
+        toast.success("Brand updated successfully!");
       }
 
       setIsModalOpen(false);
-      toast.success(modalMode === "create" ? "Brand created successfully!" : "Brand updated successfully!");
-      // Reload to ensure populated relations
-      loadBrands();
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
     } finally {
@@ -149,8 +123,7 @@ export default function AdminBrandsPage() {
     if (!confirm(`Are you sure you want to delete brand "${brand.name}"?`)) return;
 
     try {
-      await brandApi.delete(brand.id);
-      setBrands((prev) => prev.filter((b) => b.id !== brand.id));
+      await deleteBrand(brand.id).unwrap();
       toast.success(`Brand "${brand.name}" removed successfully.`);
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
@@ -190,11 +163,11 @@ export default function AdminBrandsPage() {
           <Button
             size="sm"
             variant="outline"
-            onClick={loadBrands}
-            disabled={loading}
+            onClick={() => refetch()}
+            disabled={loading || isFetching}
             className="text-xs gap-1.5"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-sky-400" : ""}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin text-sky-400" : ""}`} />
             <span>Refresh</span>
           </Button>
 

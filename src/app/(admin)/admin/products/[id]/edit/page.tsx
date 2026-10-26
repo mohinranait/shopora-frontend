@@ -1,35 +1,23 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from "react";
+import React, { Suspense } from "react";
 import { useParams } from "next/navigation";
 import { ProductForm } from "@/components/admin/ProductForm";
-import { productApi, getApiErrorMessage } from "@/services/api";
-import { IProductItem } from "@/types";
+import { useGetProductByIdQuery } from "@/redux";
 import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
 
 function EditProductInner() {
   const params = useParams();
   const id = params?.id as string;
-  const [product, setProduct] = useState<IProductItem | null>(null);
-  const [loading, setLoading] = useState(true);
+  const numId = Number(id);
 
-  useEffect(() => {
-    if (!id) return;
-    const loadProduct = async () => {
-      try {
-        setLoading(true);
-        const data = await productApi.getById(Number(id));
-        setProduct(data);
-      } catch (err: unknown) {
-        toast.error(getApiErrorMessage(err));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProduct();
-  }, [id]);
+  const {
+    data: product,
+    isLoading: loading,
+    isError,
+  } = useGetProductByIdQuery(numId, {
+    skip: !numId || isNaN(numId),
+  });
 
   if (loading) {
     return (
@@ -40,7 +28,7 @@ function EditProductInner() {
     );
   }
 
-  if (!product) {
+  if (isError || !product) {
     return (
       <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
         <p className="text-sm font-bold text-white">Product not found</p>

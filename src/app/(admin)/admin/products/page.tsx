@@ -1,19 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   Package,
   Plus,
   Search,
-  Filter,
+
   CheckCircle2,
   XCircle,
-  Eye,
+
   Edit,
   Trash2,
   Store,
-  Tag,
+
   AlertTriangle,
   RefreshCw,
   Loader2,
@@ -25,46 +25,31 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { productApi, getApiErrorMessage } from "@/services/api";
+import {
+  useGetProductsQuery,
+  useReviewProductApprovalMutation,
+  useDeleteProductMutation,
+} from "@/redux";
+import { getApiErrorMessage } from "@/services/api";
 import { IProductItem } from "@/types";
 import { toast } from "sonner";
 
 export default function AdminProductsPage() {
-  const [products, setProducts] = useState<IProductItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading: loading, isFetching, refetch } = useGetProductsQuery({ limit: 50 });
+  const [reviewProductApproval] = useReviewProductApprovalMutation();
+  const [deleteProduct] = useDeleteProductMutation();
+
+  const products = data?.products || [];
   const [activeTab, setActiveTab] = useState<
     "all" | "platform" | "vendor" | "pending" | "low_stock"
   >("all");
   const [search, setSearch] = useState("");
 
-  const loadProducts = async () => {
-    try {
-      setLoading(true);
-      const res = await productApi.getAll({ limit: 50 });
-      setProducts(res.products);
-    } catch (err: unknown) {
-      console.error("Failed to load products:", err);
-      toast.error(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
   const handleApprove = async (id: number) => {
     try {
-      await productApi.reviewApproval(id, "APPROVED");
-      setProducts((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, approvalStatus: "APPROVED" } : p))
-      );
+      await reviewProductApproval({ id, status: "APPROVED" }).unwrap();
       toast.success("Product approved and published successfully.");
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
@@ -75,10 +60,7 @@ export default function AdminProductsPage() {
     const reason = prompt("Enter rejection reason:");
     if (!reason) return;
     try {
-      await productApi.reviewApproval(id, "REJECTED", reason);
-      setProducts((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, approvalStatus: "REJECTED" } : p))
-      );
+      await reviewProductApproval({ id, status: "REJECTED", rejectionReason: reason }).unwrap();
       toast.info("Product marked as rejected.");
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
@@ -88,8 +70,7 @@ export default function AdminProductsPage() {
   const handleDelete = async (prod: IProductItem) => {
     if (!confirm(`Are you sure you want to delete product "${prod.name}"?`)) return;
     try {
-      await productApi.delete(prod.id);
-      setProducts((prev) => prev.filter((p) => p.id !== prod.id));
+      await deleteProduct(prod.id).unwrap();
       toast.success(`Product "${prod.name}" deleted successfully.`);
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
@@ -137,11 +118,11 @@ export default function AdminProductsPage() {
           <Button
             size="sm"
             variant="outline"
-            onClick={loadProducts}
-            disabled={loading}
+            onClick={() => refetch()}
+            disabled={isFetching}
             className="text-xs gap-1.5"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-sky-400" : ""}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin text-sky-400" : ""}`} />
             <span>Refresh</span>
           </Button>
 

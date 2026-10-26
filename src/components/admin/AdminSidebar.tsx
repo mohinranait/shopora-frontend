@@ -129,8 +129,8 @@ const navSections: NavSection[] = [
   {
     title: "Promotions & Marketing",
     items: [
+      { label: "Hero Sliders", href: "/admin/sliders", icon: ImageIcon },
       { label: "Coupons & Discounts", href: "/admin/coupons", icon: TicketPercent },
-      { label: "Banners & Sliders", href: "/admin/banners", icon: ImageIcon },
     ],
   },
   {

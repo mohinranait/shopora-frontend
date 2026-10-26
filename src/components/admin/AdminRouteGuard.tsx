@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from "react";
+import React, { useEffect, Suspense } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Loader2, Sparkles, Lock } from "lucide-react";
@@ -14,7 +14,7 @@ function AdminRouteGuardInner({ children }: AdminRouteGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, isAuthenticated, isLoading } = useAuth();
-  const [authorized, setAuthorized] = useState(false);
+  const isAuthorized = !isLoading && isAuthenticated && user?.role === "ADMIN";
 
   useEffect(() => {
     if (isLoading) return;
@@ -30,16 +30,14 @@ function AdminRouteGuardInner({ children }: AdminRouteGuardProps) {
       router.replace("/admin-login");
       return;
     }
-
-    setAuthorized(true);
   }, [isLoading, isAuthenticated, user, router, pathname]);
 
-  if (isLoading || !authorized) {
+  if (isLoading || !isAuthorized) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-slate-100 select-none">
         <div className="flex flex-col items-center gap-4 max-w-sm text-center">
           <div className="relative">
-            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-brand to-brand-deep flex items-center justify-center text-white shadow-xl shadow-brand/20">
+            <div className="h-14 w-14 rounded-2xl bg-linear-to-br from-brand to-brand-deep flex items-center justify-center text-white shadow-xl shadow-brand/20">
               <Sparkles className="h-7 w-7" />
             </div>
             <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-slate-900 border-2 border-slate-950 flex items-center justify-center text-sky-400">

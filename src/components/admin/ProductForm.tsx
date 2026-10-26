@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -42,19 +42,19 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import {
-  productApi,
-  attributeApi,
-  categoryApi,
-  brandApi,
-  getApiErrorMessage,
-} from "@/services/api";
+  useGetCategoriesQuery,
+  useGetBrandsQuery,
+  useGetAttributesQuery,
+  useGenerateCombinationsMutation,
+  useCreateProductMutation,
+  useUpdateProductMutation,
+} from "@/redux";
+import { getApiErrorMessage } from "@/services/api";
 import {
   IProductItem,
   IAttribute,
   ICategory,
-  IBrand,
   ICreateProductPayload,
-  IUpdateProductPayload,
   IProductVariantInput,
   IProductImageInput,
   IProductSelectedAttributeInput,
@@ -83,12 +83,14 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
   const router = useRouter();
 
   // ==========================================
-  // Global Data Catalogs
+  // Global Data Catalogs (RTK Query Cache)
   // ==========================================
-  const [categories, setCategories] = useState<ICategory[]>([]);
-  const [brands, setBrands] = useState<IBrand[]>([]);
-  const [availableAttributes, setAvailableAttributes] = useState<IAttribute[]>([]);
-  const [dataLoading, setDataLoading] = useState(true);
+  const { data: categories = [], isLoading: isCategoriesLoading } = useGetCategoriesQuery();
+  const { data: brands = [], isLoading: isBrandsLoading } = useGetBrandsQuery(true);
+  const { data: availableAttributes = [] } = useGetAttributesQuery(true);
+  const [generateCombinations, { isLoading: isGenerating }] = useGenerateCombinationsMutation();
+  const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
+  const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
 
   // ==========================================
   // Form State: 1. Core General Info
@@ -148,9 +150,38 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
   // ==========================================
   // Form State: 5. Variable Products (Attributes & Variant Matrix)
   // ==========================================
-  const [selectedAttributeGroups, setSelectedAttributeGroups] = useState<SelectedAttrGroup[]>([]);
-  const [variantRows, setVariantRows] = useState<IProductVariantInput[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedAttributeGroups, setSelectedAttributeGroups] = useState<SelectedAttrGroup[]>(() => {
+    if (!initialData?.selectedAttributes || initialData.selectedAttributes.length === 0) return [];
+    return initialData.selectedAttributes.map((sa) => ({
+      attributeId: sa.attributeId,
+      attributeName: sa.name || `Attribute #${sa.attributeId}`,
+      type: sa.type || "SELECT",
+      selectedValues: sa.values
+        .map((v) => v.attributeValueId)
+        .filter((v): v is number => typeof v === "number"),
+    }));
+  });
+
+  const [variantRows, setVariantRows] = useState<IProductVariantInput[]>(() => {
+    if (!initialData?.variants || initialData.variants.length === 0) return [];
+    return initialData.variants.map((v) => ({
+      id: v.id,
+      title: v.title,
+      sku: v.sku,
+      price: v.price,
+      comparePrice: v.comparePrice,
+      costPrice: v.costPrice,
+      stock: v.stock,
+      lowStockThreshold: v.lowStockThreshold || 5,
+      image: v.image,
+      useMediaId: v.useMediaId,
+      barcode: v.barcode,
+      isDefault: v.isDefault,
+      isActive: v.isActive,
+      attributeValueIds: v.attributeValues?.map((av) => av.attributeValueId) || [],
+      attributes: v.attributes,
+    }));
+  });
 
   // Bulk Edit Inputs
   const [bulkPrice, setBulkPrice] = useState<string>("");
@@ -184,71 +215,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
   const [submitting, setSubmitting] = useState(false);
 
   // ==========================================
-  // 1. Load Categories, Brands, Attributes
-  // ==========================================
-  useEffect(() => {
-    const loadCatalogs = async () => {
-      try {
-        setDataLoading(true);
-        const [cats, brs, attrs] = await Promise.all([
-          categoryApi.getAll(),
-          brandApi.getAll(true),
-          attributeApi.getAll(true),
-        ]);
-        setCategories(cats);
-        setBrands(brs);
-        setAvailableAttributes(attrs);
-
-        // Preload selected attributes and variants if editing
-        if (initialData) {
-          if (initialData.selectedAttributes && initialData.selectedAttributes.length > 0) {
-            const preloadedGroups: SelectedAttrGroup[] = initialData.selectedAttributes.map((sa) => {
-              const matchedAttr = attrs.find((a) => a.id === sa.attributeId);
-              return {
-                attributeId: sa.attributeId,
-                attributeName: sa.name || matchedAttr?.name || `Attribute #${sa.attributeId}`,
-                type: sa.type || matchedAttr?.type || "SELECT",
-                selectedValues: sa.values
-                  .map((v) => v.attributeValueId)
-                  .filter((v): v is number => typeof v === "number"),
-              };
-            });
-            setSelectedAttributeGroups(preloadedGroups);
-          }
-
-          if (initialData.variants && initialData.variants.length > 0) {
-            const preloadedVariants: IProductVariantInput[] = initialData.variants.map((v) => ({
-              id: v.id,
-              title: v.title,
-              sku: v.sku,
-              price: v.price,
-              comparePrice: v.comparePrice,
-              costPrice: v.costPrice,
-              stock: v.stock,
-              lowStockThreshold: v.lowStockThreshold || 5,
-              image: v.image,
-              useMediaId: v.useMediaId,
-              barcode: v.barcode,
-              isDefault: v.isDefault,
-              isActive: v.isActive,
-              attributeValueIds: v.attributeValues?.map((av) => av.attributeValueId) || [],
-              attributes: v.attributes,
-            }));
-            setVariantRows(preloadedVariants);
-          }
-        }
-      } catch (err: unknown) {
-        toast.error(getApiErrorMessage(err));
-      } finally {
-        setDataLoading(false);
-      }
-    };
-
-    loadCatalogs();
-  }, [initialData]);
-
-  // ==========================================
-  // 2. Auto-generate Slug from Product Name
+  // 1. Auto-generate Slug from Product Name
   // ==========================================
   const handleNameChange = (val: string) => {
     setName(val);
@@ -363,13 +330,12 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
     }
 
     try {
-      setIsGenerating(true);
-      const res = await attributeApi.generateCombinations({
+      const res = await generateCombinations({
         attributes: validGroups.map((g) => ({
           attributeId: g.attributeId,
           valueIds: g.selectedValues,
         })),
-      });
+      }).unwrap();
 
       // Calculate master SKU base
       const skuBase = sku.trim() || name.slice(0, 3).toUpperCase().replace(/[^A-Z]/g, "PRD");
@@ -404,8 +370,6 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
       );
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
-    } finally {
-      setIsGenerating(false);
     }
   };
 
@@ -581,13 +545,16 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
       };
 
       if (isEdit && initialData) {
-        await productApi.update(initialData.id, {
-          ...payload,
-          status,
-        });
+        await updateProduct({
+          id: initialData.id,
+          body: {
+            ...payload,
+            status,
+          },
+        }).unwrap();
         toast.success(`Product "${name}" updated successfully!`);
       } else {
-        const created = await productApi.create(payload);
+        const created = await createProduct(payload).unwrap();
         toast.success(`Product "${created.name}" created and published successfully!`);
       }
 
@@ -642,10 +609,10 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
             type="submit"
             variant="brand"
             size="sm"
-            disabled={submitting}
+            disabled={submitting || isCreating || isUpdating}
             className="text-xs gap-1.5 font-bold shadow-md shadow-brand/20 px-4"
           >
-            {submitting ? (
+            {submitting || isCreating || isUpdating ? (
               <>
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 <span>Saving Product...</span>
@@ -1161,6 +1128,22 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
                   className="w-full h-10 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand"
                 />
               </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-3 border-t border-slate-800/60 mt-3">
+              <input
+                type="checkbox"
+                id="trackStockCheckbox"
+                checked={trackStock}
+                onChange={(e) => setTrackStock(e.target.checked)}
+                className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-brand focus:ring-brand"
+              />
+              <label
+                htmlFor="trackStockCheckbox"
+                className="text-xs text-slate-300 font-medium cursor-pointer select-none"
+              >
+                Track inventory stock count automatically
+              </label>
             </div>
           </CardContent>
         </Card>
@@ -1791,10 +1774,10 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
             type="submit"
             variant="brand"
             size="sm"
-            disabled={submitting}
+            disabled={submitting || isCreating || isUpdating}
             className="text-xs gap-1.5 font-bold shadow-lg shadow-brand/20 px-6 h-10"
           >
-            {submitting ? (
+            {submitting || isCreating || isUpdating ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span>Saving...</span>

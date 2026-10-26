@@ -5,3 +5,4 @@ export * from "./category.type";
 export * from "./attribute.type";
 export * from "./product.type";
 export * from "./auth.type";
+export * from "./slider.type";

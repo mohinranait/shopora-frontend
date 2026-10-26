@@ -1,42 +1,57 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
+import React, { useState } from "react";
 import {
   Layers,
   Plus,
-  Search,
   FolderTree,
-  ChevronRight,
-  Package,
   Edit,
   Trash2,
-  ExternalLink,
-  Tag,
   RefreshCw,
   Loader2,
   X,
-  Image as ImageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import { categoryApi, getApiErrorMessage } from "@/services/api";
+  useGetCategoriesQuery,
+  useGetCategoryTreeQuery,
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
+} from "@/redux";
+import { getApiErrorMessage } from "@/services/api";
 import { ICategory, ImageValue } from "@/types";
 import { toast } from "sonner";
 import { ImageUploadField } from "@/components/media/ImageUploadField";
 
 export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState<ICategory[]>([]);
-  const [treeCategories, setTreeCategories] = useState<ICategory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const {
+    data: categories = [],
+    isLoading: isCategoriesLoading,
+    isFetching: isCategoriesFetching,
+    refetch: refetchCategories,
+  } = useGetCategoriesQuery();
+
+  const {
+    data: treeCategories = [],
+    isLoading: isTreeLoading,
+    isFetching: isTreeFetching,
+    refetch: refetchTree,
+  } = useGetCategoryTreeQuery();
+
+  const [createCategory] = useCreateCategoryMutation();
+  const [updateCategory] = useUpdateCategoryMutation();
+  const [deleteCategory] = useDeleteCategoryMutation();
+
+  const loading = isCategoriesLoading || isTreeLoading;
+  const isFetching = isCategoriesFetching || isTreeFetching;
+
+  const handleRefresh = () => {
+    refetchCategories();
+    refetchTree();
+  };
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,28 +66,6 @@ export default function AdminCategoriesPage() {
   const [formIsActive, setFormIsActive] = useState(true);
   const [formImage, setFormImage] = useState<ImageValue | null>(null);
   const [formSubmitting, setFormSubmitting] = useState(false);
-
-  // Load Categories from Backend
-  const loadCategories = async () => {
-    try {
-      setLoading(true);
-      const [allList, tree] = await Promise.all([
-        categoryApi.getAll(),
-        categoryApi.getTree(),
-      ]);
-      setCategories(allList);
-      setTreeCategories(tree);
-    } catch (err: unknown) {
-      console.error("Failed to load categories:", err);
-      toast.error(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadCategories();
-  }, []);
 
   // Open Create Modal
   const handleOpenCreate = (parentId?: number) => {
@@ -115,7 +108,7 @@ export default function AdminCategoriesPage() {
   const handleSaveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim()) {
-      alert("Category name is required");
+      toast.error("Category name is required");
       return;
     }
 
@@ -132,14 +125,14 @@ export default function AdminCategoriesPage() {
       };
 
       if (modalMode === "create") {
-        await categoryApi.create(payload);
+        await createCategory(payload).unwrap();
+        toast.success("Category created successfully!");
       } else if (editingCategory) {
-        await categoryApi.update(editingCategory.id, payload);
+        await updateCategory({ id: editingCategory.id, body: payload }).unwrap();
+        toast.success("Category updated successfully!");
       }
 
       setIsModalOpen(false);
-      toast.success(modalMode === "create" ? "Category created successfully!" : "Category updated successfully!");
-      loadCategories();
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
     } finally {
@@ -152,9 +145,8 @@ export default function AdminCategoriesPage() {
     if (!confirm(`Are you sure you want to delete category "${cat.name}"?`)) return;
 
     try {
-      await categoryApi.delete(cat.id);
+      await deleteCategory(cat.id).unwrap();
       toast.success(`Category "${cat.name}" removed successfully.`);
-      loadCategories();
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
     }
@@ -182,11 +174,11 @@ export default function AdminCategoriesPage() {
           <Button
             size="sm"
             variant="outline"
-            onClick={loadCategories}
-            disabled={loading}
+            onClick={handleRefresh}
+            disabled={loading || isFetching}
             className="text-xs gap-1.5"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-sky-400" : ""}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin text-sky-400" : ""}`} />
             <span>Refresh</span>
           </Button>
 

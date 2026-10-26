@@ -23,4 +23,4 @@ export interface ICreateBrandPayload {
   isActive?: boolean;
 }
 
-export interface IUpdateBrandPayload extends Partial<ICreateBrandPayload> {}
+export type IUpdateBrandPayload = Partial<ICreateBrandPayload>;
