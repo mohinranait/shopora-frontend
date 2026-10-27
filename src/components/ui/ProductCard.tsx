@@ -66,7 +66,43 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       return;
     }
     setIsAdding(true);
-    const ok = await addItem({ productId: product.id, quantity: 1, name: product.name });
+    const mainImg =
+      "images" in product && Array.isArray(product.images) && product.images.length > 0
+        ? typeof product.images[0] === "string"
+          ? product.images[0]
+          : ((product.images[0] as { url?: string })?.url || "")
+        : "mainImage" in product
+        ? ((product as { mainImage?: string }).mainImage || "")
+        : "";
+
+    const ok = await addItem({
+      productId: product.id,
+      quantity: 1,
+      name: product.name,
+      product: {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        mainImage: mainImg,
+        basePrice: product.basePrice,
+        stock: product.stock,
+        isPlatformOwned: false,
+        isFreeShipping: "isFreeShipping" in product ? Boolean(product.isFreeShipping) : false,
+      },
+      seller:
+        "seller" in product && product.seller
+          ? {
+              id: (product.seller as { id: number; storeName: string; storeSlug: string }).id,
+              storeName: (product.seller as { id: number; storeName: string; storeSlug: string }).storeName,
+              storeSlug: (product.seller as { id: number; storeName: string; storeSlug: string }).storeSlug,
+              storeLogo: null,
+              isVerified: true,
+            }
+          : null,
+      unitPrice: product.basePrice,
+      comparePrice: product.comparePrice,
+      maxAvailableStock: product.stock,
+    });
     setIsAdding(false);
     if (ok) {
       setIsAdded(true);

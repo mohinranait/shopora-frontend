@@ -10,3 +10,6 @@ export * from "./api/mediaApi";
 export * from "./api/authApi";
 export * from "./api/sliderApi";
 export * from "./api/orderApi";
+export * from "./api/customerApi";
+export * from "./api/settingsApi";
+export * from "./slices/cartSlice";

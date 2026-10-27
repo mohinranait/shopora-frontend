@@ -129,7 +129,7 @@ const inputClass = (hasError?: boolean) =>
 export default function CheckoutPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
-  const { items, subtotal, totalItems, status, refresh } = useCart();
+  const { items, subtotal, totalItems, status, refresh, clear } = useCart();
   const { quote, loading, couponCode, couponRejected, applyCoupon, removeCoupon, lines } = useOrderQuote(items);
   const [submitting, setSubmitting] = useState(false);
   const [placed, setPlaced] = useState(false);
@@ -199,7 +199,7 @@ export default function CheckoutPage() {
         couponCode: quote?.coupon?.code,
         notes: values.notes || undefined,
         guestEmail: !isAuthenticated && values.email ? values.email : undefined,
-        guestPhone: !isAuthenticated ? values.phone : undefined,
+        guestPhone: values.phone,
       });
 
       try {
@@ -222,8 +222,8 @@ export default function CheckoutPage() {
 
       setPlaced(true);
       removeCoupon();
+      await clear();
       router.replace(`/checkout/success?order=${encodeURIComponent(order.orderNumber)}`);
-      void refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Couldn't place your order");
       void refresh();

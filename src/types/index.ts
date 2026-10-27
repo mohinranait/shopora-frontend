@@ -9,3 +9,5 @@ export * from "./slider.type";
 export * from "./review.type";
 export * from "./cart.type";
 export * from "./order.type";
+export * from "./customer.type";
+export * from "./settings.type";

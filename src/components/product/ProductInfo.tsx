@@ -114,9 +114,52 @@ export function ProductInfo({
       return false;
     }
     const title = activeVariant ? `${product.name} (${activeVariant.title})` : product.name;
+    const mainImg =
+      activeVariant?.image ||
+      product.mainImage ||
+      (product.images && product.images.length > 0 ? product.images[0].url : "");
+
     setIsAdding(true);
     const ok = await addItem(
-      { productId: product.id, variantId: activeVariant?.id ?? null, quantity, name: title },
+      {
+        productId: product.id,
+        variantId: activeVariant?.id ?? null,
+        quantity,
+        name: title,
+        product: {
+          id: product.id,
+          name: product.name,
+          slug: product.slug,
+          mainImage: mainImg,
+          basePrice: product.basePrice,
+          stock: product.stock,
+          isPlatformOwned: product.isPlatformOwned,
+          isFreeShipping: Boolean(product.isFreeShipping),
+        },
+        variant: activeVariant
+          ? {
+              id: activeVariant.id ?? 0,
+              title: activeVariant.title,
+              sku: activeVariant.sku,
+              price: activeVariant.price,
+              stock: activeVariant.stock,
+              image: activeVariant.image || null,
+              attributes: activeVariant.attributes || null,
+            }
+          : null,
+        seller: product.seller
+          ? {
+              id: product.seller.id,
+              storeName: product.seller.storeName,
+              storeSlug: product.seller.storeSlug,
+              storeLogo: null,
+              isVerified: true,
+            }
+          : null,
+        unitPrice: currentPrice,
+        comparePrice: currentComparePrice,
+        maxAvailableStock: currentStock,
+      },
       options
     );
     setIsAdding(false);
