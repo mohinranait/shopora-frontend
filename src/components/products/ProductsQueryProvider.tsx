@@ -17,9 +17,12 @@ const ProductsQueryContext = createContext<ProductsQueryContextValue | null>(nul
 
 export function ProductsQueryProvider({
   query: serverQuery,
+  basePath = "/products",
   children,
 }: {
   query: ProductQuery;
+  /** Route the filters live on, e.g. "/products" or "/vendors/<slug>" */
+  basePath?: string;
   children: React.ReactNode;
 }) {
   const router = useRouter();
@@ -30,13 +33,13 @@ export function ProductsQueryProvider({
     (next: ProductQuery, scrollToResults: boolean) => {
       startTransition(() => {
         setOptimisticQuery(next);
-        router.push(productsHref(next), { scroll: false });
+        router.push(productsHref(next, basePath), { scroll: false });
       });
       if (scrollToResults) {
         document.getElementById("products-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     },
-    [router, setOptimisticQuery]
+    [router, setOptimisticQuery, basePath]
   );
 
   const update = useCallback(

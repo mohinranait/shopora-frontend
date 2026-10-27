@@ -17,6 +17,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
 import { IProductItem, IProductVariantItem } from "@/types";
 
 interface ProductInfoProps {
@@ -34,6 +36,9 @@ export function ProductInfo({
 }: ProductInfoProps) {
   const [quantity, setQuantity] = useState<number>(1);
   const [isAdding, setIsAdding] = useState<boolean>(false);
+  const { addItem } = useCart();
+  const router = useRouter();
+  const needsVariant = product.productType === "VARIABLE" && (product.variants?.length ?? 0) > 0;
 
   // Current pricing & stock based on active variant or base product
   const currentPrice = activeVariant ? activeVariant.price : product.basePrice;
@@ -99,27 +104,31 @@ export function ProductInfo({
     });
   };
 
-  const handleAddToCart = () => {
+  const addCurrentToCart = async (options: { openDrawer?: boolean; silent?: boolean } = {}) => {
     if (isOutOfStock) {
       toast.error("This item is currently out of stock");
-      return;
+      return false;
     }
-    setIsAdding(true);
-    setTimeout(() => {
-      setIsAdding(false);
-      const title = activeVariant ? `${product.name} (${activeVariant.title})` : product.name;
-      toast.success(`Added ${quantity}x "${title}" to your cart!`);
-    }, 600);
-  };
-
-  const handleBuyNow = () => {
-    if (isOutOfStock) {
-      toast.error("This item is currently out of stock");
-      return;
+    if (needsVariant && !activeVariant) {
+      toast.error("Please choose an option first");
+      return false;
     }
     const title = activeVariant ? `${product.name} (${activeVariant.title})` : product.name;
-    toast.success(`Proceeding to checkout with ${quantity}x "${title}"`);
-    // Router push to checkout will connect here
+    setIsAdding(true);
+    const ok = await addItem(
+      { productId: product.id, variantId: activeVariant?.id ?? null, quantity, name: title },
+      options
+    );
+    setIsAdding(false);
+    return ok;
+  };
+
+  const handleAddToCart = () => {
+    void addCurrentToCart({ openDrawer: true, silent: true });
+  };
+
+  const handleBuyNow = async () => {
+    if (await addCurrentToCart({ silent: true })) router.push("/checkout");
   };
 
   return (

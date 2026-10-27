@@ -3,7 +3,10 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Star, ShoppingBag, Heart, Check, Store } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import type { IProductItem, IMockProduct } from "@/types";
+import { useCart } from "@/context/CartContext";
 
 export type ProductCardData = IProductItem | IMockProduct;
 
@@ -49,11 +52,26 @@ export function ProductCardSkeleton() {
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const { addItem } = useCart();
+  const router = useRouter();
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  // Variable products need an option (size, colour…) picked on the product page
+  const needsOptions = "productType" in product && product.productType === "VARIABLE";
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 1500);
+    if (needsOptions) {
+      router.push(`/products/${product.slug}`);
+      return;
+    }
+    setIsAdding(true);
+    const ok = await addItem({ productId: product.id, quantity: 1, name: product.name });
+    setIsAdding(false);
+    if (ok) {
+      setIsAdded(true);
+      setTimeout(() => setIsAdded(false), 1500);
+    }
   };
 
   // Safe pricing calculations
@@ -234,7 +252,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {/* Add to Cart Button */}
           <button
             type="button"
-            disabled={!inStock}
+            disabled={!inStock || isAdding}
             onClick={handleAddToCart}
             className={`w-full flex items-center justify-center gap-1.5 rounded-lg py-2 px-3 text-xs font-semibold transition-all shadow-2xs ${
               !inStock
@@ -246,6 +264,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           >
             {!inStock ? (
               "Out of Stock"
+            ) : isAdding ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Adding…
+              </>
+            ) : needsOptions ? (
+              "Choose options"
             ) : isAdded ? (
               <>
                 <Check className="h-3.5 w-3.5" /> Added to Cart!

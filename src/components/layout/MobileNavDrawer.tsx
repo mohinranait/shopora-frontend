@@ -226,6 +226,18 @@ export function MobileNavDrawer({ isOpen, onClose }: MobileNavDrawerProps) {
               </Link>
 
               <Link
+                href="/vendors"
+                onClick={onClose}
+                className="flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-100 transition"
+              >
+                <span className="flex items-center gap-3">
+                  <Store className="h-4.5 w-4.5 text-emerald-600" />
+                  <span>Vendors</span>
+                </span>
+                <ChevronRight className="h-4 w-4 text-slate-400" />
+              </Link>
+
+              <Link
                 href="/products?sort=hot"
                 onClick={onClose}
                 className="flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-100 transition"

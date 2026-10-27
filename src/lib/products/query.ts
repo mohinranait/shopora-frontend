@@ -97,14 +97,18 @@ export function toSearchParams(q: ProductQuery, { includePage = true } = {}): UR
   return params;
 }
 
-export function productsHref(q: ProductQuery): string {
+export function productsHref(q: ProductQuery, basePath = "/products"): string {
   const qs = toSearchParams(q).toString();
-  return qs ? `/products?${qs}` : "/products";
+  return qs ? `${basePath}?${qs}` : basePath;
 }
 
 /** Query string for the backend API (its param names differ slightly). */
-export function toApiQueryString(q: ProductQuery, { forFacets = false } = {}): string {
+export function toApiQueryString(
+  q: ProductQuery,
+  { forFacets = false, sellerId }: { forFacets?: boolean; sellerId?: number } = {}
+): string {
   const params = new URLSearchParams();
+  if (sellerId != null) params.set("sellerId", String(sellerId));
   if (q.search) params.set("search", q.search);
   if (q.category) params.set("category", q.category);
   if (q.brands.length) params.set("brand", q.brands.join(","));

@@ -7,3 +7,4 @@ export * from "./product.type";
 export * from "./auth.type";
 export * from "./slider.type";
 export * from "./review.type";
+export * from "./cart.type";

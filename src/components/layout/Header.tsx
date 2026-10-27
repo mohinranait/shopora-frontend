@@ -25,13 +25,15 @@ import {
 import { CartDrawer } from "../cart/CartDrawer";
 import { MobileNavDrawer } from "./MobileNavDrawer";
 import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
 
 export const Header: React.FC = () => {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const { totalItems, subtotal, isDrawerOpen, openDrawer, closeDrawer } = useCart();
+  const cartBadge = totalItems > 99 ? "99+" : String(totalItems);
   const [searchQuery, setSearchQuery] = useState("");
   const [isAccountOpen, setIsAccountOpen] = useState(false);
 
@@ -148,19 +150,21 @@ export const Header: React.FC = () => {
             {/* Cart Button */}
             <button
               type="button"
-              onClick={() => setIsCartOpen(true)}
+              onClick={openDrawer}
               className="relative flex items-center gap-2.5 rounded-md border border-slate-200 px-3 py-2 text-slate-700 hover:border-brand hover:text-brand-deep hover:bg-sky-50/50 transition group cursor-pointer"
               title="Shopping Cart"
             >
               <div className="relative">
                 <ShoppingBag className="h-5 w-5 text-brand group-hover:scale-110 transition" />
-                <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-brand-deep text-[10px] font-bold text-white shadow-2xs">
-                  2
-                </span>
+                {totalItems > 0 && (
+                  <span className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-deep px-1 text-[10px] font-bold text-white shadow-2xs">
+                    {cartBadge}
+                  </span>
+                )}
               </div>
               <div className="text-left hidden lg:block">
                 <p className="text-[10px] uppercase font-semibold text-slate-400 leading-none">Cart</p>
-                <p className="text-xs font-extrabold text-slate-900 leading-tight">৳7,798</p>
+                <p className="text-xs font-extrabold text-slate-900 leading-tight">৳{Math.round(subtotal).toLocaleString("en-US")}</p>
               </div>
             </button>
 
@@ -294,14 +298,16 @@ export const Header: React.FC = () => {
           <div className="ml-auto flex items-center gap-2 md:hidden">
             <button
               type="button"
-              onClick={() => setIsCartOpen(true)}
+              onClick={openDrawer}
               className="relative p-2 text-slate-700 hover:bg-slate-100 rounded-md cursor-pointer"
               aria-label="Open cart"
             >
               <ShoppingBag className="h-5 w-5 text-brand" />
-              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-deep text-[10px] font-bold text-white">
-                2
-              </span>
+              {totalItems > 0 && (
+                <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-deep px-1 text-[10px] font-bold text-white">
+                  {cartBadge}
+                </span>
+              )}
             </button>
 
             {/* Hamburger Icon Button to open Mobile Drawer */}
@@ -333,6 +339,14 @@ export const Header: React.FC = () => {
             >
               <FolderTree className="h-4 w-4 text-slate-400 group-hover:text-brand transition" />
               All Categories
+            </Link>
+
+            <Link
+              href="/vendors"
+              className="group inline-flex shrink-0 items-center gap-2 border-b-2 border-transparent px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-brand hover:text-brand-deep"
+            >
+              <Store className="h-4 w-4 text-slate-400 group-hover:text-brand transition" />
+              Vendors
             </Link>
 
             <Link
@@ -397,7 +411,7 @@ export const Header: React.FC = () => {
       />
 
       {/* Slide-over Cart Drawer */}
-      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <CartDrawer isOpen={isDrawerOpen} onClose={closeDrawer} />
     </>
   );
 };
