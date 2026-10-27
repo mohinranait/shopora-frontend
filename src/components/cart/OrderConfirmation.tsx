@@ -2,7 +2,8 @@
 
 import React, { useSyncExternalStore } from "react";
 import Link from "next/link";
-import { CheckCircle2, Copy, MapPin, Package, Phone, ShoppingBag } from "lucide-react";
+import { CheckCircle2, Copy, MapPin, Package, PackageSearch, Phone, ShoppingBag } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { formatTaka } from "./CartParts";
 
@@ -34,6 +35,7 @@ const readStored = () => {
 };
 
 export function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
+  const { isAuthenticated } = useAuth();
   const raw = useSyncExternalStore(subscribe, readStored, () => null);
   let order: StoredOrder | null = null;
   try {
@@ -58,7 +60,7 @@ export function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
         </div>
         <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">Thank you! Your order is placed.</h1>
         <p className="mt-2 text-sm text-slate-500">
-          We&apos;ve received your order and our sellers are getting it ready. You&apos;ll get updates by SMS.
+          We&apos;ve received your order and our sellers are getting it ready. Pay in cash when it arrives.
         </p>
       </div>
 
@@ -147,17 +149,19 @@ export function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
       </div>
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+        {orderNumber && (
+          <Link
+            href={isAuthenticated ? `/orders/${encodeURIComponent(orderNumber)}` : `/track-order?order=${encodeURIComponent(orderNumber)}`}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-deep px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand"
+          >
+            <PackageSearch className="h-4 w-4" /> {isAuthenticated ? "View order" : "Track order"}
+          </Link>
+        )}
         <Link
           href="/products"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-deep px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand"
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300"
         >
           <ShoppingBag className="h-4 w-4" /> Continue shopping
-        </Link>
-        <Link
-          href="/"
-          className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300"
-        >
-          Back to home
         </Link>
       </div>
     </div>

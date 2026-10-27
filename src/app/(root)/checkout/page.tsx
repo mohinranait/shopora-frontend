@@ -355,20 +355,33 @@ export default function CheckoutPage() {
             <div className="grid gap-3" role="radiogroup">
               {PAYMENT_OPTIONS.map((opt) => {
                 const selected = paymentMethod === opt.value;
+                // The server decides which methods are live (COD for now)
+                const enabled = (quote?.paymentMethods ?? ["COD"]).includes(opt.value);
                 return (
                   <label
                     key={opt.value}
-                    className={`flex cursor-pointer items-center gap-4 rounded-2xl border p-4 transition ${
-                      selected ? "border-brand bg-brand-light/60 ring-2 ring-brand/20" : "border-slate-200 hover:border-slate-300"
+                    className={`flex items-center gap-4 rounded-2xl border p-4 transition ${
+                      !enabled
+                        ? "cursor-not-allowed border-slate-200 bg-slate-50 opacity-60"
+                        : selected
+                          ? "cursor-pointer border-brand bg-brand-light/60 ring-2 ring-brand/20"
+                          : "cursor-pointer border-slate-200 hover:border-slate-300"
                     }`}
                   >
-                    <input type="radio" value={opt.value} {...register("paymentMethod")} className="sr-only" />
+                    <input type="radio" value={opt.value} disabled={!enabled} {...register("paymentMethod")} className="sr-only" />
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white ring-1 ring-slate-200">
                       {opt.icon}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold text-slate-900">{opt.label}</span>
-                      <span className="block text-xs text-slate-500">{opt.hint}</span>
+                      <span className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                        {opt.label}
+                        {!enabled && (
+                          <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600">
+                            Coming soon
+                          </span>
+                        )}
+                      </span>
+                      <span className="block text-xs text-slate-500">{enabled ? opt.hint : "Available soon"}</span>
                     </span>
                     <span
                       className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${

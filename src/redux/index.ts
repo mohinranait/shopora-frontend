@@ -9,3 +9,4 @@ export * from "./api/attributeApi";
 export * from "./api/mediaApi";
 export * from "./api/authApi";
 export * from "./api/sliderApi";
+export * from "./api/orderApi";

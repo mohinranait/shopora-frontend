@@ -55,6 +55,8 @@ export interface IOrderQuote {
   couponMessage: string | null;
   issues: { productId: number; variantId: number | null; message: string }[];
   itemCount: number;
+  /** Payment methods currently enabled for checkout */
+  paymentMethods?: string[];
 }
 
 export interface ICheckoutAddress {

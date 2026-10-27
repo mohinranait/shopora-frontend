@@ -3,7 +3,7 @@
  * `x-session-id`; logged-in users by their bearer token (the backend merges a
  * guest cart into the user's cart on the first request after login).
  */
-import type { ICart, ICheckoutPayload, IOrderQuote, IPlacedOrder } from "@/types";
+import type { ICart, ICheckoutPayload, IOrder, IOrderQuote, IPaginationMeta, IPlacedOrder } from "@/types";
 
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1").replace(/\/+$/, "");
 const SESSION_KEY = "shopora_cart_session";
@@ -32,7 +32,8 @@ export class CartApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+/** Authenticated (or guest-session) JSON request to the API; returns `data` */
+export async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   headers.set("x-session-id", getCartSessionId());
   if (init.body) headers.set("Content-Type", "application/json");
@@ -75,4 +76,37 @@ export const cartApi = {
     }),
   checkout: (payload: ICheckoutPayload) =>
     request<IPlacedOrder>("/orders/checkout", { method: "POST", body: JSON.stringify(payload) }),
+};
+
+async function requestWithMeta<T>(path: string): Promise<{ data: T; meta?: IPaginationMeta }> {
+  const headers = new Headers({ "x-session-id": getCartSessionId() });
+  try {
+    const token = localStorage.getItem("shopora_token");
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+  } catch {
+    // storage unavailable
+  }
+  const res = await fetch(`${API_BASE_URL}${path}`, { headers }).catch(() => {
+    throw new CartApiError("Network error. Please check your connection.", 0);
+  });
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw new CartApiError(json?.message || `Request failed (${res.status})`, res.status);
+  return { data: json?.data as T, meta: json?.meta };
+}
+
+export const ordersApi = {
+  mine: (params: { status?: string; page?: number } = {}) => {
+    const qs = new URLSearchParams({ page: String(params.page ?? 1), limit: "10" });
+    if (params.status) qs.set("status", params.status);
+    return requestWithMeta<IOrder[]>(`/orders/my-orders?${qs}`);
+  },
+  detail: (orderNumber: string, phone?: string) =>
+    request<IOrder>(
+      `/orders/detail/${encodeURIComponent(orderNumber)}${phone ? `?phone=${encodeURIComponent(phone)}` : ""}`
+    ),
+  cancel: (orderNumber: string, body: { reason?: string; phone?: string }) =>
+    request<IOrder>(`/orders/${encodeURIComponent(orderNumber)}/cancel`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
 };
