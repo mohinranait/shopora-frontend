@@ -12,4 +12,6 @@ export * from "./api/sliderApi";
 export * from "./api/orderApi";
 export * from "./api/customerApi";
 export * from "./api/settingsApi";
+export * from "./api/sellerApi";
+export * from "./api/payoutApi";
 export * from "./slices/cartSlice";

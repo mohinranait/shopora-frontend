@@ -22,6 +22,7 @@ import {
   PackageCheck,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useIsClient } from "@/hooks/useIsClient";
 
 interface MobileNavDrawerProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ interface MobileNavDrawerProps {
 }
 
 export function MobileNavDrawer({ isOpen, onClose }: MobileNavDrawerProps) {
+  const isClient = useIsClient();
   const { user, isAuthenticated, logout } = useAuth();
 
   // Prevent background scrolling without layout shift
@@ -66,6 +68,8 @@ export function MobileNavDrawer({ isOpen, onClose }: MobileNavDrawerProps) {
     }
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
+
+  if (!isClient) return null;
 
   return (
     <div

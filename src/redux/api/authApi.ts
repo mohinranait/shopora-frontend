@@ -2,6 +2,7 @@ import { baseApi } from "./baseApi";
 import {
   IAuthUser,
   ILoginResponse,
+  IRegisterSellerResponse,
   ILoginPayload,
   IRegisterCustomerPayload,
   IRegisterSellerPayload,
@@ -30,13 +31,13 @@ export const authApiSlice = baseApi.injectEndpoints({
       invalidatesTags: ["Auth"],
     }),
 
-    registerSeller: builder.mutation<ILoginResponse, IRegisterSellerPayload>({
+    registerSeller: builder.mutation<IRegisterSellerResponse, IRegisterSellerPayload>({
       query: (body) => ({
         url: "/auth/register/seller",
         method: "POST",
         body,
       }),
-      transformResponse: (res: IApiResponse<ILoginResponse>) => res.data,
+      transformResponse: (res: IApiResponse<IRegisterSellerResponse>) => res.data,
       invalidatesTags: ["Auth"],
     }),
 

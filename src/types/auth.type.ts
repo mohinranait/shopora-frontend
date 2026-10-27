@@ -19,6 +19,24 @@ export interface ILoginResponse {
   user: IAuthUser;
   accessToken: string;
   refreshToken?: string;
+  seller?: {
+    id: number;
+    storeName: string;
+    storeSlug: string;
+    status: string;
+  };
+}
+
+export interface IRegisterSellerResponse {
+  user: IAuthUser;
+  seller: {
+    id: number;
+    storeName: string;
+    storeSlug: string;
+    status: string;
+  };
+  accessToken: string;
+  refreshToken?: string;
 }
 
 export interface ILoginPayload {
@@ -43,5 +61,8 @@ export interface IRegisterSellerPayload {
   storeDescription?: string;
   taxNumber?: string;
   nidOrTradeLicense?: string;
+  bankName?: string;
+  bankAccountNumber?: string;
+  bankRouting?: string;
   bkashOrNagad?: string;
 }

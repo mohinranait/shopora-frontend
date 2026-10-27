@@ -4,6 +4,8 @@ import React, { useEffect } from "react";
 import Link from "next/link";
 import { X, ShoppingBag, ArrowRight, Loader2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useIsClient } from "@/hooks/useIsClient";
+import { useGetWebsiteSettingsQuery } from "@/redux";
 import {
   CartItemImage,
   FreeShippingProgress,
@@ -20,7 +22,9 @@ interface CartDrawerProps {
 }
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
+  const isClient = useIsClient();
   const { items, subtotal, totalItems, status } = useCart();
+  const { data: settings } = useGetWebsiteSettingsQuery(undefined, { skip: !isOpen });
   const shipping = estimateShipping(subtotal, items);
   const hasUnavailable = items.some((i) => !i.isAvailable || !i.inStock);
 
@@ -54,6 +58,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
+  if (!isClient) return null;
   return (
     <div
       className={`fixed inset-0 z-50 ${isOpen ? "pointer-events-auto" : "pointer-events-none"}`}
@@ -98,7 +103,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
         {items.length > 0 && (
           <div className="border-b border-slate-100 px-5 py-3">
-            <FreeShippingProgress subtotal={subtotal} compact />
+            <FreeShippingProgress subtotal={subtotal} compact threshold={settings?.free_shipping_threshold} enabled={settings?.enable_free_shipping_promo !== false} />
           </div>
         )}
 

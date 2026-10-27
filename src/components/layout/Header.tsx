@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -26,6 +26,8 @@ import { CartDrawer } from "../cart/CartDrawer";
 import { MobileNavDrawer } from "./MobileNavDrawer";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
+import { useGetWebsiteSettingsQuery } from "@/redux";
+import { useIsClient } from "@/hooks/useIsClient";
 
 export const Header: React.FC = () => {
   const router = useRouter();
@@ -33,6 +35,8 @@ export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { totalItems, subtotal, isDrawerOpen, openDrawer, closeDrawer } = useCart();
+  const isClient = useIsClient();
+  const { data: settings } = useGetWebsiteSettingsQuery(undefined, { skip: !isClient });
   const cartBadge = totalItems > 99 ? "99+" : String(totalItems);
   const [searchQuery, setSearchQuery] = useState("");
   const [isAccountOpen, setIsAccountOpen] = useState(false);
@@ -77,11 +81,11 @@ export const Header: React.FC = () => {
             </Link>
             <span className="text-slate-700">|</span>
             <a
-              href="tel:09648500500"
+              href={`tel:${settings?.contact_phone || "09648500500"}`}
               className="flex items-center gap-1 hover:text-white transition font-medium"
             >
               <Headphones className="h-3 w-3 text-sky-400" />
-              09648-500500
+              <span suppressHydrationWarning>{settings?.contact_phone || "09648-500500"}</span>
             </a>
           </div>
         </div>
@@ -99,15 +103,23 @@ export const Header: React.FC = () => {
         <div className="max-w-7xl mx-auto flex h-16 items-center gap-4 px-4 sm:px-6 lg:px-8">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0 group">
-            <div className="h-9 w-9 rounded-lg bg-gradient-to-tr from-brand-deep to-brand flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
-              <ShoppingBag className="h-5 w-5" />
-            </div>
+            {settings?.site_logo && settings.site_logo !== "/logo.png" ? (
+              <img
+                src={settings.site_logo}
+                alt={settings?.site_name || "Shopora"}
+                className="h-9 max-w-[140px] object-contain group-hover:scale-105 transition-transform"
+              />
+            ) : (
+              <div className="h-9 w-9 rounded-lg bg-gradient-to-tr from-brand-deep to-brand flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
+                <ShoppingBag className="h-5 w-5" />
+              </div>
+            )}
             <div className="flex flex-col">
               <span className="text-xl font-extrabold tracking-tight text-slate-900 group-hover:text-brand transition leading-none">
-                Shopora<span className="text-brand">.</span>
+                {settings?.site_name || "Shopora"}<span className="text-brand">.</span>
               </span>
               <span className="text-[10px] tracking-wider uppercase font-semibold text-slate-400">
-                Marketplace
+                {settings?.site_tagline || "Marketplace"}
               </span>
             </div>
           </Link>
@@ -156,15 +168,15 @@ export const Header: React.FC = () => {
             >
               <div className="relative">
                 <ShoppingBag className="h-5 w-5 text-brand group-hover:scale-110 transition" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-deep px-1 text-[10px] font-bold text-white shadow-2xs">
+                {isClient && totalItems > 0 && (
+                  <span suppressHydrationWarning className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-deep px-1 text-[10px] font-bold text-white shadow-2xs">
                     {cartBadge}
                   </span>
                 )}
               </div>
               <div className="text-left hidden lg:block">
                 <p className="text-[10px] uppercase font-semibold text-slate-400 leading-none">Cart</p>
-                <p className="text-xs font-extrabold text-slate-900 leading-tight">৳{Math.round(subtotal).toLocaleString("en-US")}</p>
+                <p className="text-xs font-extrabold text-slate-900 leading-tight" suppressHydrationWarning>৳{isClient ? Math.round(subtotal).toLocaleString("en-US") : "0"}</p>
               </div>
             </button>
 
@@ -176,8 +188,8 @@ export const Header: React.FC = () => {
                 className="inline-flex items-center gap-1.5 rounded-md bg-brand-deep px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand shadow-xs cursor-pointer"
               >
                 <User className="h-4 w-4" />
-                <span className="max-w-[100px] truncate">
-                  {isAuthenticated && user ? user.name.split(" ")[0] : "Account"}
+                <span className="max-w-[100px] truncate" suppressHydrationWarning>
+                  {isClient && isAuthenticated && user ? user.name.split(" ")[0] : "Account"}
                 </span>
                 <ChevronDown
                   className={`h-3.5 w-3.5 transition-transform duration-200 ${
@@ -303,7 +315,7 @@ export const Header: React.FC = () => {
               aria-label="Open cart"
             >
               <ShoppingBag className="h-5 w-5 text-brand" />
-              {totalItems > 0 && (
+              {isClient && totalItems > 0 && (
                 <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-deep px-1 text-[10px] font-bold text-white">
                   {cartBadge}
                 </span>

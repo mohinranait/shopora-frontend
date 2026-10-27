@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 const AdminRootLayout = ({
   children,
@@ -7,7 +7,7 @@ const AdminRootLayout = ({
 }) => {
   return (
     <>{children}</>
-  )
-}
+  );
+};
 
-export default AdminRootLayout
+export default AdminRootLayout;

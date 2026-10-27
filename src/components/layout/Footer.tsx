@@ -1,4 +1,8 @@
+"use client";
+
 import React from "react";
+import { useGetWebsiteSettingsQuery } from "@/redux";
+import { useIsClient } from "@/hooks/useIsClient";
 import Link from "next/link";
 import {
   ShoppingBag,
@@ -12,6 +16,8 @@ import {
 } from "lucide-react";
 
 export const Footer: React.FC = () => {
+  const isClient = useIsClient();
+  const { data: settings } = useGetWebsiteSettingsQuery(undefined, { skip: !isClient });
   return (
     <footer className="bg-slate-900 text-slate-300 border-t border-slate-800">
       {/* Trust Badges Bar */}
@@ -67,11 +73,19 @@ export const Footer: React.FC = () => {
           {/* Brand Info */}
           <div className="lg:col-span-2">
             <Link href="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="h-9 w-9 rounded-lg bg-brand-deep flex items-center justify-center text-white">
-                <ShoppingBag className="h-5 w-5" />
-              </div>
+              {settings?.site_logo && settings.site_logo !== "/logo.png" ? (
+                <img
+                  src={settings.site_logo}
+                  alt={settings?.site_name || "Shopora"}
+                  className="h-9 max-w-[140px] object-contain"
+                />
+              ) : (
+                <div className="h-9 w-9 rounded-lg bg-brand-deep flex items-center justify-center text-white">
+                  <ShoppingBag className="h-5 w-5" />
+                </div>
+              )}
               <span className="text-2xl font-black text-white tracking-tight">
-                Shopora<span className="text-brand">.</span>
+                {settings?.site_name || "Shopora"}<span className="text-brand">.</span>
               </span>
             </Link>
             <p className="text-sm text-slate-400 max-w-sm leading-relaxed">
@@ -82,15 +96,15 @@ export const Footer: React.FC = () => {
             <div className="mt-6 flex flex-col gap-2.5 text-xs text-slate-400">
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-brand" />
-                <span>Helpline: <strong className="text-white">09648-500500</strong> (9 AM - 10 PM)</span>
+                <span>Helpline: <strong className="text-white" suppressHydrationWarning>{settings?.contact_phone || "09648-500500"}</strong> (9 AM - 10 PM)</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-brand" />
-                <span>Email: support@shopora.com.bd</span>
+                <span>Email: {settings?.contact_email || "support@shopora.com.bd"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-brand" />
-                <span>Gulshan-1, Dhaka-1212, Bangladesh</span>
+                <span>{settings?.contact_address || "Gulshan-1, Dhaka-1212, Bangladesh"}</span>
               </div>
             </div>
           </div>
@@ -195,7 +209,7 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© 2026 Shopora Multi-Vendor Platform. All rights reserved.</p>
+          <p suppressHydrationWarning>© 2026 {settings?.site_name || "Shopora"} Multi-Vendor Platform. All rights reserved.</p>
           <div className="flex items-center gap-3">
             <span className="font-medium text-slate-400">Secured Payments:</span>
             <span className="rounded bg-slate-800 px-2 py-1 text-slate-300 font-semibold">bKash</span>

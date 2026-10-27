@@ -21,6 +21,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { toast } from "sonner";
+import { ImageUploadField } from "@/components/media/ImageUploadField";
 import {
   useGetWebsiteSettingsQuery,
   useUpdateWebsiteSettingsMutation,
@@ -320,55 +321,23 @@ function SettingsFormContent({
                   </div>
                 </div>
 
-                {/* Logo & Favicon URLs with preview */}
+                {/* Logo & Favicon Media Selectors */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold text-slate-300">
-                      Main Logo URL
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={formData.site_logo || ""}
-                        onChange={(e) => handleChange("site_logo", e.target.value)}
-                        className="flex-1 rounded-xl border border-slate-800 bg-slate-800/80 px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition focus:border-brand focus:ring-1 focus:ring-brand"
-                        placeholder="/logo.png or https://..."
-                      />
-                      {formData.site_logo && (
-                        <div className="flex h-10 w-12 items-center justify-center rounded-xl border border-slate-700 bg-slate-800 p-1">
-                          <img
-                            src={formData.site_logo}
-                            alt="Logo preview"
-                            className="max-h-full max-w-full object-contain"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <ImageUploadField
+                    label="Store Brand Logo"
+                    value={formData.site_logo ? { url: formData.site_logo } : null}
+                    onChange={(val) => handleChange("site_logo", val ? val.url : "")}
+                    helperText="Select or upload primary logo from Media Library (PNG/SVG recommended)"
+                    modalTitle="Select Brand Logo Asset"
+                  />
 
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold text-slate-300">
-                      Favicon URL
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={formData.site_favicon || ""}
-                        onChange={(e) => handleChange("site_favicon", e.target.value)}
-                        className="flex-1 rounded-xl border border-slate-800 bg-slate-800/80 px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition focus:border-brand focus:ring-1 focus:ring-brand"
-                        placeholder="/favicon.ico"
-                      />
-                      {formData.site_favicon && (
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-700 bg-slate-800 p-1">
-                          <img
-                            src={formData.site_favicon}
-                            alt="Favicon"
-                            className="h-5 w-5 object-contain"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <ImageUploadField
+                    label="Browser Favicon"
+                    value={formData.site_favicon ? { url: formData.site_favicon } : null}
+                    onChange={(val) => handleChange("site_favicon", val ? val.url : "")}
+                    helperText="Select or upload 32x32 or 64x64 browser tab icon"
+                    modalTitle="Select Favicon Asset"
+                  />
                 </div>
 
                 {/* Contact channels */}

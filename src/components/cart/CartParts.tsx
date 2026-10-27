@@ -113,9 +113,21 @@ export function RemoveButton({ item, label = false }: { item: ICartItem; label?:
   );
 }
 
-export function FreeShippingProgress({ subtotal, compact = false }: { subtotal: number; compact?: boolean }) {
-  const remaining = Math.max(0, SHIPPING_FREE_THRESHOLD - subtotal);
-  const pct = Math.min(100, (subtotal / SHIPPING_FREE_THRESHOLD) * 100);
+export function FreeShippingProgress({
+  subtotal,
+  compact = false,
+  threshold = SHIPPING_FREE_THRESHOLD,
+  enabled = true,
+}: {
+  subtotal: number;
+  compact?: boolean;
+  threshold?: number;
+  enabled?: boolean;
+}) {
+  if (!enabled) return null;
+  const effectiveThreshold = threshold > 0 ? threshold : SHIPPING_FREE_THRESHOLD;
+  const remaining = Math.max(0, effectiveThreshold - subtotal);
+  const pct = Math.min(100, (subtotal / effectiveThreshold) * 100);
   return (
     <div className={compact ? "" : "rounded-2xl border border-sky-100 bg-sky-50/70 p-4"}>
       <p className="flex items-center gap-2 text-xs text-brand-deep">

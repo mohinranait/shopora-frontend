@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useSyncExternalStore, ReactNode } from "react";
+import React, { createContext, useContext, useSyncExternalStore, useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import {
   useLoginMutation,
@@ -24,7 +24,6 @@ interface AuthSnapshot {
 
 const SERVER_SNAPSHOT: AuthSnapshot = { user: null, token: null };
 let currentSnapshot: AuthSnapshot = { user: null, token: null };
-let isInitialized = false;
 
 const listeners = new Set<() => void>();
 
@@ -33,9 +32,12 @@ function notifyAuthChange() {
 }
 
 function getClientAuthSnapshot(): AuthSnapshot {
-  if (typeof window === "undefined") return SERVER_SNAPSHOT;
+  return currentSnapshot;
+}
 
-  if (!isInitialized) {
+function subscribeAuth(callback: () => void): () => void {
+  listeners.add(callback);
+  const handleStorage = () => {
     try {
       const savedToken = localStorage.getItem("shopora_token");
       const savedUser = localStorage.getItem("shopora_user");
@@ -46,17 +48,7 @@ function getClientAuthSnapshot(): AuthSnapshot {
     } catch {
       currentSnapshot = { user: null, token: null };
     }
-    isInitialized = true;
-  }
-  return currentSnapshot;
-}
-
-function subscribeAuth(callback: () => void): () => void {
-  listeners.add(callback);
-  const handleStorage = () => {
-    isInitialized = false;
-    getClientAuthSnapshot();
-    callback();
+    notifyAuthChange();
   };
   window.addEventListener("storage", handleStorage);
   return () => {
@@ -100,6 +92,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => SERVER_SNAPSHOT
   );
 
+  // Sync with client-side localStorage after hydration so server & client initial render match 100%
+  useEffect(() => {
+    try {
+      const savedToken = localStorage.getItem("shopora_token");
+      const savedUser = localStorage.getItem("shopora_user");
+      if (savedToken || savedUser) {
+        currentSnapshot = {
+          token: savedToken || null,
+          user: savedUser ? (JSON.parse(savedUser) as IAuthUser) : null,
+        };
+        notifyAuthChange();
+      }
+    } catch {
+      currentSnapshot = { user: null, token: null };
+      notifyAuthChange();
+    }
+  }, []);
+
   const user = auth.user;
   const token = auth.token;
   const isLoading = !isMounted;
@@ -109,7 +119,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user: data.user,
       token: data.accessToken,
     };
-    isInitialized = true;
     localStorage.setItem("shopora_token", data.accessToken);
     localStorage.setItem("shopora_user", JSON.stringify(data.user));
     document.cookie = `shopora_role=${data.user.role}; path=/; max-age=604800`;
@@ -136,7 +145,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     currentSnapshot = { user: null, token: null };
-    isInitialized = true;
     localStorage.removeItem("shopora_token");
     localStorage.removeItem("shopora_user");
     document.cookie = "shopora_role=; path=/; max-age=0";

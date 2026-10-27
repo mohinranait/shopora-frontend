@@ -11,3 +11,5 @@ export * from "./cart.type";
 export * from "./order.type";
 export * from "./customer.type";
 export * from "./settings.type";
+export * from "./seller.type";
+export * from "./payout.type";
