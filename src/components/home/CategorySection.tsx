@@ -89,7 +89,7 @@ export async function CategorySection() {
         </div>
 
         <Link
-          href="/products"
+          href="/categories"
           className="group inline-flex items-center gap-1.5 text-xs font-bold text-brand hover:text-brand-deep transition-colors"
         >
           <span>All Categories</span>
