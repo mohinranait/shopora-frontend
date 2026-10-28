@@ -51,8 +51,8 @@ const navSections: NavSection[] = [
   {
     title: "Overview",
     items: [
-      { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-      { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+      { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+      { label: "Analytics", href: "/admin/dashboard?tab=analytics", icon: BarChart3 },
     ],
   },
   {
@@ -74,7 +74,7 @@ const navSections: NavSection[] = [
       },
       {
         label: "Low Stock Alert",
-        href: "/admin/inventory",
+        href: "/admin/products?filter=low_stock",
         icon: AlertTriangle,
         badge: 5,
         badgeVariant: "warning",
@@ -91,10 +91,10 @@ const navSections: NavSection[] = [
         badge: "New",
         badgeVariant: "success",
       },
-      { label: "Shipments & Delivery", href: "/admin/shipments", icon: Truck },
+      { label: "Shipments & Delivery", href: "/admin/orders?status=SHIPPED", icon: Truck },
       {
         label: "Returns & Refunds",
-        href: "/admin/returns",
+        href: "/admin/orders?status=RETURNED",
         icon: RotateCcw,
         badge: 2,
         badgeVariant: "destructive",
@@ -123,21 +123,21 @@ const navSections: NavSection[] = [
     title: "Customers & Reviews",
     items: [
       { label: "Customer List", href: "/admin/customers", icon: Users },
-      { label: "Reviews & Ratings", href: "/admin/reviews", icon: Star },
+      { label: "Reviews & Ratings", href: "/admin/products?tab=reviews", icon: Star },
     ],
   },
   {
     title: "Promotions & Marketing",
     items: [
       { label: "Hero Sliders", href: "/admin/sliders", icon: ImageIcon },
-      { label: "Coupons & Discounts", href: "/admin/coupons", icon: TicketPercent },
+      { label: "Coupons & Discounts", href: "/admin/settings?tab=coupons", icon: TicketPercent },
     ],
   },
   {
     title: "System & Governance",
     items: [
       { label: "Store Settings", href: "/admin/settings", icon: Settings },
-      { label: "Staff & Permissions", href: "/admin/staff", icon: ShieldAlert },
+      { label: "Staff & Permissions", href: "/admin/settings?tab=staff", icon: ShieldAlert },
     ],
   },
 ];
@@ -179,7 +179,7 @@ export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps)
       {/* Sidebar Container */}
       <aside
         className={cn(
-          "fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-slate-950 border-r border-slate-800 text-slate-300 transition-all duration-300 select-none shadow-xl",
+          "admin-sidebar fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-slate-950 border-r border-slate-800 text-slate-300 transition-all duration-300 select-none",
           // Mobile state
           isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           // Desktop collapsed vs expanded
@@ -190,10 +190,10 @@ export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps)
         {/* Brand Header */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800/80 bg-slate-950">
           <Link
-            href="/admin"
+            href="/admin/dashboard"
             className="flex items-center gap-3 overflow-hidden group"
           >
-            <div className="h-10 w-10 shrink-0 rounded-xl bg-gradient-to-br from-brand to-brand-deep flex items-center justify-center text-white shadow-md shadow-brand/20 group-hover:scale-105 transition-transform">
+            <div className="h-10 w-10 shrink-0 rounded-xl bg-gradient-to-br from-brand to-brand-deep flex items-center justify-center text-white">
               <Sparkles className="h-5 w-5" />
             </div>
             {!collapsed && (
@@ -242,13 +242,13 @@ export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps)
               {section.items.map((item) => {
                 const Icon = item.icon;
                 const isActive =
-                  item.href === "/admin"
-                    ? pathname === "/admin"
+                  item.href === "/admin/dashboard"
+                    ? pathname === "/admin/dashboard" || pathname === "/admin"
                     : pathname.startsWith(item.href);
 
                 return (
                   <Link
-                    key={item.href}
+                    key={`${section.title}-${item.label}`}
                     href={item.href}
                     onClick={() => {
                       if (isMobileOpen) onMobileClose();
@@ -257,13 +257,13 @@ export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps)
                     className={cn(
                       "flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all group relative",
                       isActive
-                        ? "bg-gradient-to-r from-brand to-brand-deep text-white shadow-md shadow-brand/25 font-bold"
+                        ? "bg-gradient-to-r from-brand to-brand-deep text-white font-bold"
                         : "text-slate-400 hover:text-slate-100 hover:bg-slate-900"
                     )}
                   >
                     <Icon
                       className={cn(
-                        "h-4 w-4 shrink-0 transition-transform group-hover:scale-110",
+                        "h-4 w-4 shrink-0",
                         isActive ? "text-white" : "text-slate-400 group-hover:text-sky-400"
                       )}
                     />
@@ -304,7 +304,7 @@ export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps)
             )}
             title="View Live Storefront"
           >
-            <ExternalLink className="h-3.5 w-3.5 text-sky-400 group-hover:scale-110 transition-transform shrink-0" />
+            <ExternalLink className="h-3.5 w-3.5 text-sky-400 shrink-0" />
             {!collapsed && (
               <span className="truncate flex-1">View Storefront</span>
             )}

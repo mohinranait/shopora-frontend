@@ -110,7 +110,7 @@ export function CustomerDetailsDrawer({
         />
 
         {/* Slide-over Drawer Panel */}
-        <div className="relative z-10 flex h-full w-full max-w-xl flex-col border-l border-slate-800 bg-slate-900 text-slate-100 shadow-2xl transition-transform">
+        <div className="relative z-10 flex h-full w-full max-w-xl flex-col border-l border-slate-800 bg-slate-900 text-slate-100 transition-transform">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
             <div className="flex items-center gap-2">
@@ -168,7 +168,7 @@ export function CustomerDetailsDrawer({
                 <div className="rounded-2xl border border-slate-800 bg-slate-800/50 p-5">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-deep to-sky-600 text-lg font-black text-white shadow-md ring-2 ring-white/10">
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-deep to-sky-600 text-lg font-black text-white ring-2 ring-white/10">
                         {user.avatar ? (
                           <img
                             src={user.avatar}

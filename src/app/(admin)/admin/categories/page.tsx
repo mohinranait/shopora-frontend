@@ -186,7 +186,7 @@ export default function AdminCategoriesPage() {
             size="sm"
             variant="brand"
             onClick={() => handleOpenCreate()}
-            className="gap-1.5 text-xs font-bold shadow-md shadow-brand/20"
+            className="gap-1.5 text-xs font-bold"
           >
             <Plus className="h-4 w-4" />
             <span>Add Category</span>
@@ -335,7 +335,7 @@ export default function AdminCategoriesPage() {
       {/* CREATE / EDIT CATEGORY MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-6 text-slate-100 space-y-5">
+          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl p-6 text-slate-100 space-y-5">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <Layers className="h-4 w-4 text-sky-400" />
@@ -452,7 +452,7 @@ export default function AdminCategoriesPage() {
                   variant="brand"
                   size="sm"
                   disabled={formSubmitting}
-                  className="text-xs font-bold shadow-md shadow-brand/20"
+                  className="text-xs font-bold"
                 >
                   {formSubmitting ? (
                     <>

@@ -175,7 +175,7 @@ export default function AdminBrandsPage() {
             size="sm"
             variant="brand"
             onClick={handleOpenCreate}
-            className="gap-1.5 text-xs font-bold shadow-md shadow-brand/20"
+            className="gap-1.5 text-xs font-bold"
           >
             <Plus className="h-4 w-4" />
             <span>Add Brand</span>
@@ -190,7 +190,7 @@ export default function AdminBrandsPage() {
             onClick={() => setStatusFilter("all")}
             className={`px-3 py-1.5 rounded-md transition ${
               statusFilter === "all"
-                ? "bg-brand text-white shadow-sm"
+                ? "bg-brand text-white"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -200,7 +200,7 @@ export default function AdminBrandsPage() {
             onClick={() => setStatusFilter("active")}
             className={`px-3 py-1.5 rounded-md transition ${
               statusFilter === "active"
-                ? "bg-brand text-white shadow-sm"
+                ? "bg-brand text-white"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -210,7 +210,7 @@ export default function AdminBrandsPage() {
             onClick={() => setStatusFilter("inactive")}
             className={`px-3 py-1.5 rounded-md transition ${
               statusFilter === "inactive"
-                ? "bg-brand text-white shadow-sm"
+                ? "bg-brand text-white"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -365,7 +365,7 @@ export default function AdminBrandsPage() {
       {/* CREATE / EDIT BRAND MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-6 text-slate-100 space-y-5">
+          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl p-6 text-slate-100 space-y-5">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <Tag className="h-4 w-4 text-sky-400" />
@@ -466,7 +466,7 @@ export default function AdminBrandsPage() {
                   variant="brand"
                   size="sm"
                   disabled={formSubmitting}
-                  className="text-xs font-bold shadow-md shadow-brand/20"
+                  className="text-xs font-bold"
                 >
                   {formSubmitting ? (
                     <>

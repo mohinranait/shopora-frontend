@@ -4,17 +4,29 @@ import React, { useState } from "react";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminRouteGuard } from "@/components/admin/AdminRouteGuard";
+import { AdminThemeProvider, useAdminTheme } from "@/context/AdminThemeContext";
+import { cn } from "@/lib/utils";
+import "@/styles/admin-theme.css";
 
-export default function AdminGroupLayout({
+function AdminLayoutContent({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const { theme } = useAdminTheme();
 
   return (
     <AdminRouteGuard>
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex antialiased">
+      <div
+        data-admin-theme={theme}
+        className={cn(
+          "min-h-screen flex antialiased transition-colors duration-200",
+          theme === "light"
+            ? "admin-theme-light bg-slate-100/90 text-slate-900"
+            : "admin-theme-dark bg-slate-950 text-slate-100"
+        )}
+      >
         {/* Sidebar (Desktop Collapsible & Mobile Slide-over) */}
         <AdminSidebar
           isMobileOpen={mobileSidebarOpen}
@@ -35,5 +47,17 @@ export default function AdminGroupLayout({
         </div>
       </div>
     </AdminRouteGuard>
+  );
+}
+
+export default function AdminGroupLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <AdminThemeProvider>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
+    </AdminThemeProvider>
   );
 }

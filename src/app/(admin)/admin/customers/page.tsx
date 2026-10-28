@@ -57,7 +57,7 @@ function StatCard({
   tone: string;
 }) {
   return (
-    <Card className="border-slate-800 bg-slate-900/60 shadow-xs">
+    <Card className="border-slate-800 bg-slate-900/60">
       <CardContent className="flex items-center gap-3.5 p-4 sm:p-5">
         <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tone}`}>
           {icon}
@@ -228,7 +228,7 @@ export default function AdminCustomersPage() {
               }}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition ${
                 filterTab === tab.value
-                  ? "bg-brand text-white shadow-xs"
+                  ? "bg-brand text-white"
                   : "text-slate-400 hover:text-white hover:bg-slate-700/50"
               }`}
             >
@@ -239,7 +239,7 @@ export default function AdminCustomersPage() {
       </div>
 
       {/* Main Customers Table */}
-      <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
         {isLoading ? (
           <div className="flex h-72 flex-col items-center justify-center gap-3 text-slate-400">
             <Loader2 className="h-8 w-8 animate-spin text-brand" />
@@ -292,7 +292,7 @@ export default function AdminCustomersPage() {
                     {/* 1. Customer Name & Avatar */}
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-deep to-sky-600 font-bold text-white shadow-xs">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-deep to-sky-600 font-bold text-white">
                           {c.avatar ? (
                             <img
                               src={c.avatar}

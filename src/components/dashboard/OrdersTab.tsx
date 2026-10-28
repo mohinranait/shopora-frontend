@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -39,7 +39,6 @@ export function OrdersTab() {
   const [loadingDetail, setLoadingDetail] = useState(false);
 
   const fetchOrders = () => {
-    setLoading(true);
     ordersApi
       .mine({ status: status || undefined, page })
       .then(({ data, meta }) => {

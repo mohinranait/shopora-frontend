@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
@@ -9,7 +9,6 @@ import {
   ShoppingBag,
   Heart,
   CreditCard,
-  LogOut,
   ChevronRight,
   Loader2,
   ExternalLink,
@@ -37,23 +36,14 @@ const TABS = [
 function CustomerDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialTab = searchParams.get("tab") || "overview";
+  const tabParam = searchParams.get("tab");
+  const activeTab = tabParam && TABS.some((t) => t.id === tabParam) ? tabParam : "overview";
 
   const { user, isAuthenticated, isLoading: isAuthLoading, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState(initialTab);
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
 
-  // Sync tab with search params
-  useEffect(() => {
-    const tabParam = searchParams.get("tab");
-    if (tabParam && TABS.some((t) => t.id === tabParam)) {
-      setActiveTab(tabParam);
-    }
-  }, [searchParams]);
-
   const handleTabChange = (tabId: string) => {
-    setActiveTab(tabId);
     const params = new URLSearchParams(window.location.search);
     params.set("tab", tabId);
     router.replace(`/dashboard?${params.toString()}`, { scroll: false });

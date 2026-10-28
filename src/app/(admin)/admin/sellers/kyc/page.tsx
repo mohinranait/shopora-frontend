@@ -73,7 +73,7 @@ function RejectKycModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in">
-      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl text-left space-y-5">
+      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 text-left space-y-5">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2 text-rose-400">
             <BadgeAlert className="h-5 w-5" />
@@ -143,7 +143,7 @@ function InspectKycModal({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in">
-      <div className="w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl text-left space-y-6 max-h-[90vh] overflow-y-auto">
+      <div className="w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900 p-6 text-left space-y-6 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2.5">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/20 text-brand">
@@ -272,7 +272,7 @@ function InspectKycModal({
                 onClose();
                 onApprove(seller);
               }}
-              className="rounded-xl bg-emerald-600 px-5 py-2 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-sm"
+              className="rounded-xl bg-emerald-600 px-5 py-2 text-xs font-bold text-white hover:bg-emerald-500 transition"
             >
               Approve &amp; Verify
             </button>
@@ -375,7 +375,7 @@ export default function AdminSellersKycPage() {
 
       {/* Metrics Banner */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4 shadow-xs">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-amber-400">Pending Verification</span>
             <span className="rounded-lg bg-amber-500/10 p-2 text-amber-400">
@@ -386,7 +386,7 @@ export default function AdminSellersKycPage() {
           <p className="text-[11px] text-slate-500 mt-0.5">Awaiting compliance review</p>
         </div>
 
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4 shadow-xs">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-emerald-400">Verified Merchants</span>
             <span className="rounded-lg bg-emerald-500/10 p-2 text-emerald-400">
@@ -397,7 +397,7 @@ export default function AdminSellersKycPage() {
           <p className="text-[11px] text-slate-500 mt-0.5">Full compliance verified</p>
         </div>
 
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4 shadow-xs">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-rose-400">Rejected / Deficient</span>
             <span className="rounded-lg bg-rose-500/10 p-2 text-rose-400">
@@ -410,14 +410,14 @@ export default function AdminSellersKycPage() {
       </div>
 
       {/* Controls: Tabs & Search */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-3 sm:flex-row sm:items-center sm:justify-between shadow-xs">
+      <div className="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={() => setFilterTab("PENDING")}
             className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
               filterTab === "PENDING"
-                ? "bg-amber-500 text-slate-950 shadow-xs"
+                ? "bg-amber-500 text-slate-950"
                 : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
             }`}
           >
@@ -428,7 +428,7 @@ export default function AdminSellersKycPage() {
             onClick={() => setFilterTab("VERIFIED")}
             className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
               filterTab === "VERIFIED"
-                ? "bg-emerald-600 text-white shadow-xs"
+                ? "bg-emerald-600 text-white"
                 : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
             }`}
           >
@@ -439,7 +439,7 @@ export default function AdminSellersKycPage() {
             onClick={() => setFilterTab("ALL")}
             className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
               filterTab === "ALL"
-                ? "bg-brand text-white shadow-xs"
+                ? "bg-brand text-white"
                 : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
             }`}
           >
@@ -483,7 +483,7 @@ export default function AdminSellersKycPage() {
           <p className="text-xs text-slate-500 mt-1">All merchant documents are up-to-date.</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="border-b border-slate-800 bg-slate-800/50 text-[11px] font-bold uppercase tracking-wider text-slate-400">

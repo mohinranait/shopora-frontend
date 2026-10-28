@@ -103,13 +103,13 @@ function AdminLoginForm() {
       <div className="w-full max-w-md relative z-10 space-y-6">
         {/* Brand & Security Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px] text-sky-400 font-semibold mb-2 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px] text-sky-400 font-semibold mb-2">
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
             <span>Shopora Security Protocol</span>
           </div>
 
           <div className="flex items-center justify-center gap-2.5">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-brand to-brand-deep flex items-center justify-center text-white shadow-lg shadow-brand/25">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-brand to-brand-deep flex items-center justify-center text-white">
               <Sparkles className="h-5 w-5" />
             </div>
             <span className="text-2xl font-black text-white tracking-tight">Shopora</span>
@@ -127,7 +127,7 @@ function AdminLoginForm() {
         </div>
 
         {/* Card Body */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/85 backdrop-blur-xl p-6 sm:p-8 shadow-2xl space-y-5">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/85 backdrop-blur-xl p-6 sm:p-8 space-y-5">
           {/* Error Banner */}
           {errorBanner && (
             <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 flex items-start gap-2.5 text-xs text-rose-300 animate-in fade-in duration-150">
@@ -219,7 +219,7 @@ function AdminLoginForm() {
               variant="brand"
               size="lg"
               disabled={isSubmitting}
-              className="w-full font-bold text-xs gap-2 shadow-lg shadow-brand/25 h-11 rounded-xl"
+              className="w-full font-bold text-xs gap-2 h-11 rounded-xl"
             >
               {isSubmitting ? (
                 <>
@@ -243,7 +243,7 @@ function AdminLoginForm() {
               className="w-full py-2 px-3 rounded-lg border border-slate-800 hover:border-sky-500/50 bg-slate-950/60 hover:bg-slate-950 text-xs text-slate-300 hover:text-white transition flex items-center justify-between group"
             >
               <div className="flex items-center gap-2">
-                <KeyRound className="h-3.5 w-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
+                <KeyRound className="h-3.5 w-3.5 text-amber-400" />
                 <span className="text-[11px] font-medium">Auto-fill Super Admin Demo Credentials</span>
               </div>
               <Badge variant="warning" className="text-[9px] py-0 px-1 font-mono">

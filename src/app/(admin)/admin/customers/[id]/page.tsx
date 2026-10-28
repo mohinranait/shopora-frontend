@@ -47,7 +47,7 @@ function StatCard({
   tone: string;
 }) {
   return (
-    <Card className="border-slate-800 bg-slate-900/60 shadow-xs">
+    <Card className="border-slate-800 bg-slate-900/60">
       <CardContent className="flex items-center gap-3.5 p-4 sm:p-5">
         <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tone}`}>
           {icon}
@@ -167,11 +167,11 @@ export default function CustomerProfilePage({
       </div>
 
       {/* Customer Header Card */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 sm:p-6 shadow-md">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 sm:p-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
             {/* Avatar */}
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-deep to-sky-600 text-2xl font-black text-white shadow-lg ring-4 ring-white/10">
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-deep to-sky-600 text-2xl font-black text-white ring-4 ring-white/10">
               {user.avatar ? (
                 <img
                   src={user.avatar}
@@ -224,7 +224,7 @@ export default function CustomerProfilePage({
             <button
               type="button"
               onClick={() => setEditDialogOpen(true)}
-              className="inline-flex items-center gap-2 rounded-xl bg-brand-deep px-4 py-2.5 text-xs font-bold text-white transition hover:bg-brand shadow-sm"
+              className="inline-flex items-center gap-2 rounded-xl bg-brand-deep px-4 py-2.5 text-xs font-bold text-white transition hover:bg-brand"
             >
               <UserCog className="h-4 w-4" />
               <span>Edit Customer</span>
@@ -286,7 +286,7 @@ export default function CustomerProfilePage({
         {/* Left Column (1 / 3): Customer Info & Addresses */}
         <div className="space-y-6 lg:col-span-1">
           {/* Account Meta Card */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-sm">
+          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
             <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-slate-400">
               Account Overview
             </h2>
@@ -325,7 +325,7 @@ export default function CustomerProfilePage({
           </div>
 
           {/* Saved Addresses Card */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-sm">
+          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
                 <MapPin className="h-4 w-4 text-brand" />
@@ -369,7 +369,7 @@ export default function CustomerProfilePage({
 
           {/* Product Reviews Card (if any) */}
           {reviews.length > 0 && (
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-sm">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
               <h2 className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
                 <Star className="h-4 w-4 text-amber-400" />
                 Recent Product Reviews ({reviews.length})
@@ -399,7 +399,7 @@ export default function CustomerProfilePage({
 
         {/* Right Column (2 / 3): Order History */}
         <div className="space-y-6 lg:col-span-2">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900 shadow-sm">
+          <div className="rounded-2xl border border-slate-800 bg-slate-900">
             <div className="flex items-center justify-between border-b border-slate-800 p-5">
               <div>
                 <h2 className="text-base font-bold text-white">Order History</h2>

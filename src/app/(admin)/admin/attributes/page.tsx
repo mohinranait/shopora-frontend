@@ -341,7 +341,7 @@ export default function AdminAttributesPage() {
             size="sm"
             variant="brand"
             onClick={handleOpenCreateAttr}
-            className="text-xs gap-1.5 shadow-md shadow-brand/20 font-bold"
+            className="text-xs gap-1.5 font-bold"
           >
             <Plus className="h-3.5 w-3.5" />
             <span>New Attribute</span>
@@ -441,7 +441,7 @@ export default function AdminAttributesPage() {
                     onClick={() => setSelectedAttributeId(attr.id)}
                     className={`p-3.5 rounded-xl border transition-all cursor-pointer select-none group ${
                       isSelected
-                        ? "bg-slate-900 border-brand shadow-md shadow-brand/10 ring-1 ring-brand/40"
+                        ? "bg-slate-900 border-brand ring-1 ring-brand/40"
                         : "bg-slate-900/50 hover:bg-slate-900/90 border-slate-800 hover:border-slate-700"
                     }`}
                   >
@@ -523,7 +523,7 @@ export default function AdminAttributesPage() {
         {/* Right Column: Values Workspace for Selected Attribute (7 Cols) */}
         <div className="lg:col-span-7">
           {selectedAttribute ? (
-            <Card className="bg-slate-900 border-slate-800 overflow-hidden shadow-lg">
+            <Card className="bg-slate-900 border-slate-800 overflow-hidden">
               <CardHeader className="bg-slate-950/40 border-b border-slate-800 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
@@ -541,7 +541,7 @@ export default function AdminAttributesPage() {
                   size="sm"
                   variant="brand"
                   onClick={handleOpenCreateValue}
-                  className="text-xs gap-1.5 shadow-sm font-bold shrink-0"
+                  className="text-xs gap-1.5 font-bold shrink-0"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span>Add Value</span>
@@ -598,7 +598,7 @@ export default function AdminAttributesPage() {
                                 {val.colorCode ? (
                                   <div className="inline-flex items-center gap-2 px-2 py-1 rounded-md bg-slate-950/60 border border-slate-800 font-mono text-[11px] text-slate-300">
                                     <span
-                                      className="h-3.5 w-3.5 rounded-full border border-white/20 shadow-sm shrink-0"
+                                      className="h-3.5 w-3.5 rounded-full border border-white/20 shrink-0"
                                       style={{ backgroundColor: val.colorCode }}
                                     />
                                     <span>{val.colorCode}</span>
@@ -661,7 +661,7 @@ export default function AdminAttributesPage() {
       {/* ================================================================= */}
       {isAttrModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <SlidersHorizontal className="h-4 w-4 text-brand" />
@@ -791,7 +791,7 @@ export default function AdminAttributesPage() {
                   variant="brand"
                   size="sm"
                   disabled={attrSubmitting}
-                  className="text-xs gap-1.5 font-bold shadow-md shadow-brand/20"
+                  className="text-xs gap-1.5 font-bold"
                 >
                   {attrSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                   <span>{attrModalMode === "create" ? "Create Attribute" : "Save Changes"}</span>
@@ -807,7 +807,7 @@ export default function AdminAttributesPage() {
       {/* ================================================================= */}
       {isValueModalOpen && selectedAttribute && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-4 border-b border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Tag className="h-4 w-4 text-emerald-400" />
@@ -899,7 +899,7 @@ export default function AdminAttributesPage() {
                   variant="brand"
                   size="sm"
                   disabled={valueSubmitting}
-                  className="text-xs gap-1.5 font-bold shadow-md shadow-brand/20"
+                  className="text-xs gap-1.5 font-bold"
                 >
                   {valueSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                   <span>{valueModalMode === "create" ? "Add Value" : "Update Value"}</span>

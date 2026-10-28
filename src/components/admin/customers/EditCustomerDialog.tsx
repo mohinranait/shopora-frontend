@@ -162,7 +162,7 @@ function EditCustomerForm({
             }`}
           >
             <span
-              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white ring-0 transition duration-200 ease-in-out ${
                 isActive ? "translate-x-5" : "translate-x-0"
               }`}
             />
@@ -184,7 +184,7 @@ function EditCustomerForm({
             }`}
           >
             <span
-              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white ring-0 transition duration-200 ease-in-out ${
                 isVerified ? "translate-x-5" : "translate-x-0"
               }`}
             />
@@ -245,7 +245,7 @@ export function EditCustomerDialog({
       />
 
       {/* Dialog Panel */}
-      <div className="relative w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl transition-all">
+      <div className="relative w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 transition-all">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
           <div className="flex items-center gap-3">

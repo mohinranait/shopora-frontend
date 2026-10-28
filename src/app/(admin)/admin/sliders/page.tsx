@@ -302,7 +302,7 @@ export default function AdminSlidersPage() {
           <button
             onClick={() => setTypeFilter("ALL")}
             className={`px-3 py-1.5 rounded-md transition whitespace-nowrap ${
-              typeFilter === "ALL" ? "bg-brand text-white shadow-sm" : "text-slate-400 hover:text-white"
+              typeFilter === "ALL" ? "bg-brand text-white" : "text-slate-400 hover:text-white"
             }`}
           >
             All Variants ({sliders.length})
@@ -310,7 +310,7 @@ export default function AdminSlidersPage() {
           <button
             onClick={() => setTypeFilter("IMAGE_BG_CONTENT")}
             className={`px-3 py-1.5 rounded-md transition whitespace-nowrap ${
-              typeFilter === "IMAGE_BG_CONTENT" ? "bg-brand text-white shadow-sm" : "text-slate-400 hover:text-white"
+              typeFilter === "IMAGE_BG_CONTENT" ? "bg-brand text-white" : "text-slate-400 hover:text-white"
             }`}
           >
             Bg Image + Content ({imageBgCount})
@@ -318,7 +318,7 @@ export default function AdminSlidersPage() {
           <button
             onClick={() => setTypeFilter("IMAGE_ONLY")}
             className={`px-3 py-1.5 rounded-md transition whitespace-nowrap ${
-              typeFilter === "IMAGE_ONLY" ? "bg-brand text-white shadow-sm" : "text-slate-400 hover:text-white"
+              typeFilter === "IMAGE_ONLY" ? "bg-brand text-white" : "text-slate-400 hover:text-white"
             }`}
           >
             Image Only ({imageOnlyCount})
@@ -326,7 +326,7 @@ export default function AdminSlidersPage() {
           <button
             onClick={() => setTypeFilter("CONTENT_ONLY")}
             className={`px-3 py-1.5 rounded-md transition whitespace-nowrap ${
-              typeFilter === "CONTENT_ONLY" ? "bg-brand text-white shadow-sm" : "text-slate-400 hover:text-white"
+              typeFilter === "CONTENT_ONLY" ? "bg-brand text-white" : "text-slate-400 hover:text-white"
             }`}
           >
             Content Only ({contentOnlyCount})
@@ -363,7 +363,7 @@ export default function AdminSlidersPage() {
             return (
               <div
                 key={slider.id}
-                className="group relative rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col justify-between"
+                className="group relative rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden hover:border-slate-700 transition flex flex-col justify-between"
               >
                 {/* Visual Preview Box */}
                 <div className="relative h-48 w-full overflow-hidden bg-slate-950 flex items-center justify-center">
@@ -372,7 +372,7 @@ export default function AdminSlidersPage() {
                     <img
                       src={displayImg}
                       alt={slider.title || "Slider"}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover"
                     />
                   ) : slider.type === "IMAGE_BG_CONTENT" && displayImg ? (
                     <div className="relative w-full h-full">
@@ -514,7 +514,7 @@ export default function AdminSlidersPage() {
       {/* ========================================================= */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 text-slate-100">
+          <div className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 text-slate-100">
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
               <div>
@@ -712,11 +712,11 @@ export default function AdminSlidersPage() {
                             : "border-slate-700/60 opacity-80 hover:opacity-100"
                         }`}
                       >
-                        <span className="text-[11px] font-bold text-white drop-shadow">
+                        <span className="text-[11px] font-bold text-white">
                           {p.label}
                         </span>
                         {formBgGradient === p.value && (
-                          <CheckCircle2 className="h-4 w-4 text-white drop-shadow" />
+                          <CheckCircle2 className="h-4 w-4 text-white" />
                         )}
                       </button>
                     ))}
@@ -783,7 +783,7 @@ export default function AdminSlidersPage() {
                   variant="brand"
                   size="sm"
                   disabled={formSubmitting || isCreating || isUpdating}
-                  className="text-xs font-bold shadow-md shadow-brand/20 px-5"
+                  className="text-xs font-bold px-5"
                 >
                   {formSubmitting || isCreating || isUpdating ? (
                     <>

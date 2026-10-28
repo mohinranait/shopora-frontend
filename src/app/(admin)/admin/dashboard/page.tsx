@@ -209,7 +209,7 @@ export default function AdminDashboardPage() {
                 onClick={() => setTimeRange(range)}
                 className={`px-3 py-1.5 rounded-md transition-all ${
                   timeRange === range
-                    ? "bg-brand text-white shadow-sm"
+                    ? "bg-brand text-white"
                     : "text-slate-400 hover:text-white"
                 }`}
               >
@@ -396,7 +396,7 @@ export default function AdminDashboardPage() {
                   className="flex-1 flex flex-col items-center gap-2 h-full justify-end group"
                 >
                   {/* Tooltip on hover */}
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 text-[10px] bg-slate-900 border border-slate-700 px-2 py-1 rounded shadow-lg text-center pointer-events-none whitespace-nowrap">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 text-[10px] bg-slate-900 border border-slate-700 px-2 py-1 rounded text-center pointer-events-none whitespace-nowrap">
                     <p className="font-bold text-white">৳{item.gmv.toLocaleString()}</p>
                     <p className="text-slate-400">{item.orders} orders</p>
                   </div>
@@ -741,7 +741,7 @@ export default function AdminDashboardPage() {
           href="/admin/products/new"
           className="p-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-850 hover:border-slate-700 transition flex items-center gap-3.5 group"
         >
-          <div className="h-10 w-10 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 group-hover:scale-110 transition-transform">
+          <div className="h-10 w-10 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
             <Package className="h-5 w-5" />
           </div>
           <div>
@@ -754,7 +754,7 @@ export default function AdminDashboardPage() {
           href="/admin/attributes"
           className="p-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-850 hover:border-slate-700 transition flex items-center gap-3.5 group"
         >
-          <div className="h-10 w-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
+          <div className="h-10 w-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
             <SlidersHorizontal className="h-5 w-5" />
           </div>
           <div>
@@ -767,7 +767,7 @@ export default function AdminDashboardPage() {
           href="/admin/sellers/kyc"
           className="p-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-850 hover:border-slate-700 transition flex items-center gap-3.5 group"
         >
-          <div className="h-10 w-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+          <div className="h-10 w-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
             <ShieldCheck className="h-5 w-5" />
           </div>
           <div>
@@ -780,7 +780,7 @@ export default function AdminDashboardPage() {
           href="/admin/payouts"
           className="p-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-850 hover:border-slate-700 transition flex items-center gap-3.5 group"
         >
-          <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+          <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
             <CreditCard className="h-5 w-5" />
           </div>
           <div>

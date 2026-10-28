@@ -134,7 +134,7 @@ export default function AdminProductsPage() {
           </Link>
 
           <Link href="/admin/products/new">
-            <Button size="sm" variant="brand" className="text-xs gap-1.5 shadow-md shadow-brand/20 font-bold">
+            <Button size="sm" variant="brand" className="text-xs gap-1.5 font-bold">
               <Plus className="h-3.5 w-3.5" />
               <span>Create Product</span>
             </Button>
@@ -150,7 +150,7 @@ export default function AdminProductsPage() {
             onClick={() => setActiveTab("all")}
             className={`px-3 py-1.5 rounded-md transition ${
               activeTab === "all"
-                ? "bg-brand text-white shadow-sm"
+                ? "bg-brand text-white"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -160,7 +160,7 @@ export default function AdminProductsPage() {
             onClick={() => setActiveTab("platform")}
             className={`px-3 py-1.5 rounded-md transition ${
               activeTab === "platform"
-                ? "bg-brand text-white shadow-sm"
+                ? "bg-brand text-white"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -170,7 +170,7 @@ export default function AdminProductsPage() {
             onClick={() => setActiveTab("vendor")}
             className={`px-3 py-1.5 rounded-md transition ${
               activeTab === "vendor"
-                ? "bg-brand text-white shadow-sm"
+                ? "bg-brand text-white"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -180,7 +180,7 @@ export default function AdminProductsPage() {
             onClick={() => setActiveTab("pending")}
             className={`px-3 py-1.5 rounded-md transition flex items-center gap-1.5 ${
               activeTab === "pending"
-                ? "bg-amber-500 text-slate-950 font-bold shadow-sm"
+                ? "bg-amber-500 text-slate-950 font-bold"
                 : "text-amber-400 hover:text-amber-300"
             }`}
           >
@@ -193,7 +193,7 @@ export default function AdminProductsPage() {
             onClick={() => setActiveTab("low_stock")}
             className={`px-3 py-1.5 rounded-md transition flex items-center gap-1.5 ${
               activeTab === "low_stock"
-                ? "bg-rose-600 text-white shadow-sm"
+                ? "bg-rose-600 text-white"
                 : "text-rose-400 hover:text-rose-300"
             }`}
           >

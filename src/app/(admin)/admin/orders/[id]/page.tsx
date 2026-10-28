@@ -67,7 +67,7 @@ function ReasonDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label={title}>
       <div className="absolute inset-0 bg-black/60" onClick={busy ? undefined : onClose} />
-      <div className="relative w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-5 shadow-2xl">
+      <div className="relative w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-5">
         <div className="mb-3 flex items-start justify-between gap-3">
           <div>
             <h2 className="text-base font-bold text-white">{title}</h2>
@@ -424,7 +424,7 @@ function OrderDetailInner() {
               type="button"
               onClick={() => setWholeStatus(next)}
               disabled={updating}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-brand-deep disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-deep disabled:opacity-60"
             >
               {updating ? <Loader2 className="h-4 w-4 animate-spin" /> : <ChevronRight className="h-4 w-4" />}
               {NEXT_ACTION_LABEL[active[0].status]}

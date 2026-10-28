@@ -5,7 +5,7 @@ export default function RootLoading() {
     <div className="space-y-12 pb-16 animate-pulse">
       {/* Hero Skeleton */}
       <section className="pt-2 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="w-full h-[300px] sm:h-[400px] md:h-[460px] lg:h-[500px] rounded-3xl bg-slate-200/80 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center" />
+        <div className="w-full h-[300px] sm:h-[400px] md:h-[460px] lg:h-[500px] rounded-3xl bg-slate-200/80  border-slate-200 dark:border-slate-800 flex items-center justify-center" />
       </section>
 
       {/* Category Section Skeleton */}

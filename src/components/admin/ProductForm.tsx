@@ -610,7 +610,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
             variant="brand"
             size="sm"
             disabled={submitting || isCreating || isUpdating}
-            className="text-xs gap-1.5 font-bold shadow-md shadow-brand/20 px-4"
+            className="text-xs gap-1.5 font-bold px-4"
           >
             {submitting || isCreating || isUpdating ? (
               <>
@@ -630,7 +630,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
       {/* ================================================================= */}
       {/* SECTION 1: Product Type Toggle (Simple vs Variable)               */}
       {/* ================================================================= */}
-      <Card className="bg-slate-900 border-slate-800 overflow-hidden shadow-sm">
+      <Card className="bg-slate-900 border-slate-800 overflow-hidden">
         <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
             <Layers className="h-4 w-4 text-brand" />
@@ -644,7 +644,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
               onClick={() => setProductType("SIMPLE")}
               className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-3.5 ${
                 productType === "SIMPLE"
-                  ? "bg-brand/10 border-brand text-white shadow-md shadow-brand/10"
+                  ? "bg-brand/10 border-brand text-white"
                   : "bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700"
               }`}
             >
@@ -673,7 +673,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
               onClick={() => setProductType("VARIABLE")}
               className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-3.5 ${
                 productType === "VARIABLE"
-                  ? "bg-purple-600/10 border-purple-500 text-white shadow-md shadow-purple-600/10"
+                  ? "bg-purple-600/10 border-purple-500 text-white"
                   : "bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700"
               }`}
             >
@@ -705,7 +705,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
       {/* ================================================================= */}
       {/* SECTION 2: General Information                                    */}
       {/* ================================================================= */}
-      <Card className="bg-slate-900 border-slate-800 overflow-hidden shadow-sm">
+      <Card className="bg-slate-900 border-slate-800 overflow-hidden">
         <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
             <Info className="h-4 w-4 text-sky-400" />
@@ -872,7 +872,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
       {/* ================================================================= */}
       {/* SECTION 3: Media & Gallery                                        */}
       {/* ================================================================= */}
-      <Card className="bg-slate-900 border-slate-800 overflow-hidden shadow-sm">
+      <Card className="bg-slate-900 border-slate-800 overflow-hidden">
         <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
             <ImageIcon className="h-4 w-4 text-emerald-400" />
@@ -970,7 +970,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
                   <button
                     type="button"
                     onClick={() => handleRemoveGalleryImage(idx)}
-                    className="absolute top-1 right-1 h-5 w-5 rounded-full bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow"
+                    className="absolute top-1 right-1 h-5 w-5 rounded-full bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
                     title="Remove Image"
                   >
                     <X className="h-3 w-3" />
@@ -997,7 +997,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
       {/* SECTION 4: SIMPLE PRODUCT PRICING & INVENTORY                     */}
       {/* ================================================================= */}
       {productType === "SIMPLE" && (
-        <Card className="bg-slate-900 border-slate-800 overflow-hidden shadow-sm">
+        <Card className="bg-slate-900 border-slate-800 overflow-hidden">
           <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
             <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-emerald-400" />
@@ -1153,7 +1153,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
       {/* SECTION 5: VARIABLE PRODUCT (Attributes Selection & Matrix Table)  */}
       {/* ================================================================= */}
       {productType === "VARIABLE" && (
-        <Card className="bg-slate-900 border-purple-900/60 overflow-hidden shadow-lg shadow-purple-950/20">
+        <Card className="bg-slate-900 border-purple-900/60 overflow-hidden">
           <CardHeader className="bg-purple-950/40 p-4 border-b border-purple-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <CardTitle className="text-sm font-bold uppercase tracking-wider text-purple-200 flex items-center gap-2">
@@ -1268,7 +1268,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
                                 onClick={() => handleToggleAttributeValue(group.attributeId, val.id)}
                                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                                   isChecked
-                                    ? "bg-purple-600 text-white border-purple-500 shadow-sm"
+                                    ? "bg-purple-600 text-white border-purple-500"
                                     : "bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200"
                                 }`}
                               >
@@ -1309,7 +1309,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
                   variant="default"
                   onClick={handleGenerateVariants}
                   disabled={isGenerating}
-                  className="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs gap-2 shadow-lg shadow-purple-600/30 px-5 h-10 shrink-0"
+                  className="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs gap-2 px-5 h-10 shrink-0"
                 >
                   {isGenerating ? (
                     <>
@@ -1545,7 +1545,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
       {/* ================================================================= */}
       {/* SECTION 6: Shipping & Logistics                                   */}
       {/* ================================================================= */}
-      <Card className="bg-slate-900 border-slate-800 overflow-hidden shadow-sm">
+      <Card className="bg-slate-900 border-slate-800 overflow-hidden">
         <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
             <Truck className="h-4 w-4 text-sky-400" />
@@ -1625,7 +1625,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
       {/* ================================================================= */}
       {/* SECTION 7: SEO Friendly Metadata & Live Google Preview            */}
       {/* ================================================================= */}
-      <Card className="bg-slate-900 border-slate-800 overflow-hidden shadow-sm">
+      <Card className="bg-slate-900 border-slate-800 overflow-hidden">
         <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
             <Globe className="h-4 w-4 text-emerald-400" />
@@ -1702,7 +1702,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
       {/* ================================================================= */}
       {/* SECTION 8: Visibility & Flags                                     */}
       {/* ================================================================= */}
-      <Card className="bg-slate-900 border-slate-800 overflow-hidden shadow-sm">
+      <Card className="bg-slate-900 border-slate-800 overflow-hidden">
         <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-brand" />
@@ -1758,7 +1758,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
       {/* ================================================================= */}
       {/* Bottom Sticky Action Bar                                          */}
       {/* ================================================================= */}
-      <div className="sticky bottom-4 z-30 p-3 sm:p-4 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-slate-700 shadow-2xl flex items-center justify-between gap-4">
+      <div className="sticky bottom-4 z-30 p-3 sm:p-4 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-slate-700 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-xs text-slate-400">
           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
           <span>Ready to save changes</span>
@@ -1775,7 +1775,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
             variant="brand"
             size="sm"
             disabled={submitting || isCreating || isUpdating}
-            className="text-xs gap-1.5 font-bold shadow-lg shadow-brand/20 px-6 h-10"
+            className="text-xs gap-1.5 font-bold px-6 h-10"
           >
             {submitting || isCreating || isUpdating ? (
               <>

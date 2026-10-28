@@ -17,15 +17,17 @@ import {
   Layers,
   TicketPercent,
   CheckCircle2,
-  Clock,
   AlertTriangle,
   Store,
   DollarSign,
   Activity,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/context/AuthContext";
+import { useAdminTheme } from "@/context/AdminThemeContext";
 import { toast } from "sonner";
 
 interface AdminHeaderProps {
@@ -34,6 +36,7 @@ interface AdminHeaderProps {
 
 export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useAdminTheme();
   const [profileOpen, setProfileOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
@@ -123,7 +126,7 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-30 h-16 bg-slate-950/85 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-6 flex items-center justify-between gap-4 select-none">
+    <header className="admin-header sticky top-0 z-30 h-16 bg-slate-950/85 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-6 flex items-center justify-between gap-4 select-none">
       {/* Left: Mobile Toggle & Search */}
       <div className="flex items-center gap-3 flex-1 max-w-xl">
         <button
@@ -169,7 +172,7 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
             size="sm"
             variant="brand"
             onClick={() => setCreateOpen(!createOpen)}
-            className="gap-1.5 text-xs shadow-md shadow-brand/20"
+            className="gap-1.5 text-xs"
           >
             <Plus className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Create</span>
@@ -177,7 +180,7 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
           </Button>
 
           {createOpen && (
-            <div className="absolute right-0 mt-2 w-48 rounded-xl bg-slate-900 border border-slate-700/80 shadow-2xl py-1 text-xs z-50 animate-in fade-in zoom-in-95 duration-100">
+            <div className="absolute right-0 mt-2 w-48 rounded-xl bg-slate-900 border border-slate-700/80 py-1 text-xs z-50 animate-in fade-in zoom-in-95 duration-100">
               <Link
                 href="/admin/products/new"
                 onClick={() => setCreateOpen(false)}
@@ -195,21 +198,21 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
                 Add Category
               </Link>
               <Link
-                href="/admin/coupons/new"
+                href="/admin/settings"
                 onClick={() => setCreateOpen(false)}
                 className="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 transition"
               >
                 <TicketPercent className="h-3.5 w-3.5 text-amber-400" />
-                Create Coupon
+                Store Settings
               </Link>
               <div className="my-1 border-t border-slate-800" />
               <Link
-                href="/admin/sellers/invite"
+                href="/admin/sellers"
                 onClick={() => setCreateOpen(false)}
                 className="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 transition"
               >
                 <Store className="h-3.5 w-3.5 text-purple-400" />
-                Invite Vendor
+                Manage Vendors
               </Link>
             </div>
           )}
@@ -226,6 +229,21 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
           <span>Storefront</span>
         </Link>
 
+        {/* Theme Toggle (Dark / Light) */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/80 border border-transparent hover:border-slate-700/60 transition cursor-pointer flex items-center justify-center"
+          title={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
+          aria-label="Toggle admin color theme"
+        >
+          {theme === "dark" ? (
+            <Sun className="h-4 w-4 text-amber-400" />
+          ) : (
+            <Moon className="h-4 w-4 text-sky-400" />
+          )}
+        </button>
+
         {/* Notifications Dropdown */}
         <div className="relative" ref={notifRef}>
           <button
@@ -241,7 +259,7 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
           </button>
 
           {notificationOpen && (
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-xl bg-slate-900 border border-slate-750 shadow-2xl text-xs z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-xl bg-slate-900 border border-slate-750 text-xs z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
               <div className="flex items-center justify-between p-3.5 border-b border-slate-800 bg-slate-950/50">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-white">Notifications</span>
@@ -287,11 +305,11 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
 
               <div className="p-2 border-t border-slate-800 bg-slate-950/60 text-center">
                 <Link
-                  href="/admin/notifications"
+                  href="/admin/orders"
                   onClick={() => setNotificationOpen(false)}
                   className="text-xs text-sky-400 font-semibold hover:underline"
                 >
-                  View all 18 notifications →
+                  View all orders & updates →
                 </Link>
               </div>
             </div>
@@ -332,7 +350,7 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
           </button>
 
           {profileOpen && (
-            <div className="absolute right-0 mt-2 w-64 rounded-xl bg-slate-900 border border-slate-750 shadow-2xl py-2 text-xs z-50 animate-in fade-in zoom-in-95 duration-100">
+            <div className="absolute right-0 mt-2 w-64 rounded-xl bg-slate-900 border border-slate-750 py-2 text-xs z-50 animate-in fade-in zoom-in-95 duration-100">
               {/* Dynamic User Header */}
               <div className="px-4 py-3 border-b border-slate-800">
                 <p className="font-bold text-white text-sm truncate">{user?.name || "Super Admin"}</p>
@@ -381,6 +399,30 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
                   <Activity className="h-4 w-4 text-slate-400" />
                   Live System Activity
                 </Link>
+              </div>
+
+              <div className="my-1 border-t border-slate-800" />
+
+              <div className="px-2 py-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleTheme();
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition font-medium text-left cursor-pointer"
+                >
+                  <span className="flex items-center gap-2.5">
+                    {theme === "dark" ? (
+                      <Sun className="h-4 w-4 text-amber-400" />
+                    ) : (
+                      <Moon className="h-4 w-4 text-sky-400" />
+                    )}
+                    <span>Theme Mode</span>
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300 uppercase">
+                    {theme === "dark" ? "Dark Mode" : "Light Mode"}
+                  </span>
+                </button>
               </div>
 
               <div className="my-1 border-t border-slate-800" />

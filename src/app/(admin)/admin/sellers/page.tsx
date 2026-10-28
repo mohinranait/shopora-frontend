@@ -74,7 +74,7 @@ function ReviewSellerModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in">
-      <div className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl text-left space-y-6">
+      <div className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 text-left space-y-6">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2.5">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/20 text-brand">
@@ -148,7 +148,7 @@ function ReviewSellerModal({
               }`}
             >
               <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ${
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white ring-0 transition duration-200 ${
                   isVerified ? "translate-x-5" : "translate-x-0"
                 }`}
               />
@@ -283,7 +283,7 @@ export default function AdminSellersPage() {
         <div className="flex items-center gap-2.5">
           <Link
             href="/admin/sellers/kyc"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-brand/40 bg-brand/10 px-3.5 py-2 text-xs font-bold text-brand transition hover:bg-brand/20 shadow-xs"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-brand/40 bg-brand/10 px-3.5 py-2 text-xs font-bold text-brand transition hover:bg-brand/20"
           >
             <ShieldCheck className="h-4 w-4" />
             <span>KYC Verification Portal</span>
@@ -302,7 +302,7 @@ export default function AdminSellersPage() {
 
       {/* Metrics Cards */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4 shadow-xs">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-400">Total Vendors</span>
             <span className="rounded-lg bg-slate-800 p-2 text-slate-300">
@@ -313,7 +313,7 @@ export default function AdminSellersPage() {
           <p className="text-[11px] text-slate-500 mt-0.5">Across all onboarding stages</p>
         </div>
 
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4 shadow-xs">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-emerald-400">Approved Stores</span>
             <span className="rounded-lg bg-emerald-500/10 p-2 text-emerald-400">
@@ -324,7 +324,7 @@ export default function AdminSellersPage() {
           <p className="text-[11px] text-slate-500 mt-0.5">Active &amp; selling publicly</p>
         </div>
 
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4 shadow-xs">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-amber-400">Pending Review</span>
             <span className="rounded-lg bg-amber-500/10 p-2 text-amber-400">
@@ -335,7 +335,7 @@ export default function AdminSellersPage() {
           <p className="text-[11px] text-slate-500 mt-0.5">Awaiting audit &amp; approval</p>
         </div>
 
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4 shadow-xs">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-sky-400">Vendor Balance</span>
             <span className="rounded-lg bg-sky-500/10 p-2 text-brand">
@@ -350,7 +350,7 @@ export default function AdminSellersPage() {
       </div>
 
       {/* Control Bar: Tabs & Search */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-3 sm:flex-row sm:items-center sm:justify-between shadow-xs">
+      <div className="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-3 sm:flex-row sm:items-center sm:justify-between">
         {/* Status Tabs */}
         <div className="flex flex-wrap items-center gap-1.5">
           {(["ALL", "APPROVED", "PENDING", "SUSPENDED"] as const).map((tab) => (
@@ -360,7 +360,7 @@ export default function AdminSellersPage() {
               onClick={() => setActiveTab(tab)}
               className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
                 activeTab === tab
-                  ? "bg-brand text-white shadow-xs"
+                  ? "bg-brand text-white"
                   : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
               }`}
             >
@@ -411,7 +411,7 @@ export default function AdminSellersPage() {
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="border-b border-slate-800 bg-slate-800/50 text-[11px] font-bold uppercase tracking-wider text-slate-400">

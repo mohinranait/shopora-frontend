@@ -120,7 +120,7 @@ export function ImageUploadField({
           className="border-2 border-dashed border-slate-700 hover:border-sky-500 rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-left cursor-pointer transition-all bg-slate-900/40 hover:bg-slate-900/80 group"
         >
           <div className="flex items-center gap-3.5">
-            <div className="h-11 w-11 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 group-hover:scale-110 transition-transform shrink-0">
+            <div className="h-11 w-11 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
               <ImageIcon className="h-5 w-5" />
             </div>
             <div>
@@ -138,7 +138,7 @@ export function ImageUploadField({
             type="button"
             size="xs"
             variant="brand"
-            className="text-xs shrink-0 font-semibold shadow-sm"
+            className="text-xs shrink-0 font-semibold"
           >
             <Upload className="h-3 w-3 mr-1" />
             Browse Assets

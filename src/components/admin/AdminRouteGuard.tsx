@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, Suspense } from "react";
 import { useRouter, usePathname } from "next/navigation";
@@ -38,7 +38,7 @@ function AdminRouteGuardInner({ children }: AdminRouteGuardProps) {
         <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-slate-100 select-none">
           <div className="flex flex-col items-center gap-4 max-w-sm text-center">
             <div className="relative">
-              <div className="h-14 w-14 rounded-2xl bg-linear-to-br from-brand to-brand-deep flex items-center justify-center text-white shadow-xl shadow-brand/20">
+              <div className="h-14 w-14 rounded-2xl bg-linear-to-br from-brand to-brand-deep flex items-center justify-center text-white">
                 <Sparkles className="h-7 w-7" />
               </div>
               <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-slate-900 border-2 border-slate-950 flex items-center justify-center text-sky-400">

@@ -152,7 +152,7 @@ export function MediaLibraryModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
       {/* Modal Dialog Window */}
-      <div className="relative w-full max-w-5xl h-[88vh] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100">
+      <div className="relative w-full max-w-5xl h-[88vh] bg-slate-900 border border-slate-800 rounded-2xl flex flex-col overflow-hidden text-slate-100">
         {/* Modal Top Header (WordPress Style) */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/70">
           <div className="flex items-center gap-3">
@@ -267,7 +267,7 @@ export function MediaLibraryModal({
                   </div>
                 ) : (
                   <>
-                    <div className="h-16 w-16 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 mb-4 group-hover:scale-110 transition-transform">
+                    <div className="h-16 w-16 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 mb-4">
                       <Upload className="h-8 w-8" />
                     </div>
                     <h3 className="text-base font-bold text-white mb-1">
@@ -320,7 +320,7 @@ export function MediaLibraryModal({
                           onClick={() => handleSelectMedia(item)}
                           className={`relative aspect-square rounded-xl overflow-hidden cursor-pointer border-2 transition-all group ${
                             isSelected
-                              ? "border-sky-500 ring-2 ring-sky-500/40 shadow-lg scale-[0.98]"
+                              ? "border-sky-500 ring-2 ring-sky-500/40"
                               : "border-slate-800 hover:border-slate-600 bg-slate-900"
                           }`}
                         >
@@ -328,12 +328,12 @@ export function MediaLibraryModal({
                           <img
                             src={item.url}
                             alt={item.originalFilename || "Media"}
-                            className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+                            className="w-full h-full object-cover"
                           />
 
                           {/* Selected Checkmark Badge (WordPress style) */}
                           {isSelected && (
-                            <div className="absolute top-1.5 right-1.5 h-6 w-6 rounded-md bg-sky-500 text-white flex items-center justify-center shadow-md">
+                            <div className="absolute top-1.5 right-1.5 h-6 w-6 rounded-md bg-sky-500 text-white flex items-center justify-center">
                               <Check className="h-4 w-4 stroke-[3]" />
                             </div>
                           )}
@@ -484,7 +484,7 @@ export function MediaLibraryModal({
               variant="brand"
               onClick={handleConfirmSelection}
               disabled={!selectedMedia || submitting}
-              className="text-xs font-bold gap-1.5 shadow-md shadow-brand/20"
+              className="text-xs font-bold gap-1.5"
             >
               {submitting ? (
                 <>
