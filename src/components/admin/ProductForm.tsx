@@ -337,8 +337,10 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
         })),
       }).unwrap();
 
-      // Calculate master SKU base
-      const skuBase = sku.trim() || name.slice(0, 3).toUpperCase().replace(/[^A-Z]/g, "PRD");
+      // Calculate master SKU base (unique per product)
+      const skuBase =
+        sku.trim() ||
+        `${name.slice(0, 4).toUpperCase().replace(/[^A-Z]/g, "PRD")}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
       // Map generated combinations into variant rows
       const rows: IProductVariantInput[] = res.variants.map((v, i) => {
