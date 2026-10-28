@@ -37,10 +37,10 @@ export function CustomerOrderClient({ orderNumber }: { orderNumber: string }) {
         <ArrowLeft className="h-4 w-4" /> All orders
       </Link>
       {error ? (
-        <div className="rounded-3xl border border-slate-200 bg-white px-6 py-14 text-center">
+        <div className="rounded-lg border border-slate-200 bg-white px-6 py-12 text-center">
           <p className="text-base font-bold text-slate-900">{error === "Order not found" ? "We couldn't find this order" : error}</p>
-          <p className="mt-1 text-sm text-slate-500">It may belong to a different account.</p>
-          <Link href="/track-order" className="mt-5 inline-block text-sm font-semibold text-brand underline">
+          <p className="mt-1 text-xs text-slate-500">It may belong to a different account.</p>
+          <Link href="/track-order" className="mt-4 inline-block text-xs font-semibold text-brand hover:underline">
             Track a guest order instead
           </Link>
         </div>

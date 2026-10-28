@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -218,6 +218,14 @@ export const Header: React.FC = () => {
                       </div>
 
                       <div className="py-1 space-y-0.5">
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setIsAccountOpen(false)}
+                          className="flex items-center gap-2 rounded-md px-3 py-2 text-brand-deep font-bold bg-sky-50/80 hover:bg-sky-100 transition"
+                        >
+                          <LayoutDashboard className="h-4 w-4 text-brand-deep" />
+                          My Dashboard
+                        </Link>
                         {(user.role === "ADMIN" || user.role === "SELLER") && (
                           <Link
                             href="/admin"

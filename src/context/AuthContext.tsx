@@ -69,6 +69,7 @@ interface AuthContextType {
   registerCustomer: (payload: IRegisterCustomerPayload) => Promise<ILoginResponse>;
   registerSeller: (payload: IRegisterSellerPayload) => Promise<ILoginResponse>;
   logout: () => void;
+  updateUser: (updatedFields: Partial<IAuthUser>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -98,10 +99,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const savedToken = localStorage.getItem("shopora_token");
       const savedUser = localStorage.getItem("shopora_user");
       if (savedToken || savedUser) {
+        const parsedUser = savedUser ? (JSON.parse(savedUser) as IAuthUser) : null;
         currentSnapshot = {
           token: savedToken || null,
-          user: savedUser ? (JSON.parse(savedUser) as IAuthUser) : null,
+          user: parsedUser,
         };
+
+        // Ensure cookies are synced for Next.js middleware protection
+        if (savedToken && !document.cookie.includes("shopora_token=")) {
+          document.cookie = `shopora_token=${savedToken}; path=/; max-age=604800; SameSite=Lax`;
+        }
+        if (parsedUser?.role && !document.cookie.includes("shopora_role=")) {
+          document.cookie = `shopora_role=${parsedUser.role}; path=/; max-age=604800; SameSite=Lax`;
+        }
+
         notifyAuthChange();
       }
     } catch {
@@ -121,7 +132,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
     localStorage.setItem("shopora_token", data.accessToken);
     localStorage.setItem("shopora_user", JSON.stringify(data.user));
-    document.cookie = `shopora_role=${data.user.role}; path=/; max-age=604800`;
+    document.cookie = `shopora_token=${data.accessToken}; path=/; max-age=604800; SameSite=Lax`;
+    document.cookie = `shopora_role=${data.user.role}; path=/; max-age=604800; SameSite=Lax`;
     notifyAuthChange();
   };
 
@@ -143,11 +155,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return data;
   };
 
+  const updateUser = (updatedFields: Partial<IAuthUser>) => {
+    if (!currentSnapshot.user) return;
+    const updated = { ...currentSnapshot.user, ...updatedFields };
+    currentSnapshot = {
+      ...currentSnapshot,
+      user: updated,
+    };
+    localStorage.setItem("shopora_user", JSON.stringify(updated));
+    if (updated.role) {
+      document.cookie = `shopora_role=${updated.role}; path=/; max-age=604800; SameSite=Lax`;
+    }
+    notifyAuthChange();
+  };
+
   const logout = () => {
     currentSnapshot = { user: null, token: null };
     localStorage.removeItem("shopora_token");
     localStorage.removeItem("shopora_user");
-    document.cookie = "shopora_role=; path=/; max-age=0";
+    document.cookie = "shopora_token=; path=/; max-age=0; SameSite=Lax";
+    document.cookie = "shopora_role=; path=/; max-age=0; SameSite=Lax";
     notifyAuthChange();
     dispatch(baseApi.util.resetApiState());
     router.push("/");
@@ -165,6 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         registerCustomer,
         registerSeller,
         logout,
+        updateUser,
       }}
     >
       {children}

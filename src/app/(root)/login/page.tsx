@@ -91,7 +91,7 @@ function LoginForm() {
       } else if (res.user.role === "SELLER") {
         router.push("/admin");
       } else {
-        router.push(redirectUrl);
+        router.push(redirectUrl === "/" ? "/dashboard" : redirectUrl);
       }
     } catch (err: unknown) {
       const errorMsg = getApiErrorMessage(err);

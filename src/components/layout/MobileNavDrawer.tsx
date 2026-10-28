@@ -140,14 +140,26 @@ export function MobileNavDrawer({ isOpen, onClose }: MobileNavDrawerProps) {
 
               {/* Quick Role Actions */}
               <div className="pt-2 border-t border-slate-200/60 space-y-1">
+                <Link
+                  href="/dashboard"
+                  onClick={onClose}
+                  className="flex items-center justify-between rounded-xl bg-white border border-brand/20 px-3.5 py-2 text-xs font-bold text-brand-deep shadow-2xs hover:bg-sky-50 transition"
+                >
+                  <span className="flex items-center gap-2">
+                    <LayoutDashboard className="h-4 w-4 text-brand" />
+                    My Dashboard
+                  </span>
+                  <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
+                </Link>
+
                 {(user.role === "ADMIN" || user.role === "SELLER") && (
                   <Link
                     href="/admin/dashboard"
                     onClick={onClose}
-                    className="flex items-center justify-between rounded-xl bg-white border border-brand/20 px-3.5 py-2 text-xs font-bold text-brand-deep shadow-2xs hover:bg-sky-50 transition"
+                    className="flex items-center justify-between rounded-xl bg-white border border-purple-200 px-3.5 py-2 text-xs font-bold text-purple-700 shadow-2xs hover:bg-purple-50 transition"
                   >
                     <span className="flex items-center gap-2">
-                      <LayoutDashboard className="h-4 w-4 text-brand" />
+                      <LayoutDashboard className="h-4 w-4 text-purple-600" />
                       {user.role === "ADMIN" ? "Admin Command Center" : "Seller Command Center"}
                     </span>
                     <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
