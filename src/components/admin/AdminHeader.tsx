@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Menu,
   Search,
@@ -23,11 +24,21 @@ import {
   Activity,
   Sun,
   Moon,
+  Truck,
+  Inbox,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/context/AuthContext";
 import { useAdminTheme } from "@/context/AdminThemeContext";
+import {
+  useGetNotificationsQuery,
+  useGetUnreadNotificationCountQuery,
+  useMarkNotificationAsReadMutation,
+  useMarkAllNotificationsAsReadMutation,
+} from "@/redux";
+import { INotification } from "@/types";
 import { toast } from "sonner";
 
 interface AdminHeaderProps {
@@ -86,44 +97,76 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const notifications = [
-    {
-      id: "1",
-      title: "New Order #SHP-8921",
-      desc: "Rahim Chowdhury placed an order for Kieslect Ks Pro (৳ 4,699)",
-      time: "4m ago",
-      icon: Package,
-      unread: true,
-      type: "order",
-    },
-    {
-      id: "2",
-      title: "Seller KYC Submitted",
-      desc: "ByteTech Official uploaded trade license and TIN for verification",
-      time: "25m ago",
-      icon: Store,
-      unread: true,
-      type: "vendor",
-    },
-    {
-      id: "3",
-      title: "Low Stock Alert",
-      desc: "Anker Soundcore Life Q30 has reached low stock limit (4 units)",
-      time: "1h ago",
-      icon: AlertTriangle,
-      unread: true,
-      type: "alert",
-    },
-    {
-      id: "4",
-      title: "Payout Request",
-      desc: "Apex Tech & Gadgets requested ৳ 45,000 wallet payout via bKash",
-      time: "3h ago",
-      icon: DollarSign,
-      unread: false,
-      type: "finance",
-    },
-  ];
+  const router = useRouter();
+  const { data: countData } = useGetUnreadNotificationCountQuery(undefined, {
+    pollingInterval: 30000,
+  });
+  const unreadCount = countData?.unreadCount ?? 0;
+
+  const { data: notifData, isLoading: isNotifLoading } = useGetNotificationsQuery(
+    { limit: 10 },
+    { skip: !notificationOpen }
+  );
+  const [markAsRead] = useMarkNotificationAsReadMutation();
+  const [markAllAsRead, { isLoading: isMarkingAll }] = useMarkAllNotificationsAsReadMutation();
+
+  const notifications = notifData?.notifications ?? [];
+
+  const getNotificationIcon = (type: string) => {
+    switch (type?.toUpperCase()) {
+      case "ORDER":
+        return Package;
+      case "ORDER_STATUS":
+        return Truck;
+      case "KYC":
+        return Shield;
+      case "LOW_STOCK":
+        return AlertTriangle;
+      case "PAYOUT":
+        return DollarSign;
+      case "PRODUCT_APPROVAL":
+        return CheckCircle2;
+      default:
+        return Bell;
+    }
+  };
+
+  const formatRelativeTime = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr.replace(" ", "T"));
+      const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+      if (isNaN(diff) || diff < 60) return "Just now";
+      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+      if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+      return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    } catch {
+      return "Recently";
+    }
+  };
+
+  const handleNotificationClick = async (notif: INotification) => {
+    if (!notif.isRead) {
+      try {
+        await markAsRead(notif.id).unwrap();
+      } catch {
+        // silently continue
+      }
+    }
+    setNotificationOpen(false);
+    if (notif.link) {
+      router.push(notif.link);
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await markAllAsRead().unwrap();
+      toast.success("All notifications marked as read");
+    } catch {
+      toast.error("Failed to mark all as read");
+    }
+  };
 
   return (
     <header className="admin-header sticky top-0 z-30 h-16 bg-slate-950/85 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-6 flex items-center justify-between gap-4 select-none">
@@ -252,10 +295,12 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
             aria-label="View notifications"
           >
             <Bell className="h-4 w-4" />
-            <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-            </span>
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+              </span>
+            )}
           </button>
 
           {notificationOpen && (
@@ -263,53 +308,79 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps) {
               <div className="flex items-center justify-between p-3.5 border-b border-slate-800 bg-slate-950/50">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-white">Notifications</span>
-                  <Badge variant="destructive" className="h-4 px-1.5 text-[10px]">
-                    3 New
-                  </Badge>
+                  {unreadCount > 0 ? (
+                    <Badge variant="destructive" className="h-4 px-1.5 text-[10px]">
+                      {unreadCount} New
+                    </Badge>
+                  ) : (
+                    <span className="text-[10px] text-slate-400 font-medium">All caught up</span>
+                  )}
                 </div>
-                <button className="text-[11px] text-sky-400 hover:underline">
-                  Mark all read
-                </button>
+                {unreadCount > 0 && (
+                  <button
+                    onClick={handleMarkAllRead}
+                    disabled={isMarkingAll}
+                    className="text-[11px] text-sky-400 hover:underline disabled:opacity-50"
+                  >
+                    {isMarkingAll ? "Marking..." : "Mark all read"}
+                  </button>
+                )}
               </div>
 
               <div className="max-h-80 overflow-y-auto divide-y divide-slate-800/80">
-                {notifications.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <div
-                      key={item.id}
-                      className={`p-3 flex items-start gap-3 hover:bg-slate-850 transition cursor-pointer ${
-                        item.unread ? "bg-slate-850/40" : ""
-                      }`}
-                    >
-                      <div className="h-8 w-8 rounded-lg bg-slate-800 flex items-center justify-center text-sky-400 shrink-0 mt-0.5">
-                        <Icon className="h-4 w-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-1">
-                          <p className="font-bold text-slate-100 truncate">
-                            {item.title}
-                          </p>
-                          <span className="text-[10px] text-slate-400 whitespace-nowrap">
-                            {item.time}
-                          </span>
+                {isNotifLoading ? (
+                  <div className="py-8 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
+                    <Loader2 className="h-5 w-5 animate-spin text-sky-400" />
+                    <span>Loading notifications...</span>
+                  </div>
+                ) : notifications.length === 0 ? (
+                  <div className="py-8 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
+                    <Inbox className="h-7 w-7 text-slate-600" />
+                    <span>No notifications yet</span>
+                  </div>
+                ) : (
+                  notifications.map((item) => {
+                    const Icon = getNotificationIcon(item.type);
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => handleNotificationClick(item)}
+                        className={`p-3 flex items-start gap-3 hover:bg-slate-850 transition cursor-pointer ${
+                          !item.isRead ? "bg-slate-850/60" : "opacity-80"
+                        }`}
+                      >
+                        <div className="h-8 w-8 rounded-lg bg-slate-800 flex items-center justify-center text-sky-400 shrink-0 mt-0.5">
+                          <Icon className="h-4 w-4" />
                         </div>
-                        <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-2 leading-relaxed">
-                          {item.desc}
-                        </p>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1">
+                            <p className="font-bold text-slate-100 truncate">
+                              {item.title}
+                            </p>
+                            <span className="text-[10px] text-slate-400 whitespace-nowrap">
+                              {formatRelativeTime(item.createdAt)}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-300 mt-0.5 line-clamp-2 leading-relaxed">
+                            {item.message}
+                          </p>
+                        </div>
+                        {!item.isRead && (
+                          <span className="h-2 w-2 rounded-full bg-sky-400 shrink-0 mt-1.5" />
+                        )}
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
 
-              <div className="p-2 border-t border-slate-800 bg-slate-950/60 text-center">
+              <div className="p-2 border-t border-slate-800 bg-slate-950/60 text-center flex items-center justify-center gap-3">
                 <Link
-                  href="/admin/orders"
+                  href="/admin/notifications"
                   onClick={() => setNotificationOpen(false)}
                   className="text-xs text-sky-400 font-semibold hover:underline"
                 >
-                  View all orders & updates →
+                  View all notifications →
                 </Link>
               </div>
             </div>

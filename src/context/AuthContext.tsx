@@ -131,6 +131,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       token: data.accessToken,
     };
     localStorage.setItem("shopora_token", data.accessToken);
+    if (data.refreshToken) {
+      localStorage.setItem("shopora_refresh_token", data.refreshToken);
+    }
     localStorage.setItem("shopora_user", JSON.stringify(data.user));
     document.cookie = `shopora_token=${data.accessToken}; path=/; max-age=604800; SameSite=Lax`;
     document.cookie = `shopora_role=${data.user.role}; path=/; max-age=604800; SameSite=Lax`;
@@ -172,6 +175,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     currentSnapshot = { user: null, token: null };
     localStorage.removeItem("shopora_token");
+    localStorage.removeItem("shopora_refresh_token");
     localStorage.removeItem("shopora_user");
     document.cookie = "shopora_token=; path=/; max-age=0; SameSite=Lax";
     document.cookie = "shopora_role=; path=/; max-age=0; SameSite=Lax";

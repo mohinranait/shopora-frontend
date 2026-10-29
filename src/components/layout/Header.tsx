@@ -21,13 +21,26 @@ import {
   Truck,
   LogOut,
   LayoutDashboard,
+  Bell,
+  Package,
+  CheckCircle2,
+  Loader2,
+  Inbox,
 } from "lucide-react";
 import { CartDrawer } from "../cart/CartDrawer";
 import { MobileNavDrawer } from "./MobileNavDrawer";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
-import { useGetWebsiteSettingsQuery } from "@/redux";
+import {
+  useGetWebsiteSettingsQuery,
+  useGetNotificationsQuery,
+  useGetUnreadNotificationCountQuery,
+  useMarkNotificationAsReadMutation,
+  useMarkAllNotificationsAsReadMutation,
+} from "@/redux";
 import { useIsClient } from "@/hooks/useIsClient";
+import { INotification } from "@/types";
+import { toast } from "sonner";
 
 export const Header: React.FC = () => {
   const router = useRouter();
@@ -40,6 +53,43 @@ export const Header: React.FC = () => {
   const cartBadge = totalItems > 99 ? "99+" : String(totalItems);
   const [searchQuery, setSearchQuery] = useState("");
   const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+
+  const { data: countData } = useGetUnreadNotificationCountQuery(undefined, {
+    skip: !isClient || !isAuthenticated,
+    pollingInterval: 30000,
+  });
+  const unreadCount = countData?.unreadCount ?? 0;
+  const { data: notifData, isLoading: isNotifLoading } = useGetNotificationsQuery(
+    { limit: 6 },
+    { skip: !isNotifOpen || !isAuthenticated }
+  );
+  const [markAsRead] = useMarkNotificationAsReadMutation();
+  const [markAllAsRead, { isLoading: isMarkingAll }] = useMarkAllNotificationsAsReadMutation();
+  const notifications = notifData?.notifications ?? [];
+
+  const handleNotificationClick = async (notif: INotification) => {
+    if (!notif.isRead) {
+      try {
+        await markAsRead(notif.id).unwrap();
+      } catch {
+        // silently continue
+      }
+    }
+    setIsNotifOpen(false);
+    if (notif.link) {
+      router.push(notif.link);
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await markAllAsRead().unwrap();
+      toast.success("All notifications marked as read");
+    } catch {
+      toast.error("Failed to mark all as read");
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -158,6 +208,110 @@ export const Header: React.FC = () => {
                 3
               </span>
             </Link>
+
+            {/* Notification Bell Button (Customer/User) */}
+            {isClient && isAuthenticated && (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsNotifOpen(!isNotifOpen);
+                    setIsAccountOpen(false);
+                  }}
+                  className="relative flex items-center justify-center h-10 w-10 rounded-md border border-slate-200 text-slate-600 hover:text-brand hover:border-brand hover:bg-sky-50/50 transition cursor-pointer"
+                  title="Notifications"
+                >
+                  <Bell className="h-5 w-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white px-1 shadow-2xs">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {isNotifOpen && (
+                  <div
+                    className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl z-50 text-xs animate-in fade-in zoom-in-95 duration-100"
+                    onMouseLeave={() => setIsNotifOpen(false)}
+                  >
+                    <div className="flex items-center justify-between pb-2.5 mb-2 border-b border-slate-100">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-slate-900 text-sm">Notifications</span>
+                        {unreadCount > 0 && (
+                          <span className="rounded-full bg-rose-100 text-rose-600 text-[10px] font-bold px-1.5 py-0.5">
+                            {unreadCount} new
+                          </span>
+                        )}
+                      </div>
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={handleMarkAllRead}
+                          disabled={isMarkingAll}
+                          className="text-[11px] font-medium text-brand hover:underline disabled:opacity-50"
+                        >
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 pr-1">
+                      {isNotifLoading ? (
+                        <div className="py-6 text-center text-slate-400 flex flex-col items-center justify-center gap-1.5">
+                          <Loader2 className="h-4 w-4 animate-spin text-brand" />
+                          <span>Loading...</span>
+                        </div>
+                      ) : notifications.length === 0 ? (
+                        <div className="py-8 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
+                          <Inbox className="h-6 w-6 text-slate-300" />
+                          <span className="text-xs">No notifications yet</span>
+                        </div>
+                      ) : (
+                        notifications.map((item) => (
+                          <div
+                            key={item.id}
+                            onClick={() => handleNotificationClick(item)}
+                            className={`p-2.5 rounded-xl transition cursor-pointer flex items-start gap-2.5 ${
+                              !item.isRead ? "bg-sky-50/70 hover:bg-sky-50" : "hover:bg-slate-50"
+                            }`}
+                          >
+                            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-sky-100 text-brand-deep shrink-0 mt-0.5">
+                              {item.type === "ORDER" ? (
+                                <Package className="h-3.5 w-3.5" />
+                              ) : item.type === "ORDER_STATUS" ? (
+                                <Truck className="h-3.5 w-3.5" />
+                              ) : (
+                                <Bell className="h-3.5 w-3.5" />
+                              )}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-slate-800 text-xs truncate">
+                                {item.title}
+                              </p>
+                              <p className="text-[11px] text-slate-500 line-clamp-2 mt-0.5">
+                                {item.message}
+                              </p>
+                            </div>
+                            {!item.isRead && (
+                              <span className="h-2 w-2 rounded-full bg-brand shrink-0 mt-1" />
+                            )}
+                          </div>
+                        ))
+                      )}
+                    </div>
+
+                    <div className="pt-2 mt-2 border-t border-slate-100 text-center">
+                      <Link
+                        href="/orders"
+                        onClick={() => setIsNotifOpen(false)}
+                        className="text-[11px] text-brand font-semibold hover:underline"
+                      >
+                        View all orders & tracking →
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Cart Button */}
             <button

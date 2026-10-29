@@ -15,4 +15,5 @@ export * from "./api/settingsApi";
 export * from "./api/sellerApi";
 export * from "./api/payoutApi";
 export * from "./api/userApi";
+export * from "./api/notificationApi";
 export * from "./slices/cartSlice";

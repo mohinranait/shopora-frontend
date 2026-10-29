@@ -28,6 +28,7 @@ import {
   ChevronRight,
   LogOut,
   Sparkles,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -52,6 +53,7 @@ const navSections: NavSection[] = [
     title: "Overview",
     items: [
       { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+      { label: "Notifications", href: "/admin/notifications", icon: Bell },
       { label: "Analytics", href: "/admin/dashboard?tab=analytics", icon: BarChart3 },
     ],
   },

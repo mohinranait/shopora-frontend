@@ -52,6 +52,11 @@ export async function request<T>(path: string, init: RequestInit = {}): Promise<
   }
   const json = await res.json().catch(() => null);
   if (!res.ok) {
+    if (res.status === 401) {
+      try {
+        localStorage.removeItem("shopora_token");
+      } catch {}
+    }
     const message = json?.errorSources?.[0]?.message || json?.message || `Request failed (${res.status})`;
     throw new CartApiError(message, res.status);
   }
