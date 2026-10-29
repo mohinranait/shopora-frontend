@@ -13,12 +13,14 @@ export interface IWishlistItem {
     id: number;
     name: string;
     slug: string;
+    productType?: string;
     mainImage: string | null;
     basePrice: number;
     comparePrice?: number | null;
     stock: number;
     ratingAverage?: number | null;
     ratingCount?: number | null;
+    status?: string;
   } | null;
 }
 
@@ -97,6 +99,14 @@ export const userApiSlice = baseApi.injectEndpoints({
       invalidatesTags: ["Wishlist"],
     }),
 
+    clearWishlist: builder.mutation<{ message: string }, void>({
+      query: () => ({
+        url: "/wishlist/clear",
+        method: "DELETE",
+      }),
+      transformResponse: (res: IApiResponse<{ message: string }>) => res.data,
+      invalidatesTags: ["Wishlist"],
+    }),
     removeWishlistItem: builder.mutation<{ message: string }, number>({
       query: (productId) => ({
         url: `/wishlist/${productId}`,
@@ -116,4 +126,5 @@ export const {
   useGetUserWishlistQuery,
   useToggleWishlistItemMutation,
   useRemoveWishlistItemMutation,
+  useClearWishlistMutation,
 } = userApiSlice;

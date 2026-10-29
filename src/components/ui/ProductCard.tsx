@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import type { IProductItem, IMockProduct } from "@/types";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/hooks/useWishlist";
 
 export type ProductCardData = IProductItem | IMockProduct;
 
@@ -50,7 +51,8 @@ export function ProductCardSkeleton() {
  * Supports both real backend IProductItem and IMockProduct with complete null-safety
  */
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { isWishlisted: checkWishlist, toggleWishlist, isToggling } = useWishlist();
+  const isWishlisted = checkWishlist(product.id);
   const [isAdded, setIsAdded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const { addItem } = useCart();
@@ -196,16 +198,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Wishlist Button */}
         <button
           type="button"
-          onClick={(e) => {
+          disabled={isToggling}
+          onClick={async (e) => {
             e.preventDefault();
-            setIsWishlisted(!isWishlisted);
+            e.stopPropagation();
+            await toggleWishlist(product.id, product.name);
           }}
-          className={`absolute right-2.5 top-2.5 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-2xs transition hover:scale-110 ${
-            isWishlisted ? "text-rose-500" : "text-slate-400 hover:text-rose-500"
+          className={`absolute right-2.5 top-2.5 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 shadow-sm transition hover:scale-110 active:scale-95 cursor-pointer ${
+            isWishlisted ? "text-rose-500 shadow-rose-100" : "text-slate-400 hover:text-rose-500"
           }`}
-          aria-label="Add to wishlist"
+          aria-label={isWishlisted ? "Remove from favorites" : "Add to favorites"}
+          title={isWishlisted ? "Remove from favorites" : "Add to favorites"}
         >
-          <Heart className={`h-4 w-4 ${isWishlisted ? "fill-rose-500" : ""}`} />
+          <Heart className={`h-4 w-4 transition-colors ${isWishlisted ? "fill-rose-500 text-rose-500" : ""}`} />
         </button>
 
         {/* Product Image */}

@@ -15,7 +15,9 @@ import {
   Plus,
   Minus,
   Sparkles,
+  Heart,
 } from "lucide-react";
+import { useWishlist } from "@/hooks/useWishlist";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
@@ -37,6 +39,8 @@ export function ProductInfo({
   const [quantity, setQuantity] = useState<number>(1);
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const { addItem } = useCart();
+  const { isWishlisted: checkWishlist, toggleWishlist, isToggling } = useWishlist();
+  const isWishlisted = checkWishlist(product.id);
   const router = useRouter();
   const needsVariant = product.productType === "VARIABLE" && (product.variants?.length ?? 0) > 0;
 
@@ -416,6 +420,22 @@ export function ProductInfo({
           >
             <Zap className="h-4.5 w-4.5 text-amber-400 fill-amber-400" />
             <span>Buy Now</span>
+          </button>
+
+          {/* Wishlist Button */}
+          <button
+            type="button"
+            disabled={isToggling}
+            onClick={() => toggleWishlist(product.id, product.name)}
+            className={`flex items-center justify-center h-12 w-12 rounded-xl border transition-all shadow-xs cursor-pointer shrink-0 ${
+              isWishlisted
+                ? "border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100"
+                : "border-slate-200 bg-white text-slate-500 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50/50"
+            }`}
+            title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+            aria-label={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+          >
+            <Heart className={`h-5 w-5 transition-transform active:scale-90 ${isWishlisted ? "fill-rose-500 text-rose-500" : ""}`} />
           </button>
         </div>
       </div>

@@ -30,6 +30,7 @@ import {
 import { CartDrawer } from "../cart/CartDrawer";
 import { MobileNavDrawer } from "./MobileNavDrawer";
 import { useAuth } from "@/context/AuthContext";
+import { useWishlist } from "@/hooks/useWishlist";
 import { useCart } from "@/context/CartContext";
 import {
   useGetWebsiteSettingsQuery,
@@ -45,6 +46,7 @@ import { toast } from "sonner";
 export const Header: React.FC = () => {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuth();
+  const { wishlistCount } = useWishlist();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { totalItems, subtotal, isDrawerOpen, openDrawer, closeDrawer } = useCart();
@@ -199,14 +201,16 @@ export const Header: React.FC = () => {
           <div className="ml-auto hidden md:flex items-center gap-3 shrink-0">
             {/* Wishlist Button */}
             <Link
-              href="/wishlist"
+              href="/dashboard?tab=favorite"
               className="relative flex items-center justify-center h-10 w-10 rounded-md border border-slate-200 text-slate-600 hover:text-brand hover:border-brand hover:bg-sky-50/50 transition group"
-              title="Wishlist"
+              title="My Favorites & Wishlist"
             >
               <Heart className="h-5 w-5 transition group-hover:scale-110" />
-              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-2xs">
-                3
-              </span>
+              {isClient && wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-2xs">
+                  {wishlistCount > 99 ? "99+" : wishlistCount}
+                </span>
+              )}
             </Link>
 
             {/* Notification Bell Button (Customer/User) */}
@@ -399,12 +403,17 @@ export const Header: React.FC = () => {
                           My Orders
                         </Link>
                         <Link
-                          href="/wishlist"
+                          href="/dashboard?tab=favorite"
                           onClick={() => setIsAccountOpen(false)}
                           className="flex items-center gap-2 rounded-md px-3 py-2 text-slate-700 hover:bg-sky-50 hover:text-brand transition"
                         >
                           <Heart className="h-4 w-4 text-brand" />
-                          My Wishlist
+                          <span>My Wishlist</span>
+                          {isClient && wishlistCount > 0 && (
+                            <span className="ml-auto rounded-full bg-rose-100 text-rose-600 px-1.5 py-0.5 text-[10px] font-bold">
+                              {wishlistCount}
+                            </span>
+                          )}
                         </Link>
                         <div className="border-t border-slate-100 my-1" />
                         <button
