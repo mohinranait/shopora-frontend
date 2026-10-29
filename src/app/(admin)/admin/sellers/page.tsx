@@ -449,12 +449,17 @@ export default function AdminSellersPage() {
                           </div>
                           <div>
                             <div className="flex items-center gap-1.5">
-                              <span className="font-bold text-white">{seller.storeName}</span>
-                              {seller.isVerified && (
-                                <span title="Verified Merchant">
-                                  <ShieldCheck className="h-3.5 w-3.5 text-brand" />
-                                </span>
-                              )}
+                              <Link
+                                href={`/admin/sellers/${seller.id}`}
+                                className="font-bold text-white hover:text-brand transition flex items-center gap-1.5"
+                              >
+                                <span>{seller.storeName}</span>
+                                {seller.isVerified && (
+                                  <span title="Verified Merchant">
+                                    <ShieldCheck className="h-3.5 w-3.5 text-brand" />
+                                  </span>
+                                )}
+                              </Link>
                             </div>
                             <div className="flex items-center gap-2 mt-0.5">
                               <Link
@@ -568,6 +573,14 @@ export default function AdminSellersPage() {
                               Suspend
                             </button>
                           )}
+
+                          <Link
+                            href={`/admin/sellers/${seller.id}`}
+                            className="rounded-lg bg-brand/10 border border-brand/20 px-2.5 py-1 text-xs font-bold text-brand hover:bg-brand hover:text-white transition"
+                            title="View comprehensive vendor performance & analytics"
+                          >
+                            Details
+                          </Link>
 
                           <button
                             type="button"

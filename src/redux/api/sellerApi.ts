@@ -3,6 +3,7 @@ import type {
   IApiResponse,
   ISeller,
   IReviewSellerPayload,
+  ISellerDetailResponse,
 } from "@/types";
 
 export const sellerApiSlice = baseApi.injectEndpoints({
@@ -13,6 +14,14 @@ export const sellerApiSlice = baseApi.injectEndpoints({
       }),
       transformResponse: (res: IApiResponse<ISeller[]>) => res.data,
       providesTags: ["Sellers"],
+    }),
+
+    getAdminSellerDetails: builder.query<ISellerDetailResponse, number | string>({
+      query: (id) => ({
+        url: `/sellers/admin/${id}`,
+      }),
+      transformResponse: (res: IApiResponse<ISellerDetailResponse>) => res.data,
+      providesTags: (_result, _error, id) => [{ type: "Seller", id }, "Seller"],
     }),
 
     reviewSellerApplication: builder.mutation<
@@ -27,10 +36,25 @@ export const sellerApiSlice = baseApi.injectEndpoints({
       transformResponse: (res: IApiResponse<ISeller>) => res.data,
       invalidatesTags: ["Sellers", "Seller"],
     }),
+
+    sendAdminSellerNotice: builder.mutation<
+      { message: string },
+      { id: number; title: string; message: string }
+    >({
+      query: ({ id, title, message }) => ({
+        url: `/sellers/admin/${id}/notice`,
+        method: "POST",
+        body: { title, message },
+      }),
+      transformResponse: (res: IApiResponse<{ message: string }>) => res.data,
+      invalidatesTags: ["Notifications"],
+    }),
   }),
 });
 
 export const {
   useGetAdminSellersQuery,
+  useGetAdminSellerDetailsQuery,
   useReviewSellerApplicationMutation,
+  useSendAdminSellerNoticeMutation,
 } = sellerApiSlice;

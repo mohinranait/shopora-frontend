@@ -47,3 +47,82 @@ export interface IReviewSellerPayload {
   commissionRate?: number;
   isVerified?: boolean;
 }
+
+
+export interface ISellerPerformance {
+  totalProducts: number;
+  approvedProducts: number;
+  pendingProducts: number;
+  rejectedProducts: number;
+  outOfStockProducts: number;
+  avgRating: number;
+  totalReviews: number;
+  totalOrders: number;
+  deliveredOrders: number;
+  processingOrders: number;
+  cancelledOrders: number;
+  returnedOrders: number;
+  fulfillmentRate: number;
+  cancellationRate: number;
+  returnRate: number;
+  grossSales: number;
+  netEarnings: number;
+  platformCommission: number;
+  healthScore: number;
+  reputation: "EXCELLENT" | "GOOD" | "AVERAGE" | "RISKY" | "CRITICAL";
+  riskFlags: string[];
+}
+
+export interface ISellerRecentProduct {
+  id: number;
+  name: string;
+  slug: string;
+  sku: string;
+  mainImage: string | null;
+  basePrice: number;
+  stock: number;
+  status: string;
+  approvalStatus: string;
+  ratingAverage: number | null;
+  createdAt: string;
+}
+
+export interface ISellerRecentOrder {
+  id: number;
+  subOrderNumber: string;
+  orderId: number;
+  orderNumber?: string;
+  customerName: string;
+  customerPhone?: string | null;
+  totalAmount: number;
+  sellerEarnings: number;
+  commissionAmount: number;
+  status: string;
+  createdAt: string;
+}
+
+export interface ISellerDetailResponse {
+  seller: ISeller;
+  owner: {
+    id: number;
+    name: string;
+    email: string;
+    phone?: string | null;
+    role: string;
+    isActive: boolean;
+    createdAt: string;
+  } | null;
+  wallet: ISellerWallet | null;
+  payouts: Array<{
+    id: number;
+    amount: number;
+    paymentMethod: string;
+    status: string;
+    createdAt: string;
+    processedAt?: string | null;
+    transactionReference?: string | null;
+  }>;
+  performance: ISellerPerformance;
+  recentProducts: ISellerRecentProduct[];
+  recentOrders: ISellerRecentOrder[];
+}

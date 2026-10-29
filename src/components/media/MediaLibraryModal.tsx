@@ -86,6 +86,7 @@ export function MediaLibraryModal({
   const handleFileUpload = async (file: File) => {
     try {
       const formData = new FormData();
+      formData.append("image", file);
       formData.append("file", file);
       const uploaded = await uploadFileMutation(formData).unwrap();
       setUserSelectedMedia(uploaded);
