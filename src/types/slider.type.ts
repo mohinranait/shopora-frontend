@@ -20,6 +20,8 @@ export interface ISliderItem {
   isActive: boolean;
   useMediaId?: number | null;
   useMedia?: IUseMediaItem | null;
+  mobileUseMediaId?: number | null;
+  mobileUseMedia?: IUseMediaItem | null;
   startDate?: string | null;
   endDate?: string | null;
   createdAt?: string;
@@ -42,6 +44,7 @@ export interface ICreateSliderPayload {
   displayOrder?: number;
   isActive?: boolean;
   useMediaId?: number | null;
+  mobileUseMediaId?: number | null;
   startDate?: string | null;
   endDate?: string | null;
 }
