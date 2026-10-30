@@ -70,7 +70,7 @@ export function ProfileManageTab({ user }: { user: IAuthUser }) {
   const [deleteAddressMutation] = useDeleteUserAddressMutation();
 
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
-  const [deletingAddressId, setDeletingAddressId] = useState<number | null>(null);
+  const [deletingAddressId, setDeletingAddressId] = useState<string | number | null>(null);
 
   // Profile Form
   const {
@@ -155,7 +155,7 @@ export function ProfileManageTab({ user }: { user: IAuthUser }) {
     }
   };
 
-  const onDeleteAddress = async (id: number) => {
+  const onDeleteAddress = async (id: string | number) => {
     try {
       setDeletingAddressId(id);
       await deleteAddressMutation(id).unwrap();
@@ -387,11 +387,11 @@ export function ProfileManageTab({ user }: { user: IAuthUser }) {
                       <button
                         type="button"
                         onClick={() => onDeleteAddress(addr.id)}
-                        disabled={deletingAddressId === addr.id}
+                        disabled={deletingAddressId !== null && String(deletingAddressId) === String(addr.id)}
                         className="rounded-md p-1 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition cursor-pointer"
                         title="Delete Address"
                       >
-                        {deletingAddressId === addr.id ? (
+                        {deletingAddressId !== null && String(deletingAddressId) === String(addr.id) ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin text-rose-500" />
                         ) : (
                           <Trash2 className="h-3.5 w-3.5" />

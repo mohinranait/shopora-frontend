@@ -1,8 +1,8 @@
 export type SellerStatus = "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED";
 
 export interface ISellerWallet {
-  id: number;
-  sellerId: number;
+  id: string;
+  sellerId: string;
   balance: number;
   pendingBalance: number;
   totalWithdrawn: number;
@@ -13,14 +13,14 @@ export interface ISellerWallet {
 }
 
 export interface ISeller {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   storeName: string;
   storeSlug: string;
   storeLogo: string | null;
   storeBanner: string | null;
-  logoId?: number | null;
-  bannerId?: number | null;
+  logoId?: string | null;
+  bannerId?: string | null;
   storeDescription: string | null;
   phone: string;
   businessAddress: string;
@@ -50,7 +50,6 @@ export interface IReviewSellerPayload {
   isVerified?: boolean;
 }
 
-
 export interface ISellerPerformance {
   totalProducts: number;
   approvedProducts: number;
@@ -76,7 +75,7 @@ export interface ISellerPerformance {
 }
 
 export interface ISellerRecentProduct {
-  id: number;
+  id: string;
   name: string;
   slug: string;
   sku: string;
@@ -90,9 +89,9 @@ export interface ISellerRecentProduct {
 }
 
 export interface ISellerRecentOrder {
-  id: number;
+  id: string;
   subOrderNumber: string;
-  orderId: number;
+  orderId: string;
   orderNumber?: string;
   customerName: string;
   customerPhone?: string | null;
@@ -106,7 +105,7 @@ export interface ISellerRecentOrder {
 export interface ISellerDetailResponse {
   seller: ISeller;
   owner: {
-    id: number;
+    id: string;
     name: string;
     email: string;
     phone?: string | null;
@@ -116,7 +115,7 @@ export interface ISellerDetailResponse {
   } | null;
   wallet: ISellerWallet | null;
   payouts: Array<{
-    id: number;
+    id: string;
     amount: number;
     paymentMethod: string;
     status: string;

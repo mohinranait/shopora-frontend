@@ -65,14 +65,14 @@ export async function request<T>(path: string, init: RequestInit = {}): Promise<
 
 export const cartApi = {
   get: () => request<ICart>("/cart"),
-  add: (productId: number, quantity: number, variantId?: number | null) =>
+  add: (productId: string | number, quantity: number, variantId?: string | number | null) =>
     request("/cart/add", {
       method: "POST",
       body: JSON.stringify({ productId, quantity, variantId: variantId ?? null }),
     }),
-  update: (itemId: number, quantity: number) =>
+  update: (itemId: string | number, quantity: number) =>
     request(`/cart/item/${itemId}`, { method: "PATCH", body: JSON.stringify({ quantity }) }),
-  remove: (itemId: number) => request(`/cart/item/${itemId}`, { method: "DELETE" }),
+  remove: (itemId: string | number) => request(`/cart/item/${itemId}`, { method: "DELETE" }),
   clear: () => request("/cart/clear", { method: "DELETE" }),
   quote: (items: ICheckoutPayload["items"], couponCode?: string) =>
     request<IOrderQuote>("/orders/quote", {

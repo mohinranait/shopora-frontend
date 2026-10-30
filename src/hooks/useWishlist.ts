@@ -22,12 +22,12 @@ export function useWishlist() {
   const [removeMutation, { isLoading: isRemoving }] = useRemoveWishlistItemMutation();
   const [clearMutation, { isLoading: isClearing }] = useClearWishlistMutation();
 
-  const isWishlisted = (productId: number): boolean => {
+  const isWishlisted = (productId: string | number): boolean => {
     if (!isAuthenticated) return false;
-    return wishlist.some((item) => item.productId === productId);
+    return wishlist.some((item) => String(item.productId) === String(productId));
   };
 
-  const toggleWishlist = async (productId: number, productName?: string): Promise<boolean | null> => {
+  const toggleWishlist = async (productId: string | number, productName?: string): Promise<boolean | null> => {
     if (!isAuthenticated) {
       toast.info("Please login to save items to your favorites", {
         action: {
@@ -56,7 +56,7 @@ export function useWishlist() {
     }
   };
 
-  const removeFromWishlist = async (productId: number, productName?: string): Promise<boolean> => {
+  const removeFromWishlist = async (productId: string | number, productName?: string): Promise<boolean> => {
     if (!isAuthenticated) return false;
 
     try {

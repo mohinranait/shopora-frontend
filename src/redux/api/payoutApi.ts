@@ -17,7 +17,7 @@ export const payoutApiSlice = baseApi.injectEndpoints({
 
     processPayout: builder.mutation<
       IPayoutRequest,
-      { id: number; data: IProcessPayoutPayload }
+      { id: string | number; data: IProcessPayoutPayload }
     >({
       query: ({ id, data }) => ({
         url: `/payouts/admin/${id}/process`,

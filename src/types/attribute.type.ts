@@ -1,8 +1,8 @@
 export type AttributeDisplayType = "SELECT" | "COLOR" | "BUTTON" | "RADIO" | "TEXT";
 
 export interface IAttributeValue {
-  id: number;
-  attributeId: number;
+  id: string;
+  attributeId: string;
   value: string;
   colorCode?: string | null;
   displayOrder: number;
@@ -10,7 +10,7 @@ export interface IAttributeValue {
 }
 
 export interface IAttribute {
-  id: number;
+  id: string;
   name: string;
   slug: string;
   type: AttributeDisplayType;
@@ -23,9 +23,9 @@ export interface IAttribute {
 }
 
 export interface IGeneratedVariantCombinationDetail {
-  attributeId: number;
+  attributeId: string;
   attributeName: string;
-  valueId: number;
+  valueId: string;
   value: string;
   colorCode?: string | null;
 }
@@ -34,7 +34,7 @@ export interface IGeneratedVariantRow {
   index: number;
   title: string;
   suggestedSkuSuffix: string;
-  attributeValueIds: number[];
+  attributeValueIds: string[];
   attributes: Record<string, string>;
   combinationDetails: IGeneratedVariantCombinationDetail[];
   price: number;
@@ -44,7 +44,8 @@ export interface IGeneratedVariantRow {
   lowStockThreshold: number;
   isDefault: boolean;
   image?: string | null;
-  useMediaId?: number | null;
+  imageId?: string | null;
+  useMediaId?: string | null;
 }
 
 export interface ICreateAttributePayload {
@@ -77,7 +78,7 @@ export interface IUpdateAttributeValuePayload {
 }
 
 export interface IGenerateCombinationsPayload {
-  attributes: Array<{ attributeId: number; valueIds: number[] }>;
+  attributes: Array<{ attributeId: string | number; valueIds: Array<string | number> }>;
 }
 
 export interface IGenerateCombinationsResponse {

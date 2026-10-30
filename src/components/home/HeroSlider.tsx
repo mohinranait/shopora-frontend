@@ -65,7 +65,7 @@ export function HeroSliderSkeleton() {
 
 // Default Fallback Slide if database has no active slides
 const DEFAULT_FALLBACK_SLIDE: ISliderItem = {
-  id: 0,
+  id: "default-fallback-slide",
   type: "CONTENT_ONLY",
   title: "Authentic Products, Best Prices in Bangladesh",
   subtitle: "Explore verified electronics, fashion, lifestyle and home essentials with nationwide doorstep delivery.",
@@ -168,7 +168,11 @@ export function HeroSlider() {
         {/* ========================================================= */}
         {sliders.map((slide, idx) => {
           const isActive = idx === currentIndex;
-          const displayImage = slide.useMedia?.media?.url || slide.imageUrl || "";
+          const displayImage =
+            slide.useMedia?.media?.url ||
+            (slide as any).image?.media?.url ||
+            slide.imageUrl ||
+            "";
 
           return (
             <div

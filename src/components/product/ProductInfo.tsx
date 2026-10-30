@@ -121,7 +121,8 @@ export function ProductInfo({
     const mainImg =
       activeVariant?.image ||
       product.mainImage ||
-      (product.images && product.images.length > 0 ? product.images[0].url : "");
+      (product as any).mainImageUseMedia?.media?.url ||
+      (product.images && product.images.length > 0 ? (product.images[0].url || (product.images[0] as any).useMedia?.media?.url) : "");
 
     setIsAdding(true);
     const ok = await addItem(
@@ -142,7 +143,7 @@ export function ProductInfo({
         },
         variant: activeVariant
           ? {
-              id: activeVariant.id ?? 0,
+              id: activeVariant.id ?? "default",
               title: activeVariant.title,
               sku: activeVariant.sku,
               price: activeVariant.price,

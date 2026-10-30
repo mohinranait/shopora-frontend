@@ -47,7 +47,7 @@ export default function AdminProductsPage() {
   >("all");
   const [search, setSearch] = useState("");
 
-  const handleApprove = async (id: number) => {
+  const handleApprove = async (id: string | number) => {
     try {
       await reviewProductApproval({ id, status: "APPROVED" }).unwrap();
       toast.success("Product approved and published successfully.");
@@ -56,7 +56,7 @@ export default function AdminProductsPage() {
     }
   };
 
-  const handleReject = async (id: number) => {
+  const handleReject = async (id: string | number) => {
     const reason = prompt("Enter rejection reason:");
     if (!reason) return;
     try {

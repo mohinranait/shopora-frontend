@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useUpdateAdminCustomerMutation } from "@/redux";
 
 interface CustomerData {
-  id: number;
+  id: string | number;
   name: string;
   email: string;
   phone?: string | null;

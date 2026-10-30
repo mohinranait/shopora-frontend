@@ -1,14 +1,14 @@
 import { IUseMediaItem } from "./media.type";
 
 export interface IBrand {
-  id: number;
+  id: string;
   name: string;
   slug: string;
   logo?: string | null;
   website?: string | null;
   description?: string | null;
-  logoId?: number | null;
-  useMediaId?: number | null;
+  logoId?: string | null;
+  useMediaId?: string | null;
   useMedia?: IUseMediaItem | null;
   isActive: boolean;
   createdAt: string;
@@ -20,8 +20,8 @@ export interface ICreateBrandPayload {
   logo?: string | null;
   website?: string | null;
   description?: string | null;
-  logoId?: number | null;
-  useMediaId?: number | null;
+  logoId?: string | null;
+  useMediaId?: string | null;
   isActive?: boolean;
 }
 

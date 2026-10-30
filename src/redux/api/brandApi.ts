@@ -21,7 +21,7 @@ export const brandApiSlice = baseApi.injectEndpoints({
           : [{ type: "Brands", id: "LIST" }],
     }),
 
-    getBrandById: builder.query<IBrand, number>({
+    getBrandById: builder.query<IBrand, string | number>({
       query: (id) => `/brands/${id}`,
       transformResponse: (res: IApiResponse<IBrand>) => res.data,
       providesTags: (result, error, id) => [{ type: "Brand", id }],
@@ -39,7 +39,7 @@ export const brandApiSlice = baseApi.injectEndpoints({
 
     updateBrand: builder.mutation<
       IBrand,
-      { id: number; body: IUpdateBrandPayload }
+      { id: string | number; body: IUpdateBrandPayload }
     >({
       query: ({ id, body }) => ({
         url: `/brands/${id}`,
@@ -53,7 +53,7 @@ export const brandApiSlice = baseApi.injectEndpoints({
       ],
     }),
 
-    deleteBrand: builder.mutation<{ message: string; id: number }, number>({
+    deleteBrand: builder.mutation<{ message: string; id: string | number }, string | number>({
       query: (id) => ({
         url: `/brands/${id}`,
         method: "DELETE",

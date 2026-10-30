@@ -1,17 +1,17 @@
 import { IUseMediaItem } from "./media.type";
 
 export interface ICategory {
-  id: number;
+  id: string;
   name: string;
   slug: string;
   description?: string | null;
   image?: string | null;
-  imageId?: number | null;
+  imageId?: string | null;
   icon?: string | null;
-  useMediaId?: number | null;
+  useMediaId?: string | null;
   useMedia?: IUseMediaItem | null;
-  parentId?: number | null;
-  parent?: { id: number; name: string; slug: string } | null;
+  parentId?: string | null;
+  parent?: { id: string; name: string; slug: string } | null;
   children?: ICategory[];
   isActive: boolean;
   displayOrder: number;
@@ -23,10 +23,10 @@ export interface ICreateCategoryPayload {
   name: string;
   description?: string | null;
   image?: string | null;
-  imageId?: number | null;
+  imageId?: string | null;
   icon?: string | null;
-  useMediaId?: number | null;
-  parentId?: number | null;
+  useMediaId?: string | null;
+  parentId?: string | null;
   isActive?: boolean;
   displayOrder?: number;
 }

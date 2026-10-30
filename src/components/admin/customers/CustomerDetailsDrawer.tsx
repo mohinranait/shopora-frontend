@@ -33,7 +33,7 @@ import {
 import { EditCustomerDialog } from "./EditCustomerDialog";
 
 interface CustomerDetailsDrawerProps {
-  customerId: number | null;
+  customerId: string | number | null;
   isOpen: boolean;
   onClose: () => void;
 }

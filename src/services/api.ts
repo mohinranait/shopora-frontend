@@ -146,8 +146,8 @@ export const mediaApi = {
   },
 
   // Delete raw media asset
-  deleteMedia: async (id: number) => {
-    const res = await fetchApi<{ message: string; id: number }>(`/media/${id}`, {
+  deleteMedia: async (id: string | number) => {
+    const res = await fetchApi<{ message: string; id: string | number }>(`/media/${id}`, {
       method: "DELETE",
     });
     return res.data;
@@ -164,7 +164,7 @@ export const brandApi = {
     return Array.isArray(res.data) ? res.data : [];
   },
 
-  getById: async (id: number) => {
+  getById: async (id: string | number) => {
     const res = await fetchApi<IBrand>(`/brands/${id}`);
     return res.data;
   },
@@ -177,7 +177,7 @@ export const brandApi = {
     return res.data;
   },
 
-  update: async (id: number, payload: IUpdateBrandPayload) => {
+  update: async (id: string | number, payload: IUpdateBrandPayload) => {
     const res = await fetchApi<IBrand>(`/brands/${id}`, {
       method: "PATCH",
       body: JSON.stringify(payload),
@@ -185,8 +185,8 @@ export const brandApi = {
     return res.data;
   },
 
-  delete: async (id: number) => {
-    const res = await fetchApi<{ message: string; id: number }>(`/brands/${id}`, {
+  delete: async (id: string | number) => {
+    const res = await fetchApi<{ message: string; id: string | number }>(`/brands/${id}`, {
       method: "DELETE",
     });
     return res.data;
@@ -208,7 +208,7 @@ export const categoryApi = {
     return Array.isArray(res.data) ? res.data : [];
   },
 
-  getById: async (id: number) => {
+  getById: async (id: string | number) => {
     const res = await fetchApi<ICategory>(`/categories/${id}`);
     return res.data;
   },
@@ -221,7 +221,7 @@ export const categoryApi = {
     return res.data;
   },
 
-  update: async (id: number, payload: IUpdateCategoryPayload) => {
+  update: async (id: string | number, payload: IUpdateCategoryPayload) => {
     const res = await fetchApi<ICategory>(`/categories/${id}`, {
       method: "PATCH",
       body: JSON.stringify(payload),
@@ -229,8 +229,8 @@ export const categoryApi = {
     return res.data;
   },
 
-  delete: async (id: number) => {
-    const res = await fetchApi<{ message: string; id: number }>(`/categories/${id}`, {
+  delete: async (id: string | number) => {
+    const res = await fetchApi<{ message: string; id: string | number }>(`/categories/${id}`, {
       method: "DELETE",
     });
     return res.data;
@@ -247,7 +247,7 @@ export const attributeApi = {
     return Array.isArray(res.data) ? res.data : [];
   },
 
-  getById: async (id: number) => {
+  getById: async (id: string | number) => {
     const res = await fetchApi<IAttribute>(`/attributes/${id}`);
     return res.data;
   },
@@ -260,7 +260,7 @@ export const attributeApi = {
     return res.data;
   },
 
-  update: async (id: number, payload: IUpdateAttributePayload) => {
+  update: async (id: string | number, payload: IUpdateAttributePayload) => {
     const res = await fetchApi<IAttribute>(`/attributes/${id}`, {
       method: "PATCH",
       body: JSON.stringify(payload),
@@ -268,14 +268,14 @@ export const attributeApi = {
     return res.data;
   },
 
-  delete: async (id: number) => {
-    const res = await fetchApi<{ message: string; id: number }>(`/attributes/${id}`, {
+  delete: async (id: string | number) => {
+    const res = await fetchApi<{ message: string; id: string | number }>(`/attributes/${id}`, {
       method: "DELETE",
     });
     return res.data;
   },
 
-  createValue: async (attributeId: number, payload: ICreateAttributeValuePayload) => {
+  createValue: async (attributeId: string | number, payload: ICreateAttributeValuePayload) => {
     const res = await fetchApi<IAttributeValue>(`/attributes/${attributeId}/values`, {
       method: "POST",
       body: JSON.stringify(payload),
@@ -283,7 +283,7 @@ export const attributeApi = {
     return res.data;
   },
 
-  updateValue: async (valueId: number, payload: IUpdateAttributeValuePayload) => {
+  updateValue: async (valueId: string | number, payload: IUpdateAttributeValuePayload) => {
     const res = await fetchApi<IAttributeValue>(`/attributes/values/${valueId}`, {
       method: "PATCH",
       body: JSON.stringify(payload),
@@ -291,8 +291,8 @@ export const attributeApi = {
     return res.data;
   },
 
-  deleteValue: async (valueId: number) => {
-    const res = await fetchApi<{ message: string; valueId: number }>(
+  deleteValue: async (valueId: string | number) => {
+    const res = await fetchApi<{ message: string; valueId: string | number }>(
       `/attributes/values/${valueId}`,
       {
         method: "DELETE",
@@ -331,7 +331,7 @@ export const productApi = {
     };
   },
 
-  getById: async (id: number) => {
+  getById: async (id: string | number) => {
     const res = await fetchApi<IProductItem>(`/products/${id}`);
     return res.data;
   },
@@ -349,7 +349,7 @@ export const productApi = {
     return res.data;
   },
 
-  update: async (id: number, payload: IUpdateProductPayload) => {
+  update: async (id: string | number, payload: IUpdateProductPayload) => {
     const res = await fetchApi<IProductItem>(`/products/${id}`, {
       method: "PATCH",
       body: JSON.stringify(payload),
@@ -357,7 +357,7 @@ export const productApi = {
     return res.data;
   },
 
-  reviewApproval: async (id: number, status: "APPROVED" | "REJECTED", rejectionReason?: string) => {
+  reviewApproval: async (id: string | number, status: "APPROVED" | "REJECTED", rejectionReason?: string) => {
     const res = await fetchApi<IProductItem>(`/products/admin/${id}/approval`, {
       method: "PATCH",
       body: JSON.stringify({ status, rejectionReason }),
@@ -365,7 +365,7 @@ export const productApi = {
     return res.data;
   },
 
-  delete: async (id: number) => {
+  delete: async (id: string | number) => {
     const res = await fetchApi<{ message: string }>(`/products/${id}`, {
       method: "DELETE",
     });

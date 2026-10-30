@@ -1,10 +1,10 @@
 export interface ICartItem {
-  id: number;
-  productId: number;
-  variantId: number | null;
+  id: string | number;
+  productId: string;
+  variantId: string | null;
   quantity: number;
   product: {
-    id: number;
+    id: string;
     name: string;
     slug: string;
     mainImage: string;
@@ -14,7 +14,7 @@ export interface ICartItem {
     isFreeShipping?: boolean;
   } | null;
   variant: {
-    id: number;
+    id: string;
     title: string;
     sku: string;
     price: number;
@@ -23,7 +23,7 @@ export interface ICartItem {
     attributes?: Record<string, string> | null;
   } | null;
   seller: {
-    id: number;
+    id: string;
     storeName: string;
     storeSlug: string;
     storeLogo?: string | null;
@@ -53,7 +53,7 @@ export interface IOrderQuote {
   freeShippingThreshold: number;
   coupon: { code: string; discountType: string; discountValue: number } | null;
   couponMessage: string | null;
-  issues: { productId: number; variantId: number | null; message: string }[];
+  issues: { productId: string | number; variantId: string | number | null; message: string }[];
   itemCount: number;
   /** Payment methods currently enabled for checkout */
   paymentMethods?: string[];
@@ -72,7 +72,7 @@ export interface ICheckoutAddress {
 export type PaymentMethod = "COD" | "BKASH" | "NAGAD";
 
 export interface ICheckoutPayload {
-  items: { productId: number; variantId: number | null; quantity: number }[];
+  items: { productId: string | number; variantId: string | number | null; quantity: number }[];
   shippingAddress: ICheckoutAddress;
   paymentMethod: PaymentMethod;
   couponCode?: string;
@@ -82,7 +82,7 @@ export interface ICheckoutPayload {
 }
 
 export interface IPlacedOrder {
-  id: number;
+  id: string;
   orderNumber: string;
   totalAmount: number;
   subtotal: number;

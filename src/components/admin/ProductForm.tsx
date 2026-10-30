@@ -68,10 +68,10 @@ import { toast } from "sonner";
 /* ========================================================================== */
 
 interface SelectedAttrGroup {
-  attributeId: number;
+  attributeId: string;
   attributeName: string;
   type: string;
-  selectedValues: number[];
+  selectedValues: string[];
 }
 
 interface ProductFormProps {
@@ -98,8 +98,8 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
   const [name, setName] = useState(initialData?.name || "");
   const [slug, setSlug] = useState(initialData?.slug || "");
   const [isSlugCustomized, setIsSlugCustomized] = useState(false);
-  const [categoryId, setCategoryId] = useState<number | "">(initialData?.categoryId || "");
-  const [brandId, setBrandId] = useState<number | "">(initialData?.brandId || "");
+  const [categoryId, setCategoryId] = useState<string | "">(initialData?.categoryId ? String(initialData.categoryId) : "");
+  const [brandId, setBrandId] = useState<string | "">(initialData?.brandId ? String(initialData.brandId) : "");
   const [shortDescription, setShortDescription] = useState(initialData?.shortDescription || "");
   const [description, setDescription] = useState(initialData?.description || "");
   const [tagsInput, setTagsInput] = useState(initialData?.tags?.join(", ") || "");
@@ -130,16 +130,16 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
   // Form State: 4. Media
   // ==========================================
   const [mainImageUrl, setMainImageUrl] = useState(initialData?.mainImage || "");
-  const [mainImageUseMediaId, setMainImageUseMediaId] = useState<number | undefined>(
-    initialData?.mainImageId ?? initialData?.mainImageUseMediaId ?? undefined
+  const [mainImageUseMediaId, setMainImageUseMediaId] = useState<string | undefined>(
+    (initialData?.mainImageId ?? initialData?.mainImageUseMediaId ?? undefined) as string | undefined
   );
   const [galleryImages, setGalleryImages] = useState<
-    Array<{ url: string; useMediaId?: number; imageId?: number; altText?: string }>
+    Array<{ url: string; useMediaId?: string; imageId?: string; altText?: string }>
   >(
     initialData?.images?.map((img) => ({
       url: img.url,
-      imageId: img.imageId ?? img.useMediaId ?? undefined,
-      useMediaId: img.imageId ?? img.useMediaId ?? undefined,
+      imageId: (img.imageId ?? img.useMediaId ?? undefined) as string | undefined,
+      useMediaId: (img.imageId ?? img.useMediaId ?? undefined) as string | undefined,
       altText: img.altText ?? undefined,
     })) || []
   );
@@ -154,12 +154,12 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
   const [selectedAttributeGroups, setSelectedAttributeGroups] = useState<SelectedAttrGroup[]>(() => {
     if (!initialData?.selectedAttributes || initialData.selectedAttributes.length === 0) return [];
     return initialData.selectedAttributes.map((sa) => ({
-      attributeId: sa.attributeId,
+      attributeId: String(sa.attributeId),
       attributeName: sa.name || `Attribute #${sa.attributeId}`,
       type: sa.type || "SELECT",
       selectedValues: sa.values
         .map((v) => v.attributeValueId)
-        .filter((v): v is number => typeof v === "number"),
+        .filter((v): v is string => Boolean(v)),
     }));
   });
 
@@ -267,7 +267,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
   // ==========================================
   // 4. Attribute Group Selection for Variable Products
   // ==========================================
-  const handleAddAttributeGroup = (attrId: number) => {
+  const handleAddAttributeGroup = (attrId: string) => {
     if (!attrId) return;
     if (selectedAttributeGroups.some((g) => g.attributeId === attrId)) {
       toast.info("This attribute is already added to the product.");
@@ -288,11 +288,11 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
     ]);
   };
 
-  const handleRemoveAttributeGroup = (attrId: number) => {
+  const handleRemoveAttributeGroup = (attrId: string) => {
     setSelectedAttributeGroups((prev) => prev.filter((g) => g.attributeId !== attrId));
   };
 
-  const handleToggleAttributeValue = (attrId: number, valueId: number) => {
+  const handleToggleAttributeValue = (attrId: string, valueId: string) => {
     setSelectedAttributeGroups((prev) =>
       prev.map((g) => {
         if (g.attributeId !== attrId) return g;
@@ -305,7 +305,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
     );
   };
 
-  const handleSelectAllValues = (attrId: number) => {
+  const handleSelectAllValues = (attrId: string) => {
     const matched = availableAttributes.find((a) => a.id === attrId);
     if (!matched) return;
     setSelectedAttributeGroups((prev) =>
@@ -315,7 +315,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
     );
   };
 
-  const handleClearAllValues = (attrId: number) => {
+  const handleClearAllValues = (attrId: string) => {
     setSelectedAttributeGroups((prev) =>
       prev.map((g) => (g.attributeId === attrId ? { ...g, selectedValues: [] } : g))
     );
@@ -514,8 +514,8 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
         name: name.trim(),
         shortDescription: shortDescription.trim() || undefined,
         description: description.trim(),
-        categoryId: Number(categoryId),
-        brandId: brandId ? Number(brandId) : null,
+        categoryId: String(categoryId),
+        brandId: brandId ? String(brandId) : null,
         sku: sku.trim() || undefined,
         productType,
         basePrice: finalBasePrice,
@@ -771,7 +771,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
               <select
                 required
                 value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : "")}
+                onChange={(e) => setCategoryId(e.target.value)}
                 className="w-full h-10 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand font-medium"
               >
                 <option value="">-- Choose Category --</option>
@@ -789,7 +789,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
               </label>
               <select
                 value={brandId}
-                onChange={(e) => setBrandId(e.target.value ? Number(e.target.value) : "")}
+                onChange={(e) => setBrandId(e.target.value)}
                 className="w-full h-10 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand font-medium"
               >
                 <option value="">-- Select Brand (No Brand) --</option>
@@ -1176,7 +1176,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
               <select
                 onChange={(e) => {
                   if (e.target.value) {
-                    handleAddAttributeGroup(Number(e.target.value));
+                    handleAddAttributeGroup(e.target.value);
                     e.target.value = "";
                   }
                 }}

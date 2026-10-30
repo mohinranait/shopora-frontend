@@ -125,11 +125,11 @@ export function MediaLibraryModal({
   };
 
   // Handle Delete Raw Media
-  const handleDeleteMedia = async (id: number) => {
+  const handleDeleteMedia = async (id: string | number) => {
     if (!confirm("Are you sure you want to permanently delete this media asset?")) return;
     try {
       await deleteMediaMutation(id).unwrap();
-      if (userSelectedMedia?.id === id) {
+      if (String(userSelectedMedia?.id) === String(id)) {
         setUserSelectedMedia(null);
         setCustomAltText(null);
       }

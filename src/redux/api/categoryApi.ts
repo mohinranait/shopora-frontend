@@ -28,7 +28,7 @@ export const categoryApiSlice = baseApi.injectEndpoints({
       providesTags: ["CategoryTree"],
     }),
 
-    getCategoryById: builder.query<ICategory, number>({
+    getCategoryById: builder.query<ICategory, string | number>({
       query: (id) => `/categories/${id}`,
       transformResponse: (res: IApiResponse<ICategory>) => res.data,
       providesTags: (result, error, id) => [{ type: "Category", id }],
@@ -46,7 +46,7 @@ export const categoryApiSlice = baseApi.injectEndpoints({
 
     updateCategory: builder.mutation<
       ICategory,
-      { id: number; body: IUpdateCategoryPayload }
+      { id: string | number; body: IUpdateCategoryPayload }
     >({
       query: ({ id, body }) => ({
         url: `/categories/${id}`,
@@ -61,7 +61,7 @@ export const categoryApiSlice = baseApi.injectEndpoints({
       ],
     }),
 
-    deleteCategory: builder.mutation<{ message: string; id: number }, number>({
+    deleteCategory: builder.mutation<{ message: string; id: string | number }, string | number>({
       query: (id) => ({
         url: `/categories/${id}`,
         method: "DELETE",

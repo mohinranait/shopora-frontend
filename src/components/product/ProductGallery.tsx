@@ -17,20 +17,26 @@ export function ProductGallery({ product, selectedVariantImage }: ProductGallery
 
     if (product.mainImage) {
       list.push(product.mainImage);
+    } else if ((product as any).mainImageUseMedia?.media?.url) {
+      list.push((product as any).mainImageUseMedia.media.url);
+    } else if ("image" in product && typeof (product as any).image === "string" && (product as any).image) {
+      list.push((product as any).image);
     }
 
     if (product.images && Array.isArray(product.images)) {
-      product.images.forEach((img) => {
-        if (img.url && !list.includes(img.url)) {
-          list.push(img.url);
+      product.images.forEach((img: any) => {
+        const u = img.url || img.useMedia?.media?.url || img.image?.media?.url;
+        if (u && !list.includes(u)) {
+          list.push(u);
         }
       });
     }
 
     if (product.variants && Array.isArray(product.variants)) {
-      product.variants.forEach((v) => {
-        if (v.image && !list.includes(v.image)) {
-          list.push(v.image);
+      product.variants.forEach((v: any) => {
+        const u = v.image || v.useMedia?.media?.url || v.image?.media?.url;
+        if (u && !list.includes(u)) {
+          list.push(u);
         }
       });
     }

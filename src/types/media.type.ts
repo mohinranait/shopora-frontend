@@ -1,5 +1,5 @@
 export interface IMediaItem {
-  id: number;
+  id: string;
   url: string;
   publicId: string;
   format?: string | null;
@@ -12,8 +12,8 @@ export interface IMediaItem {
 }
 
 export interface IUseMediaItem {
-  id: number;
-  mediaId: number;
+  id: string;
+  mediaId: string;
   alt?: string | null;
   description?: string | null;
   media?: IMediaItem;
@@ -21,22 +21,22 @@ export interface IUseMediaItem {
 }
 
 export interface SelectedMediaPayload {
-  useMediaId: number;
+  useMediaId: string;
   url: string;
   alt: string;
   description: string;
-  mediaId: number;
+  mediaId: string;
 }
 
 export interface ImageValue {
   url: string;
-  useMediaId?: number | null;
+  useMediaId?: string | null;
   alt?: string;
   description?: string;
 }
 
 export interface ICreateUseMediaPayload {
-  mediaId: number;
+  mediaId: string;
   alt?: string;
   description?: string;
 }

@@ -63,7 +63,7 @@ export default function AdminNotificationsPage() {
   const notifications = data?.notifications || [];
   const meta = data?.meta;
 
-  const handleMarkRead = async (id: number) => {
+  const handleMarkRead = async (id: string | number) => {
     try {
       await markAsRead(id).unwrap();
       toast.success("Notification marked as read");
@@ -81,7 +81,7 @@ export default function AdminNotificationsPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string | number) => {
     try {
       await deleteNotification(id).unwrap();
       toast.success("Notification removed");

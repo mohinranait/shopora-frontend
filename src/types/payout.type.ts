@@ -1,15 +1,15 @@
 export type PayoutStatus = "PENDING" | "APPROVED" | "PAID" | "REJECTED";
 
 export interface IPayoutSellerBrief {
-  id: number;
+  id: string;
   storeName: string;
   storeSlug: string;
   phone: string;
 }
 
 export interface IPayoutRequest {
-  id: number;
-  sellerId: number;
+  id: string;
+  sellerId: string;
   amount: number;
   paymentMethod: string;
   accountDetails: {

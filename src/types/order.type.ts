@@ -2,13 +2,13 @@ export type OrderStatus = "PENDING" | "CONFIRMED" | "PROCESSING" | "SHIPPED" | "
 export type PaymentStatus = "PENDING" | "PAID" | "FAILED" | "REFUNDED";
 
 export interface IOrderItem {
-  id: number;
-  orderId: number;
-  subOrderId: number | null;
-  productId: number;
+  id: string;
+  orderId: string;
+  subOrderId: string | null;
+  productId: string;
   productSlug: string | null;
-  variantId: number | null;
-  sellerId: number | null;
+  variantId: string | null;
+  sellerId: string | null;
   productName: string;
   variantTitle: string | null;
   productImage: string | null;
@@ -19,10 +19,10 @@ export interface IOrderItem {
 }
 
 export interface ISubOrder {
-  id: number;
+  id: string;
   subOrderNumber: string;
-  orderId: number;
-  sellerId: number | null;
+  orderId: string;
+  sellerId: string | null;
   isPlatformOwned: boolean;
   subtotal: number;
   totalAmount: number;
@@ -35,7 +35,7 @@ export interface ISubOrder {
   courierName: string | null;
   createdAt: string;
   updatedAt: string;
-  store: { id: number; storeName: string; storeSlug: string; phone?: string | null } | null;
+  store: { id: string; storeName: string; storeSlug: string; phone?: string | null } | null;
   items: IOrderItem[];
 }
 
@@ -50,9 +50,9 @@ export interface IOrderAddress {
 }
 
 export interface IOrder {
-  id: number;
+  id: string;
   orderNumber: string;
-  userId: number | null;
+  userId: string | null;
   guestEmail: string | null;
   guestPhone: string | null;
   shippingAddress: IOrderAddress;
@@ -74,5 +74,5 @@ export interface IOrder {
   subOrders: ISubOrder[];
   itemCount: number;
   canCancel: boolean;
-  customer?: { id: number; name: string; email: string; phone: string | null } | null;
+  customer?: { id: string; name: string; email: string; phone: string | null } | null;
 }

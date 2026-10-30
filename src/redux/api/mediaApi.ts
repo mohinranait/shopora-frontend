@@ -57,7 +57,7 @@ export const mediaApiSlice = baseApi.injectEndpoints({
       transformResponse: (res: IApiResponse<IUseMediaItem>) => res.data,
     }),
 
-    deleteMedia: builder.mutation<{ message: string; id: number }, number>({
+    deleteMedia: builder.mutation<{ message: string; id: string | number }, string | number>({
       query: (id) => ({
         url: `/media/${id}`,
         method: "DELETE",

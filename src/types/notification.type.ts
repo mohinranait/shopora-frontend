@@ -8,8 +8,8 @@ export type NotificationType =
   | "SYSTEM";
 
 export interface INotification {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   title: string;
   message: string;
   type: NotificationType | string;

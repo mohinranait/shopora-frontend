@@ -49,7 +49,7 @@ export default function AdminAttributesPage() {
   const [deleteAttributeValue] = useDeleteAttributeValueMutation();
 
   const [search, setSearch] = useState("");
-  const [selectedAttributeId, setSelectedAttributeId] = useState<number | null>(null);
+  const [selectedAttributeId, setSelectedAttributeId] = useState<string | number | null>(null);
 
   // Modal State for Create / Edit Attribute
   const [isAttrModalOpen, setIsAttrModalOpen] = useState(false);
@@ -73,7 +73,7 @@ export default function AdminAttributesPage() {
   const [valueSubmitting, setValueSubmitting] = useState(false);
 
   // Selected Attribute
-  const selectedAttribute = attributes.find((a) => a.id === selectedAttributeId) || attributes[0] || null;
+  const selectedAttribute = attributes.find((a) => String(a.id) === String(selectedAttributeId)) || attributes[0] || null;
 
   // Total Counts
   const totalAttributes = attributes.length;
@@ -187,7 +187,7 @@ export default function AdminAttributesPage() {
     try {
       await deleteAttribute(attr.id).unwrap();
       toast.success(`Attribute "${attr.name}" removed.`);
-      if (selectedAttributeId === attr.id) {
+      if (String(selectedAttributeId) === String(attr.id)) {
         const remaining = attributes.filter((a) => a.id !== attr.id);
         setSelectedAttributeId(remaining.length > 0 ? remaining[0].id : null);
       }

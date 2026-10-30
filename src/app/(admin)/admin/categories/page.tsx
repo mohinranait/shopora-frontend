@@ -60,7 +60,7 @@ export default function AdminCategoriesPage() {
 
   // Form State
   const [formName, setFormName] = useState("");
-  const [formParentId, setFormParentId] = useState<number | null>(null);
+  const [formParentId, setFormParentId] = useState<string | null>(null);
   const [formDescription, setFormDescription] = useState("");
   const [formDisplayOrder, setFormDisplayOrder] = useState(0);
   const [formIsActive, setFormIsActive] = useState(true);
@@ -68,7 +68,7 @@ export default function AdminCategoriesPage() {
   const [formSubmitting, setFormSubmitting] = useState(false);
 
   // Open Create Modal
-  const handleOpenCreate = (parentId?: number) => {
+  const handleOpenCreate = (parentId?: string) => {
     setModalMode("create");
     setEditingCategory(null);
     setFormName("");
@@ -373,7 +373,7 @@ export default function AdminCategoriesPage() {
                 </label>
                 <select
                   value={formParentId || ""}
-                  onChange={(e) => setFormParentId(e.target.value ? Number(e.target.value) : null)}
+                  onChange={(e) => setFormParentId(e.target.value ? e.target.value : null)}
                   className="mt-1 w-full h-9 rounded-lg border border-slate-700 bg-slate-950 px-3 text-xs text-white focus:outline-none focus:ring-2 focus:ring-brand"
                 >
                   <option value="">None (Top-Level Root Category)</option>

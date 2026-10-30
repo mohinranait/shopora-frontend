@@ -32,11 +32,11 @@ export function FavoritesTab() {
     isClearing,
   } = useWishlist();
 
-  const [removingId, setRemovingId] = useState<number | null>(null);
-  const [addingId, setAddingId] = useState<number | null>(null);
+  const [removingId, setRemovingId] = useState<string | number | null>(null);
+  const [addingId, setAddingId] = useState<string | number | null>(null);
   const [confirmClear, setConfirmClear] = useState(false);
 
-  const handleRemove = async (productId: number, productName: string) => {
+  const handleRemove = async (productId: string | number, productName: string) => {
     setRemovingId(productId);
     await removeFromWishlist(productId, productName);
     setRemovingId(null);
@@ -166,8 +166,8 @@ export function FavoritesTab() {
               const product = item.product;
               if (!product) return null;
 
-              const isItemRemoving = removingId === item.productId;
-              const isItemAdding = addingId === item.productId;
+              const isItemRemoving = removingId !== null && String(removingId) === String(item.productId);
+              const isItemAdding = addingId !== null && String(addingId) === String(item.productId);
               const isVariable = product.productType === "VARIABLE";
               const inStock = product.stock > 0;
 

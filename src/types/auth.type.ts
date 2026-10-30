@@ -1,15 +1,15 @@
 export type UserRole = "ADMIN" | "SELLER" | "CUSTOMER";
 
 export interface IAuthUser {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: UserRole;
   phone?: string | null;
   avatar?: string | null;
-  avatarId?: number | null;
+  avatarId?: string | null;
   sellerProfile?: {
-    id: number;
+    id: string;
     storeName: string;
     storeSlug: string;
     status: string;
@@ -21,7 +21,7 @@ export interface ILoginResponse {
   accessToken: string;
   refreshToken?: string;
   seller?: {
-    id: number;
+    id: string;
     storeName: string;
     storeSlug: string;
     status: string;
@@ -31,7 +31,7 @@ export interface ILoginResponse {
 export interface IRegisterSellerResponse {
   user: IAuthUser;
   seller: {
-    id: number;
+    id: string;
     storeName: string;
     storeSlug: string;
     status: string;

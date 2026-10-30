@@ -4,12 +4,12 @@ import type { ICartItem } from "@/types";
 export const CART_STORAGE_KEY = "shopora_cart";
 
 export interface AddToCartInput {
-  productId: number;
-  variantId?: number | null;
+  productId: string;
+  variantId?: string | null;
   quantity?: number;
   name?: string;
   product?: {
-    id: number;
+    id: string;
     name: string;
     slug: string;
     mainImage: string;
@@ -19,7 +19,7 @@ export interface AddToCartInput {
     isFreeShipping?: boolean;
   } | null;
   variant?: {
-    id: number;
+    id: string;
     title: string;
     sku: string;
     price: number;
@@ -28,7 +28,7 @@ export interface AddToCartInput {
     attributes?: Record<string, string> | null;
   } | null;
   seller?: {
-    id: number;
+    id: string;
     storeName: string;
     storeSlug: string;
     storeLogo?: string | null;
@@ -122,7 +122,7 @@ export const cartSlice = createSlice({
         existing.quantity = Math.min(existing.quantity + addQty, maxStock);
         existing.itemTotal = existing.unitPrice * existing.quantity;
       } else {
-        const id = variantId ? payload.productId * 1000000 + variantId : payload.productId;
+        const id = variantId ? `${payload.productId}__${variantId}` : payload.productId;
         const unitPrice = payload.unitPrice ?? payload.product?.basePrice ?? 0;
         const comparePrice = payload.comparePrice ?? null;
         const maxStock = payload.maxAvailableStock ?? payload.product?.stock ?? 999;
@@ -161,7 +161,7 @@ export const cartSlice = createSlice({
               },
           variant: payload.variant
             ? {
-                id: payload.variant.id ?? variantId ?? 0,
+                id: payload.variant.id ?? variantId ?? "default",
                 title: payload.variant.title ?? "",
                 sku: payload.variant.sku ?? "",
                 price: payload.variant.price ?? unitPrice,
@@ -182,7 +182,7 @@ export const cartSlice = createSlice({
       saveCart(state.items);
     },
 
-    updateQuantity: (state, action: PayloadAction<{ id: number; quantity: number }>) => {
+    updateQuantity: (state, action: PayloadAction<{ id: string | number; quantity: number }>) => {
       const { id, quantity } = action.payload;
       if (quantity <= 0) {
         state.items = state.items.filter((i) => i.id !== id);
@@ -201,7 +201,7 @@ export const cartSlice = createSlice({
       saveCart(state.items);
     },
 
-    removeFromCart: (state, action: PayloadAction<number>) => {
+    removeFromCart: (state, action: PayloadAction<string | number>) => {
       const id = action.payload;
       state.items = state.items.filter((i) => i.id !== id);
       const { subtotal, totalItems } = calculateTotals(state.items);

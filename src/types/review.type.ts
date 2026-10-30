@@ -1,13 +1,13 @@
 export interface IReviewUser {
-  id: number;
+  id: string;
   name: string;
   avatar?: string | null;
 }
 
 export interface IReviewItem {
-  id: number;
-  productId: number;
-  userId: number;
+  id: string;
+  productId: string;
+  userId: string;
   rating: number;
   title?: string | null;
   comment: string;
@@ -20,7 +20,7 @@ export interface IReviewItem {
 }
 
 export interface ICreateReviewPayload {
-  productId: number;
+  productId: string;
   rating: number;
   title?: string;
   comment: string;

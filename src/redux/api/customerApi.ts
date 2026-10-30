@@ -35,7 +35,7 @@ export const customerApiSlice = baseApi.injectEndpoints({
           : [{ type: "Customers", id: "LIST" }],
     }),
 
-    getAdminCustomer: builder.query<ICustomerDetail, number>({
+    getAdminCustomer: builder.query<ICustomerDetail, string | number>({
       query: (id) => `/users/admin/${id}`,
       transformResponse: (res: IApiResponse<ICustomerDetail>) => res.data,
       providesTags: (_r, _e, id) => [{ type: "Customer", id }],
@@ -44,7 +44,7 @@ export const customerApiSlice = baseApi.injectEndpoints({
     updateAdminCustomer: builder.mutation<
       ICustomerItem,
       {
-        id: number;
+        id: string | number;
         name?: string;
         email?: string;
         phone?: string | null;
@@ -65,7 +65,7 @@ export const customerApiSlice = baseApi.injectEndpoints({
       ],
     }),
 
-    toggleCustomerStatus: builder.mutation<unknown, { id: number; isActive: boolean }>({
+    toggleCustomerStatus: builder.mutation<unknown, { id: string | number; isActive: boolean }>({
       query: ({ id, isActive }) => ({
         url: `/users/admin/${id}/status`,
         method: "PATCH",

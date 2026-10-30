@@ -27,7 +27,7 @@ interface CartContextValue {
   totalItems: number;
   status: CartStatus;
   /** Item ids with an update in flight */
-  pendingIds: Set<number>;
+  pendingIds: Set<string | number>;
   isDrawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
@@ -36,8 +36,8 @@ interface CartContextValue {
     input: AddItemInput,
     options?: { openDrawer?: boolean; silent?: boolean }
   ) => Promise<boolean>;
-  updateQuantity: (itemId: number, quantity: number) => Promise<void>;
-  removeItem: (itemId: number) => Promise<void>;
+  updateQuantity: (itemId: string | number, quantity: number) => Promise<void>;
+  removeItem: (itemId: string | number) => Promise<void>;
   clear: () => Promise<void>;
 }
 
@@ -50,7 +50,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const { items, subtotal, totalItems, isDrawerOpen, isHydrated } = useAppSelector(
     (state) => state.cart
   );
-  const [pendingIds, setPendingIds] = useState<Set<number>>(new Set());
+  const [pendingIds, setPendingIds] = useState<Set<string | number>>(new Set());
 
   // Hydrate cart from localStorage on client mount
   useEffect(() => {
@@ -63,7 +63,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     dispatch(hydrateCart());
   }, [dispatch]);
 
-  const markPending = useCallback((id: number, on: boolean) => {
+  const markPending = useCallback((id: string | number, on: boolean) => {
     setPendingIds((prev) => {
       const next = new Set(prev);
       if (on) next.add(id);
@@ -143,7 +143,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 
   const removeItem = useCallback(
-    async (itemId: number) => {
+    async (itemId: string | number) => {
       const existing = items.find((i) => i.id === itemId);
       if (!existing) return;
 
@@ -174,7 +174,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 
   const updateQuantity = useCallback(
-    async (itemId: number, quantity: number) => {
+    async (itemId: string | number, quantity: number) => {
       const item = items.find((i) => i.id === itemId);
       if (!item || quantity === item.quantity) return;
 

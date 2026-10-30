@@ -34,8 +34,8 @@ export const notificationApi = baseApi.injectEndpoints({
     }),
 
     markNotificationAsRead: builder.mutation<
-      { id: number; isRead: boolean },
-      number
+      { id: string | number; isRead: boolean },
+      string | number
     >({
       query: (id) => ({
         url: `/notifications/${id}/read`,
@@ -53,8 +53,8 @@ export const notificationApi = baseApi.injectEndpoints({
     }),
 
     deleteNotification: builder.mutation<
-      { id: number; deleted: boolean },
-      number
+      { id: string | number; deleted: boolean },
+      string | number
     >({
       query: (id) => ({
         url: `/notifications/${id}`,

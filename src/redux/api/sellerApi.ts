@@ -26,7 +26,7 @@ export const sellerApiSlice = baseApi.injectEndpoints({
 
     reviewSellerApplication: builder.mutation<
       ISeller,
-      { id: number; data: IReviewSellerPayload }
+      { id: string | number; data: IReviewSellerPayload }
     >({
       query: ({ id, data }) => ({
         url: `/sellers/admin/${id}/review`,
@@ -39,7 +39,7 @@ export const sellerApiSlice = baseApi.injectEndpoints({
 
     sendAdminSellerNotice: builder.mutation<
       { message: string },
-      { id: number; title: string; message: string }
+      { id: string | number; title: string; message: string }
     >({
       query: ({ id, title, message }) => ({
         url: `/sellers/admin/${id}/notice`,

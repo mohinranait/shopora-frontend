@@ -6,11 +6,11 @@ import type {
 } from "@/types";
 
 export interface IWishlistItem {
-  id: number;
-  productId: number;
+  id: string | number;
+  productId: string;
   createdAt: string;
   product: {
-    id: number;
+    id: string;
     name: string;
     slug: string;
     productType?: string;
@@ -28,8 +28,8 @@ export interface IUpdateProfilePayload {
   name?: string;
   phone?: string;
   avatar?: string;
-  avatarId?: number | null;
-  avatarUseMediaId?: number | null;
+  avatarId?: string | number | null;
+  avatarUseMediaId?: string | number | null;
 }
 
 export interface IAddAddressPayload {
@@ -72,7 +72,7 @@ export const userApiSlice = baseApi.injectEndpoints({
       invalidatesTags: ["UserAddresses"],
     }),
 
-    deleteUserAddress: builder.mutation<{ message: string }, number>({
+    deleteUserAddress: builder.mutation<{ message: string }, string | number>({
       query: (id) => ({
         url: `/users/addresses/${id}`,
         method: "DELETE",
@@ -89,7 +89,7 @@ export const userApiSlice = baseApi.injectEndpoints({
 
     toggleWishlistItem: builder.mutation<
       { isWishlisted: boolean; message: string },
-      { productId: number }
+      { productId: string | number }
     >({
       query: (body) => ({
         url: "/wishlist/toggle",
@@ -108,7 +108,7 @@ export const userApiSlice = baseApi.injectEndpoints({
       transformResponse: (res: IApiResponse<{ message: string }>) => res.data,
       invalidatesTags: ["Wishlist"],
     }),
-    removeWishlistItem: builder.mutation<{ message: string }, number>({
+    removeWishlistItem: builder.mutation<{ message: string }, string | number>({
       query: (productId) => ({
         url: `/wishlist/${productId}`,
         method: "DELETE",

@@ -81,7 +81,7 @@ export default function AdminCustomersPage() {
   const [limit] = useState(15);
 
   // Drawer & Edit Dialog state
-  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | number | null>(null);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<ICustomerItem | null>(null);
 
@@ -116,14 +116,14 @@ export default function AdminCustomersPage() {
 
   const customers = data?.users ?? [];
   const meta = data?.meta;
-  const counts = meta?.counts;
+  const counts = (meta as any)?.counts;
 
   const totalPages = meta?.totalPages ?? 1;
 
   // Calculate gross spend of visible customers or lifetime sum
   const totalRevenueSum = customers.reduce((acc, c) => acc + (c.totalSpent || 0), 0);
 
-  const handleQuickView = (customerId: number) => {
+  const handleQuickView = (customerId: string | number) => {
     setSelectedCustomerId(customerId);
     setDrawerOpen(true);
   };

@@ -38,8 +38,8 @@ export const productApiSlice = baseApi.injectEndpoints({
           : [{ type: "Products", id: "LIST" }],
     }),
 
-    // Get single product by numerical ID
-    getProductById: builder.query<IProductItem, number>({
+    // Get single product by ID
+    getProductById: builder.query<IProductItem, string | number>({
       query: (id) => `/products/${id}`,
       transformResponse: (res: IApiResponse<IProductItem>) => res.data,
       providesTags: (result, error, id) => [{ type: "Product", id }],
@@ -66,7 +66,7 @@ export const productApiSlice = baseApi.injectEndpoints({
     // Update existing product
     updateProduct: builder.mutation<
       IProductItem,
-      { id: number; body: IUpdateProductPayload }
+      { id: string | number; body: IUpdateProductPayload }
     >({
       query: ({ id, body }) => ({
         url: `/products/${id}`,
@@ -83,7 +83,7 @@ export const productApiSlice = baseApi.injectEndpoints({
     // Review product approval status (Admin)
     reviewProductApproval: builder.mutation<
       IProductItem,
-      { id: number; status: "APPROVED" | "REJECTED"; rejectionReason?: string }
+      { id: string | number; status: "APPROVED" | "REJECTED"; rejectionReason?: string }
     >({
       query: ({ id, status, rejectionReason }) => ({
         url: `/products/admin/${id}/approval`,
@@ -98,7 +98,7 @@ export const productApiSlice = baseApi.injectEndpoints({
     }),
 
     // Delete product
-    deleteProduct: builder.mutation<{ message: string }, number>({
+    deleteProduct: builder.mutation<{ message: string }, string | number>({
       query: (id) => ({
         url: `/products/${id}`,
         method: "DELETE",

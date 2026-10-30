@@ -1,8 +1,8 @@
 import { IPaginationMeta } from "./common.type";
 
 export interface ICustomerAddress {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   fullName: string;
   phone: string;
   streetAddress: string;
@@ -17,7 +17,7 @@ export interface ICustomerAddress {
 }
 
 export interface ICustomerItem {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: string;
@@ -33,7 +33,7 @@ export interface ICustomerItem {
 }
 
 export interface ICustomerOrderSummary {
-  id: number;
+  id: string;
   orderNumber: string;
   orderStatus: string;
   paymentStatus: string;
@@ -47,8 +47,8 @@ export interface ICustomerOrderSummary {
 }
 
 export interface ICustomerReviewSummary {
-  id: number;
-  productId: number;
+  id: string;
+  productId: string;
   rating: number;
   title?: string | null;
   comment: string;
@@ -57,7 +57,7 @@ export interface ICustomerReviewSummary {
   isApproved: boolean;
   createdAt: string;
   product?: {
-    id: number;
+    id: string;
     name: string;
     slug: string;
     mainImage?: string | null;
@@ -66,7 +66,7 @@ export interface ICustomerReviewSummary {
 
 export interface ICustomerDetail {
   user: {
-    id: number;
+    id: string;
     name: string;
     email: string;
     role: string;
@@ -100,11 +100,5 @@ export interface ICustomerFilters {
 
 export interface ICustomerListResponse {
   users: ICustomerItem[];
-  meta: IPaginationMeta & {
-    counts?: {
-      totalCustomers: number;
-      activeCustomers: number;
-      verifiedCustomers: number;
-    };
-  };
+  meta?: IPaginationMeta;
 }

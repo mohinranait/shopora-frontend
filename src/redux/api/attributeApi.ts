@@ -26,7 +26,7 @@ export const attributeApiSlice = baseApi.injectEndpoints({
           : [{ type: "Attributes", id: "LIST" }],
     }),
 
-    getAttributeById: builder.query<IAttribute, number>({
+    getAttributeById: builder.query<IAttribute, string | number>({
       query: (id) => `/attributes/${id}`,
       transformResponse: (res: IApiResponse<IAttribute>) => res.data,
       providesTags: (result, error, id) => [{ type: "Attribute", id }],
@@ -44,7 +44,7 @@ export const attributeApiSlice = baseApi.injectEndpoints({
 
     updateAttribute: builder.mutation<
       IAttribute,
-      { id: number; body: IUpdateAttributePayload }
+      { id: string | number; body: IUpdateAttributePayload }
     >({
       query: ({ id, body }) => ({
         url: `/attributes/${id}`,
@@ -58,18 +58,18 @@ export const attributeApiSlice = baseApi.injectEndpoints({
       ],
     }),
 
-    deleteAttribute: builder.mutation<{ message: string; id: number }, number>({
+    deleteAttribute: builder.mutation<{ message: string; id: string | number }, string | number>({
       query: (id) => ({
         url: `/attributes/${id}`,
         method: "DELETE",
       }),
-      transformResponse: (res: IApiResponse<{ message: string; id: number }>) => res.data,
+      transformResponse: (res: IApiResponse<{ message: string; id: string | number }>) => res.data,
       invalidatesTags: [{ type: "Attributes", id: "LIST" }],
     }),
 
     createAttributeValue: builder.mutation<
       IAttributeValue,
-      { attributeId: number; body: ICreateAttributeValuePayload }
+      { attributeId: string | number; body: ICreateAttributeValuePayload }
     >({
       query: ({ attributeId, body }) => ({
         url: `/attributes/${attributeId}/values`,
@@ -85,7 +85,7 @@ export const attributeApiSlice = baseApi.injectEndpoints({
 
     updateAttributeValue: builder.mutation<
       IAttributeValue,
-      { valueId: number; body: IUpdateAttributeValuePayload }
+      { valueId: string | number; body: IUpdateAttributeValuePayload }
     >({
       query: ({ valueId, body }) => ({
         url: `/attributes/values/${valueId}`,
@@ -97,14 +97,14 @@ export const attributeApiSlice = baseApi.injectEndpoints({
     }),
 
     deleteAttributeValue: builder.mutation<
-      { message: string; valueId: number },
-      number
+      { message: string; valueId: string | number },
+      string | number
     >({
       query: (valueId) => ({
         url: `/attributes/values/${valueId}`,
         method: "DELETE",
       }),
-      transformResponse: (res: IApiResponse<{ message: string; valueId: number }>) =>
+      transformResponse: (res: IApiResponse<{ message: string; valueId: string | number }>) =>
         res.data,
       invalidatesTags: [{ type: "Attributes", id: "LIST" }],
     }),

@@ -4,7 +4,7 @@ import { IReviewItem, ICreateReviewPayload, IApiResponse } from "@/types";
 export const reviewApiSlice = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Get all approved reviews for a product
-    getProductReviews: builder.query<IReviewItem[], number>({
+    getProductReviews: builder.query<IReviewItem[], string | number>({
       query: (productId) => `/reviews/product/${productId}`,
       transformResponse: (res: IApiResponse<IReviewItem[]>) =>
         Array.isArray(res.data) ? res.data : [],

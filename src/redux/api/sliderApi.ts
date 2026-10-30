@@ -21,7 +21,7 @@ export const sliderApiSlice = baseApi.injectEndpoints({
           : [{ type: "Sliders", id: "LIST" }],
     }),
 
-    getSliderById: builder.query<ISliderItem, number>({
+    getSliderById: builder.query<ISliderItem, string | number>({
       query: (id) => `/sliders/${id}`,
       transformResponse: (res: IApiResponse<ISliderItem>) => res.data,
       providesTags: (_result, _error, id) => [{ type: "Slider", id }],
@@ -39,7 +39,7 @@ export const sliderApiSlice = baseApi.injectEndpoints({
 
     updateSlider: builder.mutation<
       ISliderItem,
-      { id: number; body: IUpdateSliderPayload }
+      { id: string | number; body: IUpdateSliderPayload }
     >({
       query: ({ id, body }) => ({
         url: `/sliders/${id}`,
@@ -53,7 +53,7 @@ export const sliderApiSlice = baseApi.injectEndpoints({
       ],
     }),
 
-    deleteSlider: builder.mutation<{ message: string }, number>({
+    deleteSlider: builder.mutation<{ message: string }, string | number>({
       query: (id) => ({
         url: `/sliders/${id}`,
         method: "DELETE",

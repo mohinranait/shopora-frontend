@@ -34,13 +34,13 @@ export const orderApiSlice = baseApi.injectEndpoints({
           : [{ type: "Orders", id: "LIST" }],
     }),
 
-    getAdminOrder: builder.query<IOrder, number>({
+    getAdminOrder: builder.query<IOrder, string | number>({
       query: (id) => `/orders/admin/${id}`,
       transformResponse: (res: IApiResponse<IOrder>) => res.data,
       providesTags: (_r, _e, id) => [{ type: "Order", id }],
     }),
 
-    updateAdminOrderStatus: builder.mutation<IOrder, { id: number; status: OrderStatus; reason?: string }>({
+    updateAdminOrderStatus: builder.mutation<IOrder, { id: string | number; status: OrderStatus; reason?: string }>({
       query: ({ id, ...body }) => ({ url: `/orders/admin/${id}/status`, method: "PATCH", body }),
       transformResponse: (res: IApiResponse<IOrder>) => res.data,
       invalidatesTags: (_r, _e, { id }) => [{ type: "Order", id }, { type: "Orders", id: "LIST" }],
@@ -48,7 +48,7 @@ export const orderApiSlice = baseApi.injectEndpoints({
 
     updateSubOrderStatus: builder.mutation<
       unknown,
-      { orderId: number; subOrderId: number; status: OrderStatus; trackingNumber?: string; courierName?: string }
+      { orderId: string | number; subOrderId: string | number; status: OrderStatus; trackingNumber?: string; courierName?: string }
     >({
       query: ({ subOrderId, status, trackingNumber, courierName }) => ({
         url: `/orders/seller/suborder/${subOrderId}/status`,
@@ -58,7 +58,7 @@ export const orderApiSlice = baseApi.injectEndpoints({
       invalidatesTags: (_r, _e, { orderId }) => [{ type: "Order", id: orderId }, { type: "Orders", id: "LIST" }],
     }),
 
-    updatePaymentStatus: builder.mutation<unknown, { id: number; paymentStatus: PaymentStatus; transactionId?: string }>({
+    updatePaymentStatus: builder.mutation<unknown, { id: string | number; paymentStatus: PaymentStatus; transactionId?: string }>({
       query: ({ id, ...body }) => ({ url: `/orders/admin/${id}/payment`, method: "PATCH", body }),
       invalidatesTags: (_r, _e, { id }) => [{ type: "Order", id }, { type: "Orders", id: "LIST" }],
     }),

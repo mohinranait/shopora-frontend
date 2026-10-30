@@ -7,20 +7,21 @@ export type ProductStatus = "PUBLISHED" | "UNPUBLISHED" | "ARCHIVED";
 export type ProductApprovalStatus = "DRAFT" | "PENDING" | "APPROVED" | "REJECTED";
 
 export interface IProductImageItem {
-  id?: number;
-  productId?: number;
+  id?: string;
+  productId?: string;
   url: string;
   altText?: string | null;
   displayOrder?: number;
   isPrimary?: boolean;
-  imageId?: number | null;
-  useMediaId?: number | null;
+  imageId?: string | null;
+  useMediaId?: string | null;
+  image?: IUseMediaItem | null;
   useMedia?: IUseMediaItem | null;
 }
 
 export interface IProductVariantItem {
-  id?: number;
-  productId?: number;
+  id?: string;
+  productId?: string;
   sku: string;
   title: string;
   price: number;
@@ -29,18 +30,18 @@ export interface IProductVariantItem {
   stock: number;
   lowStockThreshold?: number;
   image?: string | null;
-  imageId?: number | null;
-  useMediaId?: number | null;
+  imageId?: string | null;
+  useMediaId?: string | null;
   useMedia?: IUseMediaItem | null;
   barcode?: string | null;
   attributes?: Record<string, string>;
-  attributeValueIds?: number[];
+  attributeValueIds?: string[];
   attributeValues?: Array<{
-    id?: number;
-    attributeId: number;
+    id?: string;
+    attributeId: string;
     attributeName: string;
     attributeSlug: string;
-    attributeValueId: number;
+    attributeValueId: string;
     value: string;
     colorCode?: string | null;
   }>;
@@ -49,16 +50,16 @@ export interface IProductVariantItem {
 }
 
 export interface IProductSelectedAttributeValue {
-  id?: number;
-  attributeValueId: number | null;
+  id?: string;
+  attributeValueId: string | null;
   value: string;
   colorCode?: string | null;
   customValue?: string | null;
 }
 
 export interface IProductSelectedAttributeItem {
-  id?: number;
-  attributeId: number;
+  id?: string;
+  attributeId: string;
   name?: string;
   slug?: string;
   type?: string;
@@ -68,18 +69,18 @@ export interface IProductSelectedAttributeItem {
 }
 
 export interface IProductItem {
-  id: number;
+  id: string;
   name: string;
   slug: string;
   sku: string;
   shortDescription?: string | null;
   description: string;
-  categoryId: number;
-  category?: { id: number; name: string; slug: string };
-  brandId?: number | null;
-  brand?: { id: number; name: string; slug: string; logo?: string } | null;
-  sellerId?: number | null;
-  seller?: { id: number; storeName: string; storeSlug: string } | null;
+  categoryId: string;
+  category?: { id: string; name: string; slug: string };
+  brandId?: string | null;
+  brand?: { id: string; name: string; slug: string; logo?: string } | null;
+  sellerId?: string | null;
+  seller?: { id: string; storeName: string; storeSlug: string } | null;
   isPlatformOwned: boolean;
   approvalStatus: ProductApprovalStatus;
   status: ProductStatus;
@@ -90,8 +91,8 @@ export interface IProductItem {
   stock: number;
   lowStockThreshold: number;
   mainImage: string;
-  mainImageId?: number | null;
-  mainImageUseMediaId?: number | null;
+  mainImageId?: string | null;
+  mainImageUseMediaId?: string | null;
   ratingAverage: number;
   ratingCount: number;
   totalSold: number;
@@ -115,13 +116,13 @@ export interface IProductItem {
 }
 
 export interface IProductSelectedAttributeInput {
-  attributeId: number;
+  attributeId: string;
   isVariation?: boolean;
-  values: Array<number | string>;
+  values: Array<string | number>;
 }
 
 export interface IProductVariantInput {
-  id?: number;
+  id?: string;
   title: string;
   sku?: string;
   price: number;
@@ -130,8 +131,8 @@ export interface IProductVariantInput {
   stock: number;
   lowStockThreshold?: number;
   image?: string | null;
-  imageId?: number | null;
-  useMediaId?: number | null;
+  imageId?: string | null;
+  useMediaId?: string | null;
   barcode?: string | null;
   weightKg?: number | null;
   dimensions?: {
@@ -141,14 +142,14 @@ export interface IProductVariantInput {
   } | null;
   isDefault?: boolean;
   isActive?: boolean;
-  attributeValueIds?: number[];
+  attributeValueIds?: string[];
   attributes?: Record<string, string>;
 }
 
 export interface IProductImageInput {
   url?: string;
-  imageId?: number;
-  useMediaId?: number;
+  imageId?: string;
+  useMediaId?: string;
   altText?: string;
   displayOrder?: number;
   isPrimary?: boolean;
@@ -158,8 +159,8 @@ export interface ICreateProductPayload {
   name: string;
   shortDescription?: string;
   description: string;
-  categoryId: number;
-  brandId?: number | null;
+  categoryId: string;
+  brandId?: string | null;
   sku?: string;
   productType?: ProductType;
   basePrice: number;
@@ -168,8 +169,8 @@ export interface ICreateProductPayload {
   stock?: number;
   lowStockThreshold?: number;
   mainImage?: string;
-  mainImageId?: number | null;
-  mainImageUseMediaId?: number;
+  mainImageId?: string | null;
+  mainImageUseMediaId?: string | null;
   images?: IProductImageInput[];
   selectedAttributes?: IProductSelectedAttributeInput[];
   variants?: IProductVariantInput[];
@@ -201,7 +202,7 @@ export interface IProductListResponse {
 }
 
 export interface IMockProduct {
-  id: number;
+  id: string | number;
   name: string;
   slug: string;
   category: string;

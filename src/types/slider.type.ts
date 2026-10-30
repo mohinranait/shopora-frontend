@@ -3,7 +3,7 @@ import { IUseMediaItem } from "./media.type";
 export type SliderType = "IMAGE_ONLY" | "IMAGE_BG_CONTENT" | "CONTENT_ONLY";
 
 export interface ISliderItem {
-  id: number;
+  id: string;
   type: SliderType;
   title?: string | null;
   subtitle?: string | null;
@@ -18,12 +18,12 @@ export interface ISliderItem {
   textColor?: "LIGHT" | "DARK" | null;
   displayOrder: number;
   isActive: boolean;
-  imageId?: number | null;
-  useMediaId?: number | null;
+  imageId?: string | null;
+  useMediaId?: string | null;
   image?: IUseMediaItem | null;
   useMedia?: IUseMediaItem | null;
-  mobileImageId?: number | null;
-  mobileUseMediaId?: number | null;
+  mobileImageId?: string | null;
+  mobileUseMediaId?: string | null;
   mobileImage?: IUseMediaItem | null;
   mobileUseMedia?: IUseMediaItem | null;
   startDate?: string | null;
@@ -47,10 +47,10 @@ export interface ICreateSliderPayload {
   textColor?: "LIGHT" | "DARK";
   displayOrder?: number;
   isActive?: boolean;
-  imageId?: number | null;
-  useMediaId?: number | null;
-  mobileImageId?: number | null;
-  mobileUseMediaId?: number | null;
+  imageId?: string | null;
+  useMediaId?: string | null;
+  mobileImageId?: string | null;
+  mobileUseMediaId?: string | null;
   startDate?: string | null;
   endDate?: string | null;
 }

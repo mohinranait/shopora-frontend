@@ -69,20 +69,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     }
     setIsAdding(true);
     const mainImg =
-      "images" in product && Array.isArray(product.images) && product.images.length > 0
-        ? typeof product.images[0] === "string"
-          ? product.images[0]
-          : ((product.images[0] as { url?: string })?.url || "")
-        : "mainImage" in product
-        ? ((product as { mainImage?: string }).mainImage || "")
-        : "";
+      ("mainImage" in product && product.mainImage) ||
+      ((product as any).mainImageUseMedia?.media?.url) ||
+      ("images" in product && Array.isArray((product as any).images) && (product as any).images[0]?.url) ||
+      ("images" in product && Array.isArray((product as any).images) && ((product as any).images[0] as any)?.useMedia?.media?.url) ||
+      ("image" in product && typeof product.image === "string" ? product.image : "") ||
+      "";
 
     const ok = await addItem({
-      productId: product.id,
+      productId: String(product.id),
       quantity: 1,
       name: product.name,
       product: {
-        id: product.id,
+        id: String(product.id),
         name: product.name,
         slug: product.slug,
         mainImage: mainImg,
@@ -94,9 +93,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       seller:
         "seller" in product && product.seller
           ? {
-              id: (product.seller as { id: number; storeName: string; storeSlug: string }).id,
-              storeName: (product.seller as { id: number; storeName: string; storeSlug: string }).storeName,
-              storeSlug: (product.seller as { id: number; storeName: string; storeSlug: string }).storeSlug,
+              id: String((product.seller as any).id),
+              storeName: (product.seller as any).storeName,
+              storeSlug: (product.seller as any).storeSlug,
               storeLogo: null,
               isVerified: true,
             }
@@ -136,14 +135,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   let imageUrl = "/images/placeholder-product.png";
   if ("mainImage" in product && product.mainImage) {
     imageUrl = product.mainImage;
-  } else if ("image" in product && product.image) {
-    imageUrl = product.image;
+  } else if ("mainImageUseMedia" in product && (product as any).mainImageUseMedia?.media?.url) {
+    imageUrl = (product as any).mainImageUseMedia.media.url;
+  } else if ("image" in product && typeof (product as any).image === "string" && (product as any).image) {
+    imageUrl = (product as any).image;
+  } else if ("image" in product && (product as any).image?.media?.url) {
+    imageUrl = (product as any).image.media.url;
   } else if (
     "images" in product &&
     Array.isArray(product.images) &&
-    product.images[0]?.url
+    product.images.length > 0
   ) {
-    imageUrl = product.images[0].url;
+    const firstImg = product.images[0] as any;
+    const resolvedUrl = firstImg?.url || firstImg?.useMedia?.media?.url || firstImg?.image?.media?.url;
+    if (resolvedUrl) imageUrl = resolvedUrl;
   }
 
   // Safe category display name
