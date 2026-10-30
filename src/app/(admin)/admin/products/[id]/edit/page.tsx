@@ -9,14 +9,13 @@ import { Loader2 } from "lucide-react";
 function EditProductInner() {
   const params = useParams();
   const id = params?.id as string;
-  const numId = Number(id);
 
   const {
     data: product,
     isLoading: loading,
     isError,
-  } = useGetProductByIdQuery(numId, {
-    skip: !numId || isNaN(numId),
+  } = useGetProductByIdQuery(id, {
+    skip: !id,
   });
 
   if (loading) {

@@ -11,7 +11,11 @@ const BANNER_GRADIENTS = [
   "from-slate-700 via-slate-800 to-slate-950",
 ];
 
-export const storeGradient = (id: number) => BANNER_GRADIENTS[id % BANNER_GRADIENTS.length];
+export const storeGradient = (id: string | number) => {
+  const str = String(id || "");
+  const hash = str.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return BANNER_GRADIENTS[hash % BANNER_GRADIENTS.length];
+};
 
 export const storeInitials = (name: string) =>
   name

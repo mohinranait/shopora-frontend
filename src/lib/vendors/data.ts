@@ -8,7 +8,7 @@ const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/
 );
 
 export interface IPublicStore {
-  id: number;
+  id: string;
   storeName: string;
   storeSlug: string;
   storeLogo: string | null;

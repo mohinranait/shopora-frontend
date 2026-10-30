@@ -11,7 +11,7 @@ import { ProductQuery, toApiQueryString } from "@/lib/products/query";
 interface CatalogScope {
   query: ProductQuery;
   /** Restrict every request to one vendor's products */
-  sellerId?: number;
+  sellerId?: string | number;
 }
 
 /** Server-rendered product grid for one filter combination */

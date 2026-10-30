@@ -49,10 +49,10 @@ interface PageProps {
 export default function AdminSellerDetailsPage({ params }: PageProps) {
   const router = useRouter();
   const { id } = use(params);
-  const sellerId = Number(id);
+  const sellerId = id;
 
   const { data, isLoading, isError, refetch } = useGetAdminSellerDetailsQuery(sellerId, {
-    skip: isNaN(sellerId),
+    skip: !sellerId,
   });
 
   const [reviewSeller, { isLoading: isUpdatingStatus }] = useReviewSellerApplicationMutation();

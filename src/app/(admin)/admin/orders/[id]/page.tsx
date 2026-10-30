@@ -344,9 +344,9 @@ function PaymentCard({ order }: { order: IOrder }) {
 
 function OrderDetailInner() {
   const params = useParams();
-  const id = Number(params?.id);
+  const id = params?.id as string;
   const { data: order, isLoading, isError, refetch } = useGetAdminOrderQuery(id, {
-    skip: !id || Number.isNaN(id),
+    skip: !id,
     refetchOnMountOrArgChange: true,
   });
   const [updateOrderStatus, { isLoading: updating }] = useUpdateAdminOrderStatusMutation();

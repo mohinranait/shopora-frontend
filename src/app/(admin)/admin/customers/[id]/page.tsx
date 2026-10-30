@@ -69,17 +69,17 @@ export default function CustomerProfilePage({
   params: Promise<{ id: string }>;
 }) {
   const resolvedParams = use(params);
-  const customerId = Number(resolvedParams.id);
+  const customerId = resolvedParams.id;
 
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
 
   const { data, isLoading, isError, refetch } = useGetAdminCustomerQuery(customerId, {
-    skip: !customerId || isNaN(customerId),
+    skip: !customerId,
   });
 
   const [toggleStatus, { isLoading: isToggling }] = useToggleCustomerStatusMutation();
 
-  if (isNaN(customerId)) {
+  if (!customerId) {
     return (
       <div className="flex h-72 flex-col items-center justify-center gap-3 text-center">
         <AlertCircle className="h-8 w-8 text-rose-400" />

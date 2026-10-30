@@ -105,7 +105,7 @@ export function productsHref(q: ProductQuery, basePath = "/products"): string {
 /** Query string for the backend API (its param names differ slightly). */
 export function toApiQueryString(
   q: ProductQuery,
-  { forFacets = false, sellerId }: { forFacets?: boolean; sellerId?: number } = {}
+  { forFacets = false, sellerId }: { forFacets?: boolean; sellerId?: string | number } = {}
 ): string {
   const params = new URLSearchParams();
   if (sellerId != null) params.set("sellerId", String(sellerId));
