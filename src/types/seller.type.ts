@@ -19,6 +19,8 @@ export interface ISeller {
   storeSlug: string;
   storeLogo: string | null;
   storeBanner: string | null;
+  logoId?: number | null;
+  bannerId?: number | null;
   storeDescription: string | null;
   phone: string;
   businessAddress: string;

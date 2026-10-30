@@ -93,7 +93,7 @@ export default function AdminCategoriesPage() {
     if (cat.image || cat.useMedia) {
       setFormImage({
         url: cat.useMedia?.media?.url || cat.image || "",
-        useMediaId: cat.useMediaId,
+        useMediaId: cat.imageId ?? cat.useMediaId ?? undefined,
         alt: cat.useMedia?.alt || `${cat.name} Category`,
         description: cat.useMedia?.description || "",
       });
@@ -121,6 +121,7 @@ export default function AdminCategoriesPage() {
         displayOrder: Number(formDisplayOrder) || 0,
         isActive: formIsActive,
         image: formImage?.url || undefined,
+        imageId: formImage?.useMediaId ?? null,
         useMediaId: formImage?.useMediaId ?? null,
       };
 
@@ -227,9 +228,9 @@ export default function AdminCategoriesPage() {
                     <div>
                       <h3 className="font-bold text-white text-base flex items-center gap-2">
                         <span>{cat.name}</span>
-                        {cat.useMediaId && (
+                        {(cat.imageId || cat.useMediaId) && (
                           <Badge variant="brand" className="text-[10px] font-mono py-0">
-                            UseMedia #{cat.useMediaId}
+                            UseMedia #{cat.imageId || cat.useMediaId}
                           </Badge>
                         )}
                       </h3>

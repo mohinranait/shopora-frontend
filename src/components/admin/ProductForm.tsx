@@ -131,14 +131,15 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
   // ==========================================
   const [mainImageUrl, setMainImageUrl] = useState(initialData?.mainImage || "");
   const [mainImageUseMediaId, setMainImageUseMediaId] = useState<number | undefined>(
-    initialData?.mainImageUseMediaId ?? undefined
+    initialData?.mainImageId ?? initialData?.mainImageUseMediaId ?? undefined
   );
   const [galleryImages, setGalleryImages] = useState<
-    Array<{ url: string; useMediaId?: number; altText?: string }>
+    Array<{ url: string; useMediaId?: number; imageId?: number; altText?: string }>
   >(
     initialData?.images?.map((img) => ({
       url: img.url,
-      useMediaId: img.useMediaId ?? undefined,
+      imageId: img.imageId ?? img.useMediaId ?? undefined,
+      useMediaId: img.imageId ?? img.useMediaId ?? undefined,
       altText: img.altText ?? undefined,
     })) || []
   );
@@ -174,7 +175,8 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
       stock: v.stock,
       lowStockThreshold: v.lowStockThreshold || 5,
       image: v.image,
-      useMediaId: v.useMediaId,
+      imageId: v.imageId ?? v.useMediaId,
+      useMediaId: v.imageId ?? v.useMediaId,
       barcode: v.barcode,
       isDefault: v.isDefault,
       isActive: v.isActive,
@@ -500,7 +502,8 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
       // Build Gallery Images Payload
       const imagesPayload: IProductImageInput[] = galleryImages.map((img, idx) => ({
         url: img.url,
-        useMediaId: img.useMediaId,
+        imageId: img.imageId ?? img.useMediaId,
+        useMediaId: img.imageId ?? img.useMediaId,
         altText: img.altText || name,
         displayOrder: idx,
         isPrimary: idx === 0,
@@ -521,6 +524,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
         stock: finalStock,
         lowStockThreshold: typeof lowStockThreshold === "number" ? lowStockThreshold : 5,
         mainImage: mainImageUrl,
+        mainImageId: mainImageUseMediaId,
         mainImageUseMediaId,
         images: imagesPayload,
         selectedAttributes: selectedAttributesPayload,

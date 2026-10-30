@@ -18,9 +18,13 @@ export interface ISliderItem {
   textColor?: "LIGHT" | "DARK" | null;
   displayOrder: number;
   isActive: boolean;
+  imageId?: number | null;
   useMediaId?: number | null;
+  image?: IUseMediaItem | null;
   useMedia?: IUseMediaItem | null;
+  mobileImageId?: number | null;
   mobileUseMediaId?: number | null;
+  mobileImage?: IUseMediaItem | null;
   mobileUseMedia?: IUseMediaItem | null;
   startDate?: string | null;
   endDate?: string | null;
@@ -43,7 +47,9 @@ export interface ICreateSliderPayload {
   textColor?: "LIGHT" | "DARK";
   displayOrder?: number;
   isActive?: boolean;
+  imageId?: number | null;
   useMediaId?: number | null;
+  mobileImageId?: number | null;
   mobileUseMediaId?: number | null;
   startDate?: string | null;
   endDate?: string | null;

@@ -13,6 +13,7 @@ export interface IProductImageItem {
   altText?: string | null;
   displayOrder?: number;
   isPrimary?: boolean;
+  imageId?: number | null;
   useMediaId?: number | null;
   useMedia?: IUseMediaItem | null;
 }
@@ -28,6 +29,7 @@ export interface IProductVariantItem {
   stock: number;
   lowStockThreshold?: number;
   image?: string | null;
+  imageId?: number | null;
   useMediaId?: number | null;
   useMedia?: IUseMediaItem | null;
   barcode?: string | null;
@@ -88,6 +90,7 @@ export interface IProductItem {
   stock: number;
   lowStockThreshold: number;
   mainImage: string;
+  mainImageId?: number | null;
   mainImageUseMediaId?: number | null;
   ratingAverage: number;
   ratingCount: number;
@@ -127,6 +130,7 @@ export interface IProductVariantInput {
   stock: number;
   lowStockThreshold?: number;
   image?: string | null;
+  imageId?: number | null;
   useMediaId?: number | null;
   barcode?: string | null;
   weightKg?: number | null;
@@ -143,6 +147,7 @@ export interface IProductVariantInput {
 
 export interface IProductImageInput {
   url?: string;
+  imageId?: number;
   useMediaId?: number;
   altText?: string;
   displayOrder?: number;
@@ -163,6 +168,7 @@ export interface ICreateProductPayload {
   stock?: number;
   lowStockThreshold?: number;
   mainImage?: string;
+  mainImageId?: number | null;
   mainImageUseMediaId?: number;
   images?: IProductImageInput[];
   selectedAttributes?: IProductSelectedAttributeInput[];

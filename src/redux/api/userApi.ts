@@ -28,6 +28,7 @@ export interface IUpdateProfilePayload {
   name?: string;
   phone?: string;
   avatar?: string;
+  avatarId?: number | null;
   avatarUseMediaId?: number | null;
 }
 

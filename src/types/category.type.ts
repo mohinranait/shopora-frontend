@@ -6,6 +6,7 @@ export interface ICategory {
   slug: string;
   description?: string | null;
   image?: string | null;
+  imageId?: number | null;
   icon?: string | null;
   useMediaId?: number | null;
   useMedia?: IUseMediaItem | null;
@@ -22,6 +23,7 @@ export interface ICreateCategoryPayload {
   name: string;
   description?: string | null;
   image?: string | null;
+  imageId?: number | null;
   icon?: string | null;
   useMediaId?: number | null;
   parentId?: number | null;

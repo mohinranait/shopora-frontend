@@ -106,7 +106,7 @@ export default function AdminSlidersPage() {
     if (imageUrl) {
       setFormImage({
         url: imageUrl,
-        useMediaId: slider.useMediaId || null,
+        useMediaId: slider.imageId ?? slider.useMediaId ?? null,
         alt: slider.useMedia?.alt || slider.title || "Slider Image",
         description: slider.useMedia?.description || "",
       });
@@ -140,6 +140,7 @@ export default function AdminSlidersPage() {
         description: formDescription.trim() || undefined,
         badgeText: formBadgeText.trim() || undefined,
         imageUrl: formImage?.url || undefined,
+        imageId: formImage?.useMediaId ?? null,
         useMediaId: formImage?.useMediaId ?? null,
         linkUrl: formLinkUrl.trim() || "/products",
         buttonText: formButtonText.trim() || "Shop Now",

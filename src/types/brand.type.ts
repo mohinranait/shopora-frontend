@@ -7,6 +7,7 @@ export interface IBrand {
   logo?: string | null;
   website?: string | null;
   description?: string | null;
+  logoId?: number | null;
   useMediaId?: number | null;
   useMedia?: IUseMediaItem | null;
   isActive: boolean;
@@ -19,6 +20,7 @@ export interface ICreateBrandPayload {
   logo?: string | null;
   website?: string | null;
   description?: string | null;
+  logoId?: number | null;
   useMediaId?: number | null;
   isActive?: boolean;
 }

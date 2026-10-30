@@ -7,6 +7,7 @@ export interface IAuthUser {
   role: UserRole;
   phone?: string | null;
   avatar?: string | null;
+  avatarId?: number | null;
   sellerProfile?: {
     id: number;
     storeName: string;

@@ -72,7 +72,7 @@ export default function AdminBrandsPage() {
     if (brand.logo || brand.useMedia) {
       setFormLogo({
         url: brand.useMedia?.media?.url || brand.logo || "",
-        useMediaId: brand.useMediaId,
+        useMediaId: brand.logoId ?? brand.useMediaId ?? undefined,
         alt: brand.useMedia?.alt || `${brand.name} Logo`,
         description: brand.useMedia?.description || "",
       });
@@ -99,6 +99,7 @@ export default function AdminBrandsPage() {
         description: formDescription.trim() || undefined,
         isActive: formIsActive,
         logo: formLogo?.url || undefined,
+        logoId: formLogo?.useMediaId ?? null,
         useMediaId: formLogo?.useMediaId ?? null,
       };
 
@@ -294,10 +295,10 @@ export default function AdminBrandsPage() {
                         </td>
 
                         <td className="py-3 px-4">
-                          {brand.useMediaId ? (
+                          {brand.logoId || brand.useMediaId ? (
                             <div className="space-y-0.5">
                               <Badge variant="brand" className="text-[10px] font-mono">
-                                UseMedia #{brand.useMediaId}
+                                UseMedia #{brand.logoId || brand.useMediaId}
                               </Badge>
                               {brand.useMedia?.alt && (
                                 <p className="text-[10px] text-slate-400 truncate max-w-[180px]">
