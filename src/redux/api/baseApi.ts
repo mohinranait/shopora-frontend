@@ -92,6 +92,12 @@ const baseQueryWithReauth: BaseQueryFn<
         if (currentPath.startsWith("/admin") && currentPath !== "/admin-login") {
           window.location.href = `/admin-login?redirect=${encodeURIComponent(currentPath)}`;
         } else if (
+          currentPath.startsWith("/seller") &&
+          currentPath !== "/seller/register" &&
+          currentPath !== "/seller/login"
+        ) {
+          window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+        } else if (
           currentPath.startsWith("/dashboard") ||
           currentPath.startsWith("/orders")
         ) {
@@ -140,6 +146,10 @@ export const baseApi = createApi({
     "Wishlist",
     "Notifications",
     "NotificationCount",
+    "Questions",
+    "Question",
+    "Logistics",
+    "Escrow",
   ],
   endpoints: () => ({}),
 });

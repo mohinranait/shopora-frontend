@@ -38,6 +38,7 @@ import {
   useGetUnreadNotificationCountQuery,
   useMarkNotificationAsReadMutation,
   useMarkAllNotificationsAsReadMutation,
+  useGetAutocompleteSuggestionsQuery,
 } from "@/redux";
 import { useIsClient } from "@/hooks/useIsClient";
 import { INotification } from "@/types";
@@ -54,6 +55,32 @@ export const Header: React.FC = () => {
   const { data: settings } = useGetWebsiteSettingsQuery(undefined, { skip: !isClient });
   const cartBadge = totalItems > 99 ? "99+" : String(totalItems);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchContainerRef = React.useRef<HTMLFormElement | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim());
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const { data: suggestions, isFetching: isSearching } = useGetAutocompleteSuggestionsQuery(
+    debouncedSearch,
+    { skip: debouncedSearch.length < 2 }
+  );
+
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
 
@@ -178,6 +205,7 @@ export const Header: React.FC = () => {
 
           {/* Search Bar (Desktop only) */}
           <form
+            ref={searchContainerRef}
             onSubmit={handleSearchSubmit}
             className="relative mx-auto hidden md:block w-full max-w-xl"
           >
@@ -185,7 +213,11 @@ export const Header: React.FC = () => {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setShowSuggestions(true);
+              }}
+              onFocus={() => setShowSuggestions(true)}
               placeholder="Search products, brands and categories…"
               className="w-full rounded-md border border-brand/50 bg-slate-50/80 py-2.5 pl-10 pr-24 text-sm text-slate-800 placeholder:text-slate-400 outline-none transition focus:border-brand focus:bg-white focus:ring-2 focus:ring-brand/15"
             />
@@ -195,6 +227,118 @@ export const Header: React.FC = () => {
             >
               Search
             </button>
+
+            {/* Instant Autocomplete Live Dropdown */}
+            {showSuggestions && debouncedSearch.length >= 2 && (
+              <div className="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden z-50 divide-y divide-slate-100 max-h-96 overflow-y-auto">
+                {isSearching ? (
+                  <div className="p-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin text-brand" />
+                    <span>Searching products & categories...</span>
+                  </div>
+                ) : (
+                  <>
+                    {/* Products */}
+                    {suggestions?.products && suggestions.products.length > 0 && (
+                      <div className="p-2">
+                        <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                          Products
+                        </div>
+                        {suggestions.products.map((p) => (
+                          <Link
+                            key={p.id}
+                            href={`/products/${p.slug}`}
+                            onClick={() => setShowSuggestions(false)}
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors"
+                          >
+                            <div className="h-10 w-10 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden shrink-0 relative flex items-center justify-center">
+                              {p.mainImage ? (
+                                <img
+                                  src={p.mainImage}
+                                  alt={p.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                <Package className="h-4 w-4 text-slate-400" />
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="text-xs font-bold text-slate-800 truncate">
+                                {p.name}
+                              </div>
+                              <div className="text-xs font-semibold text-brand mt-0.5">
+                                ৳{p.basePrice.toLocaleString()}
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Categories */}
+                    {suggestions?.categories && suggestions.categories.length > 0 && (
+                      <div className="p-2">
+                        <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                          Categories
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 px-2">
+                          {suggestions.categories.map((c) => (
+                            <Link
+                              key={c.id}
+                              href={`/categories/${c.slug}`}
+                              onClick={() => setShowSuggestions(false)}
+                              className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-brand/10 hover:text-brand text-xs font-medium text-slate-700 transition-colors"
+                            >
+                              {c.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Brands */}
+                    {suggestions?.brands && suggestions.brands.length > 0 && (
+                      <div className="p-2">
+                        <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                          Brands
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 px-2">
+                          {suggestions.brands.map((b) => (
+                            <Link
+                              key={b.id}
+                              href={`/products?brand=${b.slug}`}
+                              onClick={() => setShowSuggestions(false)}
+                              className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-brand/10 hover:text-brand text-xs font-medium text-slate-700 transition-colors"
+                            >
+                              {b.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {(!suggestions?.products?.length &&
+                      !suggestions?.categories?.length &&
+                      !suggestions?.brands?.length) && (
+                      <div className="p-4 text-center text-xs text-slate-400">
+                        No results found for &quot;{debouncedSearch}&quot;
+                      </div>
+                    )}
+
+                    {/* View all footer */}
+                    <div className="p-2 bg-slate-50">
+                      <button
+                        type="submit"
+                        onClick={() => setShowSuggestions(false)}
+                        className="w-full py-2 text-center text-xs font-bold text-brand hover:underline"
+                      >
+                        View all results for &quot;{debouncedSearch}&quot;
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </form>
 
           {/* Right Ecommerce Actions (Wishlist, Cart, Account - Desktop only) */}

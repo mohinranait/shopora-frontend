@@ -30,11 +30,14 @@ export interface ISeller {
   bankAccountNumber: string | null;
   bankRouting: string | null;
   bkashOrNagad: string | null;
+  bankAccountDetails?: string | null;
   commissionRate: number;
   status: SellerStatus;
   rejectionReason: string | null;
   isVerified: boolean;
   verifiedAt: string | null;
+  isHolidayMode?: boolean;
+  holidayMessage?: string | null;
   createdAt: string;
   updatedAt: string;
   userEmail?: string;
@@ -126,4 +129,34 @@ export interface ISellerDetailResponse {
   performance: ISellerPerformance;
   recentProducts: ISellerRecentProduct[];
   recentOrders: ISellerRecentOrder[];
+}
+
+export interface ISellerEscrowHoldings {
+  pendingBalance: number;
+  availableBalance: number;
+  heldShipments: Array<{
+    subOrderId: string;
+    subOrderNumber: string;
+    sellerEarnings: number;
+    deliveredAt: string;
+    holdUntil: string | null;
+    status: string;
+  }>;
+}
+
+export interface ISellerDashboardOverview {
+  profile: ISeller;
+  wallet: ISellerWallet | null;
+  metrics: {
+    totalProducts: number;
+    approvedProducts: number;
+    pendingProducts: number;
+    totalOrders: number;
+    pendingOrders: number;
+    availableBalance: number;
+    pendingBalance: number;
+    totalEarnings: number;
+    totalCommissionPaid: number;
+  };
+  recentOrders: any[];
 }

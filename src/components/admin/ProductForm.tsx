@@ -45,6 +45,7 @@ import {
   useGetCategoriesQuery,
   useGetBrandsQuery,
   useGetAttributesQuery,
+  useGetProductsQuery,
   useGenerateCombinationsMutation,
   useCreateProductMutation,
   useUpdateProductMutation,
@@ -77,9 +78,10 @@ interface SelectedAttrGroup {
 interface ProductFormProps {
   initialData?: IProductItem;
   isEdit?: boolean;
+  backUrl?: string;
 }
 
-export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
+export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/products" }: ProductFormProps) {
   const router = useRouter();
 
   // ==========================================
@@ -105,6 +107,12 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
   const [tagsInput, setTagsInput] = useState(initialData?.tags?.join(", ") || "");
   const [warranty, setWarranty] = useState(initialData?.warranty || "");
   const [videoUrl, setVideoUrl] = useState(initialData?.videoUrl || "");
+  const [selectedBundleProductIds, setSelectedBundleProductIds] = useState<string[]>(
+    initialData?.bundleProductIds || []
+  );
+  const [bundleSearchQuery, setBundleSearchQuery] = useState("");
+  const { data: catalogProductsData } = useGetProductsQuery({ limit: 100 });
+  const allCatalogProducts = catalogProductsData?.products || [];
 
   // ==========================================
   // Form State: 2. Product Type
@@ -530,6 +538,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
         selectedAttributes: selectedAttributesPayload,
         variants: productType === "VARIABLE" ? variantRows : [],
         tags: parsedTags,
+        bundleProductIds: selectedBundleProductIds,
         warranty: warranty.trim() || undefined,
         weightKg: typeof weightKg === "number" ? weightKg : undefined,
         dimensions:
@@ -564,7 +573,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
         toast.success(`Product "${created.name}" created and published successfully!`);
       }
 
-      router.push("/admin/products");
+      router.push(backUrl);
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
     } finally {
@@ -585,7 +594,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
       {/* Top Header & Save Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
         <div className="flex items-center gap-3">
-          <Link href="/admin/products">
+          <Link href={backUrl}>
             <Button size="sm" variant="outline" type="button" className="h-9 w-9 p-0">
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -606,7 +615,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link href="/admin/products">
+          <Link href={backUrl}>
             <Button type="button" variant="outline" size="sm" className="text-xs">
               Cancel
             </Button>
@@ -1629,6 +1638,150 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
       </Card>
 
       {/* ================================================================= */}
+      {/* SECTION 6: Frequently Bought Together (Bundle Recommendations)    */}
+      {/* ================================================================= */}
+      <Card className="bg-slate-900 border-slate-800 overflow-hidden">
+        <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
+          <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-indigo-400" />
+            <span>Frequently Bought Together / Companion Products</span>
+          </CardTitle>
+          <CardDescription className="text-xs text-slate-400">
+            Select up to 4 companion products from your catalog to recommend as a bundle on this product page (e.g. phone case, charger, screen protector). Customers get an instant 5% bundle discount when buying them together. If left empty, the system will automatically recommend items from the same category.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-4 sm:p-6 space-y-4">
+          {/* Selected Products Chips */}
+          <div className="space-y-2">
+            <span className="text-xs font-semibold text-slate-300">
+              Selected Companion Items ({selectedBundleProductIds.length}/4):
+            </span>
+            {selectedBundleProductIds.length === 0 ? (
+              <p className="text-xs text-slate-500 italic">
+                No companion products manually selected. System will auto-recommend relevant items from the same category.
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {selectedBundleProductIds.map((pId) => {
+                  const pItem = allCatalogProducts.find((p) => p.id === pId);
+                  return (
+                    <div
+                      key={pId}
+                      className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="h-9 w-9 rounded-lg bg-slate-800 overflow-hidden shrink-0 relative flex items-center justify-center">
+                          {pItem?.mainImage ? (
+                            <img
+                              src={pItem.mainImage}
+                              alt={pItem.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <Package className="h-4 w-4 text-slate-500" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-white truncate max-w-[200px]">
+                            {pItem?.name || pId}
+                          </p>
+                          <p className="text-[11px] text-slate-400">
+                            ৳{pItem?.basePrice?.toLocaleString()} {pItem?.sku ? `• SKU: ${pItem.sku}` : ""}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSelectedBundleProductIds((prev) => prev.filter((id) => id !== pId))
+                        }
+                        className="p-1 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800"
+                        title="Remove from bundle"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Add companion item selector */}
+          {selectedBundleProductIds.length < 4 && (
+            <div className="pt-2 border-t border-slate-800/80 space-y-2">
+              <label className="block text-xs font-semibold text-slate-300">
+                Search & Add Companion Product:
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={bundleSearchQuery}
+                  onChange={(e) => setBundleSearchQuery(e.target.value)}
+                  placeholder="Search catalog product by title or SKU..."
+                  className="flex-1 px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              {bundleSearchQuery.trim().length >= 2 && (
+                <div className="max-h-48 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 divide-y divide-slate-800/80">
+                  {allCatalogProducts
+                    .filter(
+                      (p) =>
+                        p.id !== initialData?.id &&
+                        !selectedBundleProductIds.includes(p.id) &&
+                        (p.name.toLowerCase().includes(bundleSearchQuery.toLowerCase()) ||
+                          p.sku?.toLowerCase().includes(bundleSearchQuery.toLowerCase()))
+                    )
+                    .slice(0, 5)
+                    .map((item) => (
+                      <div
+                        key={item.id}
+                        className="p-2.5 flex items-center justify-between hover:bg-slate-900 transition-colors"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="h-8 w-8 rounded-lg bg-slate-800 overflow-hidden shrink-0 relative flex items-center justify-center">
+                            {item.mainImage ? (
+                              <img
+                                src={item.mainImage}
+                                alt={item.name}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <Package className="h-3.5 w-3.5 text-slate-500" />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-semibold text-white truncate max-w-[240px]">
+                              {item.name}
+                            </p>
+                            <p className="text-[10px] text-slate-400">
+                              ৳{item.basePrice.toLocaleString()} {item.sku ? `• ${item.sku}` : ""}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedBundleProductIds((prev) => [...prev, item.id]);
+                            setBundleSearchQuery("");
+                          }}
+                          className="h-7 text-[11px] border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/20"
+                        >
+                          <Plus className="h-3 w-3 mr-1" /> Add
+                        </Button>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ================================================================= */}
       {/* SECTION 7: SEO Friendly Metadata & Live Google Preview            */}
       {/* ================================================================= */}
       <Card className="bg-slate-900 border-slate-800 overflow-hidden">
@@ -1771,7 +1924,7 @@ export function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link href="/admin/products">
+          <Link href={backUrl}>
             <Button type="button" variant="outline" size="sm" className="text-xs">
               Discard Changes
             </Button>

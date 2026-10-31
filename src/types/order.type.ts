@@ -16,6 +16,15 @@ export interface IOrderItem {
   price: number;
   quantity: number;
   totalPrice: number;
+  unitPrice?: number;
+  product?: {
+    name?: string;
+    mainImage?: string | null;
+  } | null;
+  variant?: {
+    title?: string;
+    sku?: string;
+  } | null;
 }
 
 export interface ISubOrder {
@@ -25,18 +34,29 @@ export interface ISubOrder {
   sellerId: string | null;
   isPlatformOwned: boolean;
   subtotal: number;
+  shippingFee: number;
+  shippingCost?: number;
   totalAmount: number;
   commissionRate: number;
   commissionAmount: number;
   sellerEarnings: number;
   isPayoutSettled: boolean;
+  escrowStatus?: string;
+  escrowHoldUntil?: string | null;
   status: OrderStatus;
   trackingNumber: string | null;
   courierName: string | null;
+  consignmentId?: string | null;
   createdAt: string;
   updatedAt: string;
   store: { id: string; storeName: string; storeSlug: string; phone?: string | null } | null;
   items: IOrderItem[];
+  order?: {
+    id?: string;
+    orderNumber?: string;
+    shippingAddress?: IOrderAddress | null;
+    [key: string]: unknown;
+  } | null;
 }
 
 export interface IOrderAddress {

@@ -106,6 +106,42 @@ export const productApiSlice = baseApi.injectEndpoints({
       transformResponse: (res: IApiResponse<{ message: string }>) => res.data,
       invalidatesTags: [{ type: "Products", id: "LIST" }],
     }),
+
+    // Autocomplete live search
+    getAutocompleteSuggestions: builder.query<
+      {
+        products: Array<{
+          id: string;
+          name: string;
+          slug: string;
+          basePrice: number;
+          comparePrice?: number | null;
+          mainImage?: string | null;
+        }>;
+        categories: Array<{ id: string; name: string; slug: string; image?: string | null }>;
+        brands: Array<{ id: string; name: string; slug: string; logo?: string | null }>;
+      },
+      string
+    >({
+      query: (q) => `/products/search/autocomplete?q=${encodeURIComponent(q)}`,
+      transformResponse: (res: IApiResponse<any>) => res.data,
+    }),
+
+    // Product bundle / Frequently Bought Together
+    getProductBundle: builder.query<
+      {
+        mainProduct: IProductItem;
+        companionProducts: IProductItem[];
+        bundleDiscountPercent: number;
+        originalTotal: number;
+        bundleTotal: number;
+        totalSavings: number;
+      },
+      string
+    >({
+      query: (id) => `/products/${id}/bundle`,
+      transformResponse: (res: IApiResponse<any>) => res.data,
+    }),
   }),
 });
 
@@ -117,4 +153,7 @@ export const {
   useUpdateProductMutation,
   useReviewProductApprovalMutation,
   useDeleteProductMutation,
+  useGetAutocompleteSuggestionsQuery,
+  useLazyGetAutocompleteSuggestionsQuery,
+  useGetProductBundleQuery,
 } = productApiSlice;

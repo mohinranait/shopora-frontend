@@ -20,6 +20,9 @@ import {
   Truck,
   User,
   X,
+  Printer,
+  CheckCircle2,
+  Sparkles,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -27,9 +30,11 @@ import {
   useUpdateAdminOrderStatusMutation,
   useUpdatePaymentStatusMutation,
   useUpdateSubOrderStatusMutation,
+  useBookCourierMutation,
+  useLazyGetPackagingSlipQuery,
 } from "@/redux";
 import { getApiErrorMessage } from "@/services/api";
-import type { IOrder, ISubOrder, OrderStatus, PaymentStatus } from "@/types";
+import type { IOrder, ISubOrder, OrderStatus, PaymentStatus, IThermalPackagingSlip } from "@/types";
 import {
   ADMIN_STATUS_LABEL,
   AdminPaymentBadge,
@@ -40,7 +45,7 @@ import {
   taka,
 } from "@/components/admin/orders/adminOrderUi";
 
-const COURIERS = ["Pathao", "Steadfast", "RedX", "Sundarban", "eCourier", "Paperfly", "Shopora Logistics"];
+const COURIERS = ["Steadfast", "Pathao", "RedX", "Sundarban", "eCourier", "Paperfly", "Shopora Logistics"];
 
 /** RTK Query errors carry the API message under `data.message` */
 const errorMessage = (e: unknown) => {
@@ -103,8 +108,21 @@ function ReasonDialog({
   );
 }
 
-function ShipmentPanel({ order, shipment, single }: { order: IOrder; shipment: ISubOrder; single: boolean }) {
+function ShipmentPanel({
+  order,
+  shipment,
+  single,
+  onOpenSlip,
+}: {
+  order: IOrder;
+  shipment: ISubOrder;
+  single: boolean;
+  onOpenSlip: (slip: IThermalPackagingSlip) => void;
+}) {
   const [updateSubOrder, { isLoading }] = useUpdateSubOrderStatusMutation();
+  const [bookCourier, { isLoading: isBookingCourier }] = useBookCourierMutation();
+  const [fetchSlip, { isLoading: isFetchingSlip }] = useLazyGetPackagingSlipQuery();
+
   const [courier, setCourier] = useState(shipment.courierName ?? "");
   const [tracking, setTracking] = useState(shipment.trackingNumber ?? "");
   const [confirmCancel, setConfirmCancel] = useState(false);
@@ -112,13 +130,36 @@ function ShipmentPanel({ order, shipment, single }: { order: IOrder; shipment: I
   const terminal = shipment.status === "CANCELLED" || shipment.status === "RETURNED";
   const trackingDirty = courier !== (shipment.courierName ?? "") || tracking !== (shipment.trackingNumber ?? "");
 
+  const handleBookCourier = async (provider: string = "Steadfast") => {
+    try {
+      const res = await bookCourier({ subOrderId: shipment.id, body: { provider } }).unwrap();
+      toast.success(
+        `Courier booked with ${res.data.courierName}! Consignment: ${res.data.consignmentId}, Tracking: ${res.data.trackingCode}`
+      );
+      setCourier(res.data.courierName);
+      setTracking(res.data.trackingCode);
+    } catch (e) {
+      toast.error(errorMessage(e));
+    }
+  };
+
+  const handleFetchAndPrintSlip = async () => {
+    try {
+      const res = await fetchSlip(shipment.id).unwrap();
+      if (res.data) {
+        onOpenSlip(res.data);
+      }
+    } catch (e) {
+      toast.error(errorMessage(e));
+    }
+  };
+
   const run = async (status: OrderStatus, success: string) => {
     try {
       await updateSubOrder({
         orderId: order.id,
         subOrderId: shipment.id,
         status,
-        // Send tracking along when shipping so both are saved together
         ...(trackingDirty || status === "SHIPPED" ? { courierName: courier, trackingNumber: tracking } : {}),
       }).unwrap();
       toast.success(success);
@@ -144,7 +185,75 @@ function ShipmentPanel({ order, shipment, single }: { order: IOrder; shipment: I
               {shipment.store?.phone && ` · ${shipment.store.phone}`}
             </p>
           </div>
-          <AdminStatusBadge status={shipment.status} />
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleFetchAndPrintSlip}
+              disabled={isFetchingSlip}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-900 text-xs font-semibold text-sky-400 hover:bg-slate-800 transition"
+              title="Print 4x6 Thermal Packaging Slip"
+            >
+              {isFetchingSlip ? <Loader2 className="h-3 w-3 animate-spin" /> : <Printer className="h-3 w-3" />}
+              <span>Thermal Slip</span>
+            </button>
+            <AdminStatusBadge status={shipment.status} />
+          </div>
+        </div>
+
+        {/* Courier Booking Status Widget */}
+        <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs">
+            <div className="p-1.5 rounded-lg bg-sky-500/10 text-sky-400">
+              <Truck className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="font-bold text-white flex items-center gap-2">
+                <span>Courier Automation</span>
+                {shipment.consignmentId ? (
+                  <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3" /> Booked
+                  </span>
+                ) : (
+                  <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 text-[10px]">
+                    Not Dispatched
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                {shipment.consignmentId ? (
+                  <>
+                    <strong className="text-white">{shipment.courierName || "Steadfast"}</strong> • Consignment:{" "}
+                    <span className="font-mono text-sky-400 font-bold">{shipment.consignmentId}</span> • Tracking:{" "}
+                    <span className="font-mono text-emerald-400 font-bold">{shipment.trackingNumber || "N/A"}</span>
+                  </>
+                ) : (
+                  "Book consignment with Steadfast Courier or Pathao directly."
+                )}
+              </p>
+            </div>
+          </div>
+
+          {!shipment.consignmentId && !terminal && (
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => handleBookCourier("Steadfast")}
+                disabled={isBookingCourier}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition shadow-xs disabled:opacity-60"
+              >
+                {isBookingCourier ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Truck className="h-3.5 w-3.5" />}
+                <span>Book Steadfast</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleBookCourier("Pathao")}
+                disabled={isBookingCourier}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-semibold transition disabled:opacity-60"
+              >
+                <span>Book Pathao</span>
+              </button>
+            </div>
+          )}
         </div>
 
         <ul className="divide-y divide-slate-800 rounded-xl border border-slate-800">
@@ -351,6 +460,7 @@ function OrderDetailInner() {
   });
   const [updateOrderStatus, { isLoading: updating }] = useUpdateAdminOrderStatusMutation();
   const [dialog, setDialog] = useState<null | "cancel">(null);
+  const [packagingSlip, setPackagingSlip] = useState<IThermalPackagingSlip | null>(null);
 
   if (isLoading) {
     return (
@@ -371,7 +481,6 @@ function OrderDetailInner() {
   }
 
   const active = order.subOrders.filter((s) => s.status !== "CANCELLED" && s.status !== "RETURNED");
-  // Whole-order actions apply when every live package is at the same step
   const sameStep = active.length > 0 && active.every((s) => s.status === active[0].status);
   const next = sameStep ? NEXT_STATUS[active[0].status] : undefined;
   const canCancel = active.length > 0 && active.every((s) => s.status !== "SHIPPED" && s.status !== "DELIVERED");
@@ -460,7 +569,13 @@ function OrderDetailInner() {
       <div className="grid items-start gap-6 xl:grid-cols-[1fr_360px]">
         <div className="space-y-4">
           {order.subOrders.map((s) => (
-            <ShipmentPanel key={s.id} order={order} shipment={s} single={single} />
+            <ShipmentPanel
+              key={s.id}
+              order={order}
+              shipment={s}
+              single={single}
+              onOpenSlip={(slip) => setPackagingSlip(slip)}
+            />
           ))}
         </div>
 
@@ -542,6 +657,88 @@ function OrderDetailInner() {
             if (await setWholeStatus("CANCELLED", reason)) setDialog(null);
           }}
         />
+      )}
+
+      {/* Thermal Packaging Slip Modal (4x6 format preview) */}
+      {packagingSlip && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-white text-slate-900 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b pb-3 border-slate-200">
+              <div className="font-black text-base text-slate-900 tracking-tight">
+                THERMAL PACKAGING SLIP (4x6)
+              </div>
+              <button
+                type="button"
+                onClick={() => setPackagingSlip(null)}
+                className="text-slate-500 hover:text-slate-900"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Slip Paper View */}
+            <div id="thermal-slip-content" className="p-4 border-2 border-dashed border-slate-400 rounded-lg space-y-3 font-mono text-xs">
+              <div className="text-center pb-2 border-b border-slate-300">
+                <div className="font-black text-sm tracking-widest">{packagingSlip.storeName}</div>
+                <div className="text-[10px] text-slate-600">Merchant Fulfillment Manifest</div>
+              </div>
+
+              <div className="flex justify-between text-[11px]">
+                <span><strong>ORDER:</strong> #{packagingSlip.orderNumber}</span>
+                <span><strong>PKG:</strong> #{packagingSlip.subOrderNumber}</span>
+              </div>
+
+              <div className="p-2 bg-slate-100 rounded text-[11px] space-y-1">
+                <div><strong>SHIP TO:</strong></div>
+                <div>{packagingSlip.customer.name}</div>
+                <div>{packagingSlip.customer.phone}</div>
+                <div>{packagingSlip.customer.address}</div>
+              </div>
+
+              <div className="border-t border-b border-slate-300 py-2 space-y-1">
+                <div className="font-bold text-[10px]">ITEMS MANIFEST ({packagingSlip.items.length}):</div>
+                {packagingSlip.items.map((it, idx) => (
+                  <div key={idx} className="flex justify-between text-[10px]">
+                    <span className="truncate max-w-[180px]">
+                      {it.quantity}x {it.name} {it.variantSku ? `(${it.variantSku})` : ""}
+                    </span>
+                    <span>৳{it.price}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-between font-bold text-xs">
+                <span>COLLECT ON DELIVERY:</span>
+                <span>৳{packagingSlip.financials.codAmount}</span>
+              </div>
+
+              <div className="text-center pt-2 text-[10px] font-bold text-slate-700">
+                <div>COURIER: {packagingSlip.courier.name}</div>
+                <div className="text-sm font-mono tracking-widest mt-1">
+                  ||||| {packagingSlip.courier.trackingCode} |||||
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setPackagingSlip(null)}
+                className="px-4 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800"
+              >
+                <Printer className="h-4 w-4" />
+                Print Label
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

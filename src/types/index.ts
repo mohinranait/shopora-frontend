@@ -14,3 +14,5 @@ export * from "./settings.type";
 export * from "./seller.type";
 export * from "./payout.type";
 export * from "./notification.type";
+export * from "./question.type";
+export * from "./logistics.type";

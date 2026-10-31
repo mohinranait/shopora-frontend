@@ -124,6 +124,32 @@ export function OrderTotals({
       {quote && quote.discount > 0 && (
         <Row label={`Coupon (${quote.coupon?.code})`} value={`−${formatTaka(quote.discount)}`} accent="green" />
       )}
+
+      {/* Multi-Vendor Split Shipping Packages Breakdown (Daraz style) */}
+      {quote?.packages && quote.packages.length > 1 && (
+        <div className="rounded-xl bg-sky-50/70 p-2.5 space-y-1.5 border border-sky-100 my-2">
+          <div className="text-[11px] font-bold text-slate-800 flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <Truck className="h-3.5 w-3.5 text-brand" />
+              <span>Multi-Vendor Packages ({quote.packages.length})</span>
+            </span>
+            <span className="text-[10px] text-slate-500 font-normal">Split Shipping</span>
+          </div>
+          <div className="space-y-1 pt-1 border-t border-sky-100/80">
+            {quote.packages.map((pkg, idx) => (
+              <div key={idx} className="flex items-center justify-between text-xs text-slate-600">
+                <span className="truncate max-w-[180px]">
+                  Pkg {idx + 1}: <strong>{pkg.storeName}</strong> ({pkg.itemCount} items)
+                </span>
+                <span className={`font-semibold tabular-nums ${pkg.isFreeShipping ? "text-emerald-600 font-bold" : "text-slate-800"}`}>
+                  {pkg.isFreeShipping ? "Free" : formatTaka(pkg.packageShippingFee || pkg.shippingFee || 0)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <Row
         label="Delivery"
         value={quote ? (quote.shippingFee === 0 ? "Free" : formatTaka(quote.shippingFee)) : "—"}

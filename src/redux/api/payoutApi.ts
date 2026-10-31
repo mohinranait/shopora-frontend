@@ -27,10 +27,31 @@ export const payoutApiSlice = baseApi.injectEndpoints({
       transformResponse: (res: IApiResponse<IPayoutRequest>) => res.data,
       invalidatesTags: ["Payouts", "Payout", "Sellers"],
     }),
+
+    getSellerWallet: builder.query<{ wallet: any; payouts: IPayoutRequest[] }, void>({
+      query: () => "/payouts/wallet",
+      transformResponse: (res: IApiResponse<{ wallet: any; payouts: IPayoutRequest[] }>) => res.data,
+      providesTags: ["Payouts", "Seller"],
+    }),
+
+    requestPayout: builder.mutation<
+      IPayoutRequest,
+      { amount: number; paymentMethod: string; accountDetails?: string }
+    >({
+      query: (body) => ({
+        url: "/payouts/request",
+        method: "POST",
+        body,
+      }),
+      transformResponse: (res: IApiResponse<IPayoutRequest>) => res.data,
+      invalidatesTags: ["Payouts", "Seller"],
+    }),
   }),
 });
 
 export const {
   useGetAdminPayoutsQuery,
   useProcessPayoutMutation,
+  useGetSellerWalletQuery,
+  useRequestPayoutMutation,
 } = payoutApiSlice;

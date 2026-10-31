@@ -1,3 +1,5 @@
+import type { ISplitShippingPackage } from "./logistics.type";
+
 export interface ICartItem {
   id: string | number;
   productId: string;
@@ -57,6 +59,7 @@ export interface IOrderQuote {
   itemCount: number;
   /** Payment methods currently enabled for checkout */
   paymentMethods?: string[];
+  packages?: ISplitShippingPackage[];
 }
 
 export interface ICheckoutAddress {

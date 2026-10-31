@@ -7,6 +7,7 @@ import { IProductItem, IProductVariantItem } from "@/types";
 import { ProductGallery } from "./ProductGallery";
 import { ProductInfo } from "./ProductInfo";
 import { ProductDetailsTabs } from "./ProductDetailsTabs";
+import { ProductBundleCard } from "./ProductBundleCard";
 import { RelatedProducts } from "./RelatedProducts";
 
 interface ProductDetailsViewProps {
@@ -28,7 +29,7 @@ export function ProductDetailsView({
   });
 
   // Active tab state in details tabs
-  const [activeTab, setActiveTab] = useState<"description" | "specifications" | "reviews">(
+  const [activeTab, setActiveTab] = useState<"description" | "specifications" | "reviews" | "qa">(
     "description"
   );
 
@@ -67,7 +68,10 @@ export function ProductDetailsView({
         </div>
       </div>
 
-      {/* Middle Section: Tabbed Product Information (Description, Specifications, Reviews) */}
+      {/* Frequently Bought Together Bundle Card */}
+      <ProductBundleCard productId={product.id} />
+
+      {/* Middle Section: Tabbed Product Information (Description, Specifications, Reviews, Q&A) */}
       <ProductDetailsTabs
         product={product}
         tabRef={tabsRef}

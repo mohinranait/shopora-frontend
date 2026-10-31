@@ -10,16 +10,25 @@ import {
   Info,
   Video,
   ThumbsUp,
+  HelpCircle,
+  ShieldCheck,
+  MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 import { IProductItem, IReviewItem } from "@/types";
 import { useCreateReviewMutation, useGetProductReviewsQuery } from "@/redux/api/reviewApi";
+import {
+  useGetProductQuestionsQuery,
+  useAskQuestionMutation,
+  useAnswerQuestionMutation,
+} from "@/redux";
+import { useAuth } from "@/context/AuthContext";
 
 interface ProductDetailsTabsProps {
   product: IProductItem;
   tabRef?: React.RefObject<HTMLDivElement | null>;
-  activeTab: "description" | "specifications" | "reviews";
-  setActiveTab: (tab: "description" | "specifications" | "reviews") => void;
+  activeTab: "description" | "specifications" | "reviews" | "qa";
+  setActiveTab: (tab: "description" | "specifications" | "reviews" | "qa") => void;
 }
 
 export function ProductDetailsTabs({
@@ -35,6 +44,77 @@ export function ProductDetailsTabs({
       refetchOnMountOrArgChange: true,
     }
   );
+
+  // Fetch real Q&A from RTK Query
+  const { data: questionsRes, isLoading: isQuestionsLoading, refetch: refetchQuestions } =
+    useGetProductQuestionsQuery(product.id);
+  const questions = questionsRes?.data || [];
+
+  const [askQuestion, { isLoading: isAskingQuestion }] = useAskQuestionMutation();
+  const [answerQuestion, { isLoading: isAnsweringQuestion }] = useAnswerQuestionMutation();
+
+  const [newQuestionText, setNewQuestionText] = useState("");
+  const [answeringQuestionId, setAnsweringQuestionId] = useState<string | null>(null);
+  const [answerText, setAnswerText] = useState("");
+
+  const { user, isAuthenticated } = useAuth();
+  const currentSellerId = user?.sellerProfile?.id || user?.sellerId;
+
+  // Strict Permission Check: Only Admin or the Seller who owns THIS specific product can answer
+  const canAnswer = Boolean(
+    isAuthenticated &&
+      user &&
+      (user.role === "ADMIN" ||
+        (user.role === "SELLER" &&
+          currentSellerId &&
+          product.sellerId &&
+          currentSellerId === product.sellerId))
+  );
+
+  const handleAskQuestionSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      toast.error("Please log in to ask a question.");
+      return;
+    }
+    if (!newQuestionText.trim()) {
+      toast.error("Please enter your question.");
+      return;
+    }
+
+    try {
+      await askQuestion({
+        productId: product.id,
+        question: newQuestionText.trim(),
+      }).unwrap();
+      toast.success("Question submitted successfully! Verified merchants will respond shortly.");
+      setNewQuestionText("");
+      refetchQuestions();
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to submit question. Please login first.");
+    }
+  };
+
+  const handleAnswerSubmit = async (questionId: string) => {
+    if (!answerText.trim()) {
+      toast.error("Please enter your response.");
+      return;
+    }
+
+    try {
+      await answerQuestion({
+        id: questionId,
+        productId: product.id,
+        body: { answer: answerText.trim() },
+      }).unwrap();
+      toast.success("Verified answer published!");
+      setAnsweringQuestionId(null);
+      setAnswerText("");
+      refetchQuestions();
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to publish answer.");
+    }
+  };
 
   const reviews: IReviewItem[] = fetchedReviews && fetchedReviews.length > 0
     ? fetchedReviews
@@ -127,6 +207,19 @@ export function ProductDetailsTabs({
         >
           <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
           <span>Customer Reviews ({reviews.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("qa")}
+          className={`flex items-center gap-2 py-4 px-6 text-sm font-bold border-b-2 transition whitespace-nowrap cursor-pointer ${
+            activeTab === "qa"
+              ? "border-brand text-brand-deep bg-white shadow-2xs"
+              : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
+          }`}
+        >
+          <HelpCircle className="h-4 w-4 text-brand" />
+          <span>Questions & Answers ({questions.length})</span>
         </button>
       </div>
 
@@ -515,6 +608,165 @@ export function ProductDetailsTabs({
                   </div>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {/* 4. Q&A Tab */}
+        {activeTab === "qa" && (
+          <div className="space-y-8 max-w-4xl">
+            {/* Ask Question Card */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs">
+              <div className="flex items-center gap-2 mb-2">
+                <HelpCircle className="h-5 w-5 text-brand" />
+                <h3 className="font-bold text-slate-900 text-sm sm:text-base">
+                  Have a question about this product?
+                </h3>
+              </div>
+              <p className="text-xs text-slate-500 mb-4">
+                Ask our verified merchants and support team directly. Answers are published publicly to help fellow shoppers.
+              </p>
+
+              <form onSubmit={handleAskQuestionSubmit} className="space-y-3">
+                <textarea
+                  rows={3}
+                  value={newQuestionText}
+                  onChange={(e) => setNewQuestionText(e.target.value)}
+                  placeholder="e.g. Is this genuine Bangladesh warranty covered? Does it include original accessories?"
+                  className="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand"
+                />
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={isAskingQuestion || !newQuestionText.trim()}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand hover:bg-brand/90 text-white font-bold text-xs transition disabled:opacity-50 cursor-pointer shadow-2xs"
+                  >
+                    <Send className="h-3.5 w-3.5" />
+                    <span>{isAskingQuestion ? "Submitting..." : "Ask Question"}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Questions List */}
+            <div className="space-y-4">
+              <h4 className="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
+                <MessageSquare className="h-4 w-4 text-brand" />
+                Questions ({questions.length})
+              </h4>
+
+              {isQuestionsLoading ? (
+                <div className="p-8 text-center text-xs text-slate-400">Loading questions...</div>
+              ) : questions.length === 0 ? (
+                <div className="p-8 text-center text-xs text-slate-500 bg-slate-50 rounded-2xl border border-slate-200">
+                  No questions asked yet for this item. Be the first to ask!
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100 space-y-4">
+                  {questions.map((q) => (
+                    <div key={q.id} className="pt-4 first:pt-0 space-y-3">
+                      {/* Customer Question */}
+                      <div className="flex items-start gap-2.5">
+                        <span className="h-5 w-5 rounded-md bg-slate-200 text-slate-700 font-black text-[11px] flex items-center justify-center shrink-0 mt-0.5">
+                          Q
+                        </span>
+                        <div className="space-y-1 flex-1">
+                          <p className="text-xs sm:text-sm font-semibold text-slate-900">
+                            {q.question}
+                          </p>
+                          <div className="text-[11px] text-slate-400 flex items-center gap-2">
+                            <span>Asked by {q.asker?.name || "Customer"}</span>
+                            <span>•</span>
+                            <span>
+                              {new Date(q.createdAt).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Verified Answer (if present) */}
+                      {q.answer ? (
+                        <div className="ml-7 p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100 space-y-1.5">
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
+                            <span className="h-4 w-4 rounded-full bg-emerald-600 text-white font-black text-[9px] flex items-center justify-center">
+                              A
+                            </span>
+                            <span>{q.answerer?.name || "Verified Store"}</span>
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full bg-emerald-200/80 text-emerald-900 text-[10px] font-semibold">
+                              <ShieldCheck className="h-3 w-3" /> Verified Merchant
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-700 leading-relaxed pl-5">
+                            {q.answer}
+                          </p>
+                          {q.answeredAt && (
+                            <div className="text-[10px] text-slate-400 pl-5">
+                              Answered on{" "}
+                              {new Date(q.answeredAt).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        /* If unanswered and user is verified merchant of this product or platform admin, allow answering */
+                        canAnswer && (
+                          <div className="ml-7 pt-1">
+                            {answeringQuestionId === q.id ? (
+                              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                                <textarea
+                                  rows={2}
+                                  value={answerText}
+                                  onChange={(e) => setAnswerText(e.target.value)}
+                                  placeholder="Write official merchant response..."
+                                  className="w-full p-2.5 rounded-lg border border-slate-200 text-xs bg-white focus:outline-none focus:border-brand"
+                                />
+                                <div className="flex justify-end gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setAnsweringQuestionId(null);
+                                      setAnswerText("");
+                                    }}
+                                    className="px-3 py-1 rounded-lg text-xs text-slate-500 hover:text-slate-800"
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleAnswerSubmit(q.id)}
+                                    disabled={isAnsweringQuestion || !answerText.trim()}
+                                    className="px-4 py-1.5 rounded-lg bg-brand text-white text-xs font-bold hover:bg-brand/90 disabled:opacity-50 shadow-2xs"
+                                  >
+                                    {isAnsweringQuestion ? "Publishing..." : "Submit Answer"}
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setAnsweringQuestionId(q.id);
+                                  setAnswerText("");
+                                }}
+                                className="text-xs text-brand font-bold hover:underline inline-flex items-center gap-1"
+                              >
+                                Answer this question
+                              </button>
+                            )}
+                          </div>
+                        )
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}

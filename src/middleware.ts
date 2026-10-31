@@ -16,6 +16,22 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // Protect /seller/:path* routes (except registration/login)
+  if (
+    pathname.startsWith("/seller") &&
+    pathname !== "/seller/register" &&
+    pathname !== "/seller/login"
+  ) {
+    const tokenCookie = request.cookies.get("shopora_token")?.value;
+    const roleCookie = request.cookies.get("shopora_role")?.value;
+
+    if (!tokenCookie || (roleCookie !== "SELLER" && roleCookie !== "ADMIN")) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
   // Protect customer routes: /dashboard, /dashboard/:path*, /orders, /orders/:path*
   if (
     pathname === "/dashboard" ||
@@ -40,6 +56,7 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/admin/:path*",
+    "/seller/:path*",
     "/dashboard",
     "/dashboard/:path*",
     "/orders",

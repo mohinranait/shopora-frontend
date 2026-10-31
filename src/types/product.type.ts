@@ -83,6 +83,7 @@ export interface IProductItem {
   seller?: { id: string; storeName: string; storeSlug: string } | null;
   isPlatformOwned: boolean;
   approvalStatus: ProductApprovalStatus;
+  rejectionReason?: string | null;
   status: ProductStatus;
   productType: ProductType;
   basePrice: number;
@@ -101,6 +102,7 @@ export interface IProductItem {
   selectedAttributes?: IProductSelectedAttributeItem[];
   reviews?: IReviewItem[];
   tags?: string[];
+  bundleProductIds?: string[];
   warranty?: string | null;
   weightKg?: number | null;
   dimensions?: { length?: number; width?: number; height?: number } | null;
@@ -175,6 +177,7 @@ export interface ICreateProductPayload {
   selectedAttributes?: IProductSelectedAttributeInput[];
   variants?: IProductVariantInput[];
   tags?: string[];
+  bundleProductIds?: string[];
   warranty?: string;
   weightKg?: number;
   dimensions?: {
