@@ -63,7 +63,7 @@ function LoginForm() {
     },
   });
 
-  // Quick Demo Auto-fill
+  // Quick Demo Auto-fill for Customer
   const handleAutoFillCustomer = () => {
     setValue("email", "rahim@shopora.com", { shouldValidate: true });
     setValue("password", "Customer@123456", { shouldValidate: true });
@@ -71,27 +71,40 @@ function LoginForm() {
     toast.info("Customer demo credentials auto-filled.");
   };
 
-  const handleAutoFillSeller = () => {
-    setValue("email", "bytetech@shopora.com", { shouldValidate: true });
-    setValue("password", "Seller@123456", { shouldValidate: true });
-    setErrorBanner(null);
-    toast.info("Vendor demo credentials auto-filled.");
-  };
-
   const onSubmit = async (data: LoginFormValues) => {
     setErrorBanner(null);
 
     try {
       const res = await login(data.email.trim(), data.password);
+
+      // Block SELLER accounts from customer login
+      if (res.user.role === "SELLER") {
+        // Clear auth tokens since this portal is customer-only
+        localStorage.removeItem("shopora_token");
+        localStorage.removeItem("shopora_refresh_token");
+        localStorage.removeItem("shopora_user");
+        document.cookie = "shopora_token=; path=/; max-age=0; SameSite=Lax";
+        document.cookie = "shopora_role=; path=/; max-age=0; SameSite=Lax";
+
+        const warning = "Vendor accounts cannot sign in through the customer login portal. Please use the dedicated Seller Login page.";
+        setErrorBanner(warning);
+        toast.warning(warning);
+        return;
+      }
+
       toast.success(`Welcome back, ${res.user.name}!`);
 
       // Smart Redirect based on user role
       if (res.user.role === "ADMIN") {
-        router.push("/admin");
-      } else if (res.user.role === "SELLER") {
-        router.push("/admin");
+        router.push(redirectUrl.startsWith("/admin") ? redirectUrl : "/admin");
       } else {
-        router.push(redirectUrl === "/" ? "/dashboard" : redirectUrl);
+        const target =
+          redirectUrl.startsWith("/admin") || redirectUrl.startsWith("/seller")
+            ? "/dashboard"
+            : redirectUrl === "/"
+            ? "/dashboard"
+            : redirectUrl;
+        router.push(target);
       }
     } catch (err: unknown) {
       const errorMsg = getApiErrorMessage(err);
@@ -120,9 +133,22 @@ function LoginForm() {
         {/* Login Box */}
         <div className="rounded-2xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-sm space-y-5">
           {errorBanner && (
-            <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 flex items-start gap-2.5 text-xs text-rose-700">
+            <div className="rounded-xl border border-rose-200 bg-rose-50 p-3.5 flex items-start gap-2.5 text-xs text-rose-700">
               <AlertCircle className="h-4 w-4 shrink-0 text-rose-500 mt-0.5" />
-              <p className="leading-relaxed">{errorBanner}</p>
+              <div className="space-y-1.5 flex-1">
+                <p className="leading-relaxed font-medium">{errorBanner}</p>
+                {errorBanner.includes("Vendor accounts") && (
+                  <div className="pt-1">
+                    <Link
+                      href="/seller/login"
+                      className="inline-flex items-center gap-1.5 font-bold text-purple-700 hover:text-purple-800 underline"
+                    >
+                      <Store className="h-3.5 w-3.5" />
+                      <span>Go to Seller Login Portal →</span>
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -211,7 +237,7 @@ function LoginForm() {
               variant="brand"
               size="lg"
               disabled={isSubmitting}
-              className="w-full font-bold text-xs gap-2 shadow-md shadow-brand/20 h-11 rounded-xl"
+              className="w-full font-bold text-xs gap-2 shadow-md shadow-brand/20 h-11 rounded-xl cursor-pointer"
             >
               {isSubmitting ? (
                 <>
@@ -227,40 +253,29 @@ function LoginForm() {
             </Button>
           </form>
 
-          {/* Quick Demo Logins */}
+          {/* Quick Demo Customer Login */}
           <div className="pt-2 border-t border-slate-100 space-y-2">
             <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider text-center">
-              Quick Demo Logins
+              Quick Demo Account
             </p>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={handleAutoFillCustomer}
-                className="p-2 rounded-lg border border-slate-200 hover:border-brand bg-slate-50 hover:bg-brand-light/40 text-left transition flex items-center gap-2 group"
-              >
-                <div className="h-7 w-7 rounded-full bg-sky-100 text-brand flex items-center justify-center shrink-0">
-                  <User className="h-3.5 w-3.5" />
+            <button
+              type="button"
+              onClick={handleAutoFillCustomer}
+              className="w-full p-2.5 rounded-xl border border-slate-200 hover:border-brand bg-slate-50 hover:bg-brand-light/40 text-left transition flex items-center justify-between group cursor-pointer"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="h-8 w-8 rounded-full bg-sky-100 text-brand flex items-center justify-center shrink-0">
+                  <User className="h-4 w-4" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-bold text-slate-800 truncate">Customer</p>
-                  <p className="text-[10px] text-slate-500 truncate">Rahim Chowdhury</p>
+                  <p className="text-xs font-bold text-slate-800">Demo Customer</p>
+                  <p className="text-[10px] text-slate-500">rahim@shopora.com • Customer@123456</p>
                 </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleAutoFillSeller}
-                className="p-2 rounded-lg border border-slate-200 hover:border-purple-400 bg-slate-50 hover:bg-purple-50 text-left transition flex items-center gap-2 group"
-              >
-                <div className="h-7 w-7 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
-                  <Store className="h-3.5 w-3.5" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-bold text-slate-800 truncate">Vendor Store</p>
-                  <p className="text-[10px] text-slate-500 truncate">ByteTech Official</p>
-                </div>
-              </button>
-            </div>
+              </div>
+              <span className="text-[11px] font-semibold text-brand group-hover:underline pr-1">
+                Auto-fill
+              </span>
+            </button>
           </div>
         </div>
 
@@ -268,7 +283,21 @@ function LoginForm() {
         <div className="rounded-xl border border-slate-200 bg-white p-4 text-center text-xs text-slate-600">
           <span>New to Shopora? </span>
           <Link href="/register" className="font-bold text-brand hover:underline">
-            Create an Account / Register as Seller →
+            Create a Customer Account →
+          </Link>
+        </div>
+
+        {/* Vendor Portal Link */}
+        <div className="rounded-xl border border-purple-100 bg-purple-50/70 p-3.5 text-center text-xs text-purple-900 flex items-center justify-between gap-2 shadow-2xs">
+          <div className="flex items-center gap-2 text-left">
+            <Store className="h-4 w-4 text-purple-600 shrink-0" />
+            <span className="font-medium text-slate-700">Are you a merchant?</span>
+          </div>
+          <Link
+            href="/seller/login"
+            className="font-bold text-purple-700 hover:text-purple-800 hover:underline shrink-0"
+          >
+            Vendor Portal Login →
           </Link>
         </div>
 

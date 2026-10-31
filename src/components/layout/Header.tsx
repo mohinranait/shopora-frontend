@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -530,7 +530,7 @@ export const Header: React.FC = () => {
                         </Link>
                         {(user.role === "ADMIN" || user.role === "SELLER") && (
                           <Link
-                            href="/admin"
+                            href={user.role === "ADMIN" ? "/admin" : "/seller/dashboard"}
                             onClick={() => setIsAccountOpen(false)}
                             className="flex items-center gap-2 rounded-md px-3 py-2 text-brand-deep font-semibold bg-sky-50 hover:bg-sky-100 transition"
                           >
@@ -597,6 +597,14 @@ export const Header: React.FC = () => {
                           Create New Account
                         </Link>
                         <div className="border-t border-slate-100 my-1" />
+                                                <Link
+                          href="/seller/login"
+                          onClick={() => setIsAccountOpen(false)}
+                          className="flex items-center gap-2 rounded-md px-3 py-1.5 text-purple-700 hover:bg-purple-50 transition text-xs font-semibold"
+                        >
+                          <Store className="h-3.5 w-3.5 text-purple-600" />
+                          Vendor Portal Login
+                        </Link>
                         <Link
                           href="/seller/register"
                           onClick={() => setIsAccountOpen(false)}
@@ -705,8 +713,9 @@ export const Header: React.FC = () => {
 
             {/* "Be a Vendor" Button */}
             <div className="ml-auto flex shrink-0 items-center py-1 pl-4">
-              <Link
-                href="/seller/register"
+                                     
+                        <Link
+                          href="/seller/register"
                 className="group inline-flex items-center justify-center gap-1.5 rounded-md border border-brand/40 bg-gradient-to-b from-sky-50 to-white px-3.5 py-1.5 text-[13px] font-semibold text-brand-deep shadow-xs transition hover:border-brand hover:from-sky-100/80 hover:to-sky-50 hover:text-brand"
               >
                 <Store className="h-4 w-4 text-brand transition group-hover:scale-110 group-hover:text-brand-deep" />

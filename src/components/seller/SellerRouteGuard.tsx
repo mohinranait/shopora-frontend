@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -15,7 +15,7 @@ export function SellerRouteGuard({ children }: { children: React.ReactNode }) {
       const user = userStr ? JSON.parse(userStr) : null;
 
       if (!token) {
-        router.replace(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+        router.replace(`/seller/login?redirect=${encodeURIComponent(window.location.pathname)}`);
         return;
       }
 

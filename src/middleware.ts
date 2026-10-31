@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
@@ -26,7 +26,7 @@ export function middleware(request: NextRequest) {
     const roleCookie = request.cookies.get("shopora_role")?.value;
 
     if (!tokenCookie || (roleCookie !== "SELLER" && roleCookie !== "ADMIN")) {
-      const loginUrl = new URL("/login", request.url);
+      const loginUrl = new URL("/seller/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
