@@ -78,9 +78,9 @@ export function SellerSidebar({ isMobileOpen, onMobileClose }: SellerSidebarProp
   const sidebarContent = (
     <div className="flex flex-col h-full bg-slate-900 border-r border-slate-800 text-slate-200">
       {/* Brand & Store Header */}
-      <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+      <div className="py-[11.5px] px-5 border-b border-slate-800 flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-black text-lg shadow-md shrink-0">
+          <div className="h-10 w-10 rounded-xl bg-linear-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-black text-lg shadow-md shrink-0">
             {profile?.storeName ? profile.storeName[0].toUpperCase() : "S"}
           </div>
           <div className="min-w-0">
