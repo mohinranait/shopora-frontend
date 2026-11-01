@@ -38,6 +38,64 @@ export const productApiSlice = baseApi.injectEndpoints({
           : [{ type: "Products", id: "LIST" }],
     }),
 
+    // Get all products for admin (including PENDING review, platform-owned, vendor-owned)
+    getAdminProducts: builder.query<
+      IProductListResponse,
+      Record<string, string | number | boolean | undefined> | void
+    >({
+      query: (params) => {
+        const query = new URLSearchParams();
+        if (params) {
+          Object.entries(params).forEach(([key, val]) => {
+            if (val !== undefined && val !== null && val !== "") {
+              query.append(key, String(val));
+            }
+          });
+        }
+        return `/products/admin/all?${query.toString()}`;
+      },
+      transformResponse: (res: IApiResponse<IProductItem[]>) => ({
+        products: Array.isArray(res.data) ? res.data : [],
+        meta: res.meta,
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.products.map(({ id }) => ({ type: "Products" as const, id })),
+              { type: "Products", id: "LIST" },
+            ]
+          : [{ type: "Products", id: "LIST" }],
+    }),
+
+    // Get seller's own products (authenticated seller only)
+    getSellerProducts: builder.query<
+      IProductListResponse,
+      Record<string, string | number | boolean | undefined> | void
+    >({
+      query: (params) => {
+        const query = new URLSearchParams();
+        if (params) {
+          Object.entries(params).forEach(([key, val]) => {
+            if (val !== undefined && val !== null && val !== "") {
+              query.append(key, String(val));
+            }
+          });
+        }
+        return `/products/seller/my-products?${query.toString()}`;
+      },
+      transformResponse: (res: IApiResponse<IProductItem[]>) => ({
+        products: Array.isArray(res.data) ? res.data : [],
+        meta: res.meta,
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.products.map(({ id }) => ({ type: "Products" as const, id })),
+              { type: "Products", id: "LIST" },
+            ]
+          : [{ type: "Products", id: "LIST" }],
+    }),
+
     // Get single product by ID
     getProductById: builder.query<IProductItem, string | number>({
       query: (id) => `/products/${id}`,
@@ -147,6 +205,8 @@ export const productApiSlice = baseApi.injectEndpoints({
 
 export const {
   useGetProductsQuery,
+  useGetAdminProductsQuery,
+  useGetSellerProductsQuery,
   useGetProductByIdQuery,
   useGetProductBySlugQuery,
   useCreateProductMutation,

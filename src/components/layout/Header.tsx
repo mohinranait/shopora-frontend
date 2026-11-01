@@ -21,11 +21,8 @@ import {
   Truck,
   LogOut,
   LayoutDashboard,
-  Bell,
   Package,
-  CheckCircle2,
   Loader2,
-  Inbox,
 } from "lucide-react";
 import { CartDrawer } from "../cart/CartDrawer";
 import { MobileNavDrawer } from "./MobileNavDrawer";
@@ -34,15 +31,10 @@ import { useWishlist } from "@/hooks/useWishlist";
 import { useCart } from "@/context/CartContext";
 import {
   useGetWebsiteSettingsQuery,
-  useGetNotificationsQuery,
-  useGetUnreadNotificationCountQuery,
-  useMarkNotificationAsReadMutation,
-  useMarkAllNotificationsAsReadMutation,
   useGetAutocompleteSuggestionsQuery,
 } from "@/redux";
 import { useIsClient } from "@/hooks/useIsClient";
-import { INotification } from "@/types";
-import { toast } from "sonner";
+
 
 export const Header: React.FC = () => {
   const router = useRouter();
@@ -82,43 +74,7 @@ export const Header: React.FC = () => {
   );
 
   const [isAccountOpen, setIsAccountOpen] = useState(false);
-  const [isNotifOpen, setIsNotifOpen] = useState(false);
 
-  const { data: countData } = useGetUnreadNotificationCountQuery(undefined, {
-    skip: !isClient || !isAuthenticated,
-    pollingInterval: 30000,
-  });
-  const unreadCount = countData?.unreadCount ?? 0;
-  const { data: notifData, isLoading: isNotifLoading } = useGetNotificationsQuery(
-    { limit: 6 },
-    { skip: !isNotifOpen || !isAuthenticated }
-  );
-  const [markAsRead] = useMarkNotificationAsReadMutation();
-  const [markAllAsRead, { isLoading: isMarkingAll }] = useMarkAllNotificationsAsReadMutation();
-  const notifications = notifData?.notifications ?? [];
-
-  const handleNotificationClick = async (notif: INotification) => {
-    if (!notif.isRead) {
-      try {
-        await markAsRead(notif.id).unwrap();
-      } catch {
-        // silently continue
-      }
-    }
-    setIsNotifOpen(false);
-    if (notif.link) {
-      router.push(notif.link);
-    }
-  };
-
-  const handleMarkAllRead = async () => {
-    try {
-      await markAllAsRead().unwrap();
-      toast.success("All notifications marked as read");
-    } catch {
-      toast.error("Failed to mark all as read");
-    }
-  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -172,11 +128,10 @@ export const Header: React.FC = () => {
 
       {/* Main Sticky/Fixed Header with Backdrop Blur */}
       <header
-        className={`sticky top-0 z-40 transition-all duration-300 border-b border-slate-200/90 ${
-          isScrolled
+        className={`sticky top-0 z-40 transition-all duration-300 border-b border-slate-200/90 ${isScrolled
             ? "bg-white/85 backdrop-blur-md shadow-xs py-0"
             : "bg-white/95 backdrop-blur-sm"
-        }`}
+          }`}
       >
         {/* Upper Main Nav Row */}
         <div className="max-w-7xl mx-auto flex h-16 items-center gap-4 px-4 sm:px-6 lg:px-8">
@@ -189,7 +144,7 @@ export const Header: React.FC = () => {
                 className="h-9 max-w-[140px] object-contain group-hover:scale-105 transition-transform"
               />
             ) : (
-              <div className="h-9 w-9 rounded-lg bg-gradient-to-tr from-brand-deep to-brand flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
+              <div className="h-9 w-9 rounded-lg bg-linear-to-tr from-brand-deep to-brand flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
                 <ShoppingBag className="h-5 w-5" />
               </div>
             )}
@@ -320,10 +275,10 @@ export const Header: React.FC = () => {
                     {(!suggestions?.products?.length &&
                       !suggestions?.categories?.length &&
                       !suggestions?.brands?.length) && (
-                      <div className="p-4 text-center text-xs text-slate-400">
-                        No results found for &quot;{debouncedSearch}&quot;
-                      </div>
-                    )}
+                        <div className="p-4 text-center text-xs text-slate-400">
+                          No results found for &quot;{debouncedSearch}&quot;
+                        </div>
+                      )}
 
                     {/* View all footer */}
                     <div className="p-2 bg-slate-50">
@@ -357,109 +312,7 @@ export const Header: React.FC = () => {
               )}
             </Link>
 
-            {/* Notification Bell Button (Customer/User) */}
-            {isClient && isAuthenticated && (
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsNotifOpen(!isNotifOpen);
-                    setIsAccountOpen(false);
-                  }}
-                  className="relative flex items-center justify-center h-10 w-10 rounded-md border border-slate-200 text-slate-600 hover:text-brand hover:border-brand hover:bg-sky-50/50 transition cursor-pointer"
-                  title="Notifications"
-                >
-                  <Bell className="h-5 w-5" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white px-1 shadow-2xs">
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                    </span>
-                  )}
-                </button>
-
-                {isNotifOpen && (
-                  <div
-                    className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl z-50 text-xs animate-in fade-in zoom-in-95 duration-100"
-                    onMouseLeave={() => setIsNotifOpen(false)}
-                  >
-                    <div className="flex items-center justify-between pb-2.5 mb-2 border-b border-slate-100">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-bold text-slate-900 text-sm">Notifications</span>
-                        {unreadCount > 0 && (
-                          <span className="rounded-full bg-rose-100 text-rose-600 text-[10px] font-bold px-1.5 py-0.5">
-                            {unreadCount} new
-                          </span>
-                        )}
-                      </div>
-                      {unreadCount > 0 && (
-                        <button
-                          onClick={handleMarkAllRead}
-                          disabled={isMarkingAll}
-                          className="text-[11px] font-medium text-brand hover:underline disabled:opacity-50"
-                        >
-                          Mark all read
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 pr-1">
-                      {isNotifLoading ? (
-                        <div className="py-6 text-center text-slate-400 flex flex-col items-center justify-center gap-1.5">
-                          <Loader2 className="h-4 w-4 animate-spin text-brand" />
-                          <span>Loading...</span>
-                        </div>
-                      ) : notifications.length === 0 ? (
-                        <div className="py-8 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
-                          <Inbox className="h-6 w-6 text-slate-300" />
-                          <span className="text-xs">No notifications yet</span>
-                        </div>
-                      ) : (
-                        notifications.map((item) => (
-                          <div
-                            key={item.id}
-                            onClick={() => handleNotificationClick(item)}
-                            className={`p-2.5 rounded-xl transition cursor-pointer flex items-start gap-2.5 ${
-                              !item.isRead ? "bg-sky-50/70 hover:bg-sky-50" : "hover:bg-slate-50"
-                            }`}
-                          >
-                            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-sky-100 text-brand-deep shrink-0 mt-0.5">
-                              {item.type === "ORDER" ? (
-                                <Package className="h-3.5 w-3.5" />
-                              ) : item.type === "ORDER_STATUS" ? (
-                                <Truck className="h-3.5 w-3.5" />
-                              ) : (
-                                <Bell className="h-3.5 w-3.5" />
-                              )}
-                            </span>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-bold text-slate-800 text-xs truncate">
-                                {item.title}
-                              </p>
-                              <p className="text-[11px] text-slate-500 line-clamp-2 mt-0.5">
-                                {item.message}
-                              </p>
-                            </div>
-                            {!item.isRead && (
-                              <span className="h-2 w-2 rounded-full bg-brand shrink-0 mt-1" />
-                            )}
-                          </div>
-                        ))
-                      )}
-                    </div>
-
-                    <div className="pt-2 mt-2 border-t border-slate-100 text-center">
-                      <Link
-                        href="/orders"
-                        onClick={() => setIsNotifOpen(false)}
-                        className="text-[11px] text-brand font-semibold hover:underline"
-                      >
-                        View all orders & tracking →
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+          
 
             {/* Cart Button */}
             <button
@@ -490,13 +343,12 @@ export const Header: React.FC = () => {
                 className="inline-flex items-center gap-1.5 rounded-md bg-brand-deep px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand shadow-xs cursor-pointer"
               >
                 <User className="h-4 w-4" />
-                <span className="max-w-[100px] truncate" suppressHydrationWarning>
+                <span className="max-w-25 truncate" suppressHydrationWarning>
                   {isClient && isAuthenticated && user ? user.name.split(" ")[0] : "Account"}
                 </span>
                 <ChevronDown
-                  className={`h-3.5 w-3.5 transition-transform duration-200 ${
-                    isAccountOpen ? "rotate-180" : ""
-                  }`}
+                  className={`h-3.5 w-3.5 transition-transform duration-200 ${isAccountOpen ? "rotate-180" : ""
+                    }`}
                 />
               </button>
 
@@ -509,7 +361,7 @@ export const Header: React.FC = () => {
                     <>
                       <div className="px-3 py-2 border-b border-slate-100">
                         <div className="flex items-center justify-between">
-                          <p className="font-bold text-slate-900 truncate max-w-[140px]">
+                          <p className="font-bold text-slate-900 truncate max-w-35">
                             {user.name}
                           </p>
                           <span className="rounded bg-sky-100 text-brand-deep text-[10px] font-bold px-1.5 py-0.5">
@@ -539,7 +391,7 @@ export const Header: React.FC = () => {
                           </Link>
                         )}
                         <Link
-                          href="/orders"
+                          href="/dashboard?tab=orders"
                           onClick={() => setIsAccountOpen(false)}
                           className="flex items-center gap-2 rounded-md px-3 py-2 text-slate-700 hover:bg-sky-50 hover:text-brand transition"
                         >
@@ -597,7 +449,7 @@ export const Header: React.FC = () => {
                           Create New Account
                         </Link>
                         <div className="border-t border-slate-100 my-1" />
-                                                <Link
+                        <Link
                           href="/seller/login"
                           onClick={() => setIsAccountOpen(false)}
                           className="flex items-center gap-2 rounded-md px-3 py-1.5 text-purple-700 hover:bg-purple-50 transition text-xs font-semibold"
@@ -713,10 +565,10 @@ export const Header: React.FC = () => {
 
             {/* "Be a Vendor" Button */}
             <div className="ml-auto flex shrink-0 items-center py-1 pl-4">
-                                     
-                        <Link
-                          href="/seller/register"
-                className="group inline-flex items-center justify-center gap-1.5 rounded-md border border-brand/40 bg-gradient-to-b from-sky-50 to-white px-3.5 py-1.5 text-[13px] font-semibold text-brand-deep shadow-xs transition hover:border-brand hover:from-sky-100/80 hover:to-sky-50 hover:text-brand"
+
+              <Link
+                href="/seller/register"
+                className="group inline-flex items-center justify-center gap-1.5 rounded-md border border-brand/40 bg-linear-to-b from-sky-50 to-white px-3.5 py-1.5 text-[13px] font-semibold text-brand-deep shadow-xs transition hover:border-brand hover:from-sky-100/80 hover:to-sky-50 hover:text-brand"
               >
                 <Store className="h-4 w-4 text-brand transition group-hover:scale-110 group-hover:text-brand-deep" />
                 <span>Be a Vendor</span>

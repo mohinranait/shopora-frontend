@@ -95,7 +95,7 @@ export function MobileNavDrawer({ isOpen, onClose }: MobileNavDrawerProps) {
         {/* 1. Drawer Header */}
         <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 bg-slate-50/70">
           <Link href="/" onClick={onClose} className="flex items-center gap-2 group">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-brand-deep to-brand flex items-center justify-center text-white shadow-xs">
+            <div className="h-8 w-8 rounded-lg bg-linear-to-tr from-brand-deep to-brand flex items-center justify-center text-white shadow-xs">
               <ShoppingBag className="h-4.5 w-4.5" />
             </div>
             <div className="flex flex-col">
@@ -122,7 +122,7 @@ export function MobileNavDrawer({ isOpen, onClose }: MobileNavDrawerProps) {
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5 scrollbar-thin">
           {/* User Account Card */}
           {isAuthenticated && user ? (
-            <div className="rounded-2xl border border-slate-200/90 bg-gradient-to-br from-slate-50 to-sky-50/40 p-4 space-y-3">
+            <div className="rounded-2xl border border-slate-200/90 bg-linear-to-br from-slate-50 to-sky-50/40 p-4 space-y-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-deep text-white font-extrabold text-sm shadow-xs">
                   {user.name.slice(0, 2).toUpperCase()}
@@ -310,7 +310,7 @@ export function MobileNavDrawer({ isOpen, onClose }: MobileNavDrawerProps) {
           </div>
 
           {/* Vendor Marketplace Opportunity Card */}
-          <div className="rounded-2xl border border-brand/30 bg-gradient-to-br from-brand/10 via-sky-50 to-indigo-50 p-4 space-y-2.5 shadow-2xs">
+          <div className="rounded-2xl border border-brand/30 bg-linear-to-br from-brand/10 via-sky-50 to-indigo-50 p-4 space-y-2.5 shadow-2xs">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-deep text-white">
                 <Store className="h-4 w-4" />

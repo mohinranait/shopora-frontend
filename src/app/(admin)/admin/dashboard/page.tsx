@@ -35,65 +35,43 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import {
+  useGetAdminProductsQuery,
+  useReviewProductApprovalMutation,
+} from "@/redux";
+import { toast } from "sonner";
 
 export default function AdminDashboardPage() {
   const [timeRange, setTimeRange] = useState<"today" | "7d" | "30d" | "year">("7d");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Simulated approval queue with interactive state
-  const [pendingProducts, setPendingProducts] = useState([
-    {
-      id: "prod-1",
-      name: "Baseus 65W GaN5 Pro Fast Charger",
-      category: "Mobile Accessories",
-      storeName: "Apex Tech & Gadgets",
-      price: 2850,
-      commission: "10% (৳ 285)",
-      image:
-        "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=300&q=80",
-      submittedAt: "25m ago",
-      status: "pending",
-    },
-    {
-      id: "prod-2",
-      name: "Artisan Genuine Leather Executive Wallet",
-      category: "Fashion & Lifestyle",
-      storeName: "Apparel Studio BD",
-      price: 1550,
-      commission: "12% (৳ 186)",
-      image:
-        "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=300&q=80",
-      submittedAt: "1h ago",
-      status: "pending",
-    },
-    {
-      id: "prod-3",
-      name: "Logitech MX Master 3S Wireless Mouse",
-      category: "Computer Accessories",
-      storeName: "ByteTech Official",
-      price: 11500,
-      commission: "8% (৳ 920)",
-      image:
-        "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=300&q=80",
-      submittedAt: "3h ago",
-      status: "pending",
-    },
-  ]);
+  // Real backend products query for admin
+  const { data: adminProductsData, refetch: refetchAdminProducts } = useGetAdminProductsQuery({ limit: 100 });
+  const [reviewProductApproval] = useReviewProductApprovalMutation();
 
-  const handleApprove = (id: string) => {
-    setPendingProducts((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, status: "approved" } : item
-      )
-    );
+  const allAdminProducts = adminProductsData?.products || [];
+  const realPendingProducts = allAdminProducts.filter((p) => p.approvalStatus === "PENDING");
+
+  const handleApprove = async (id: string | number) => {
+    try {
+      await reviewProductApproval({ id, status: "APPROVED" }).unwrap();
+      toast.success("Product approved and published successfully.");
+      refetchAdminProducts();
+    } catch {
+      toast.error("Failed to approve product");
+    }
   };
 
-  const handleReject = (id: string) => {
-    setPendingProducts((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, status: "rejected" } : item
-      )
-    );
+  const handleReject = async (id: string | number) => {
+    const reason = prompt("Enter rejection reason:");
+    if (!reason) return;
+    try {
+      await reviewProductApproval({ id, status: "REJECTED", rejectionReason: reason }).unwrap();
+      toast.info("Product marked as rejected.");
+      refetchAdminProducts();
+    } catch {
+      toast.error("Failed to reject product");
+    }
   };
 
   const handleRefresh = () => {
@@ -358,7 +336,7 @@ export default function AdminDashboardPage() {
             </div>
             <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
               <span className="text-slate-400">Awaiting Approval:</span>
-              <span className="font-bold text-amber-400">12 Products</span>
+              <span className="font-bold text-amber-400">{realPendingProducts.length} Products</span>
             </div>
           </CardContent>
         </Card>
@@ -528,7 +506,7 @@ export default function AdminDashboardPage() {
             href="/admin/products?filter=pending"
             className="text-xs font-semibold text-sky-400 hover:underline flex items-center gap-1"
           >
-            <span>View All Pending (12)</span>
+            <span>View All Pending ({realPendingProducts.length})</span>
             <ChevronRight className="h-3.5 w-3.5" />
           </Link>
         </CardHeader>
@@ -540,69 +518,72 @@ export default function AdminDashboardPage() {
                   <th className="py-3 px-4">Product Details</th>
                   <th className="py-3 px-4">Vendor Store</th>
                   <th className="py-3 px-4">Category</th>
-                  <th className="py-3 px-4">Price / Commission</th>
+                  <th className="py-3 px-4">Price / MSRP</th>
                   <th className="py-3 px-4">Submitted</th>
                   <th className="py-3 px-4 text-right">Moderation Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/80 text-slate-300">
-                {pendingProducts.map((prod) => (
-                  <tr
-                    key={prod.id}
-                    className="hover:bg-slate-900/50 transition-colors"
-                  >
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-3">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={prod.image}
-                          alt={prod.name}
-                          className="h-10 w-10 rounded-lg object-cover border border-slate-700 bg-slate-900 shrink-0"
-                        />
-                        <div className="min-w-0">
-                          <p className="font-bold text-white truncate max-w-xs sm:max-w-md">
-                            {prod.name}
-                          </p>
-                          <p className="text-[11px] text-slate-400 font-mono">
-                            ID: {prod.id}
-                          </p>
+                {realPendingProducts.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-slate-400">
+                      <CheckCircle2 className="h-6 w-6 text-emerald-400 mx-auto mb-1.5" />
+                      <p className="font-semibold text-white">No products awaiting approval</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">All vendor submitted products have been reviewed.</p>
+                    </td>
+                  </tr>
+                ) : (
+                  realPendingProducts.slice(0, 5).map((prod) => (
+                    <tr
+                      key={prod.id}
+                      className="hover:bg-slate-900/50 transition-colors"
+                    >
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden shrink-0 flex items-center justify-center">
+                            {prod.mainImage ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={prod.mainImage}
+                                alt={prod.name}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <Package className="h-5 w-5 text-slate-500" />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-white truncate max-w-xs sm:max-w-md">
+                              {prod.name}
+                            </p>
+                            <p className="text-[11px] text-slate-400 font-mono">
+                              SKU: {prod.sku || "N/A"}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center gap-1 font-semibold text-slate-200">
-                        <Store className="h-3 w-3 text-purple-400" />
-                        {prod.storeName}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-slate-400">{prod.category}</td>
-                    <td className="py-3 px-4">
-                      <p className="font-bold text-white">
-                        ৳ {prod.price.toLocaleString()}
-                      </p>
-                      <p className="text-[10px] text-emerald-400">
-                        Take: {prod.commission}
-                      </p>
-                    </td>
-                    <td className="py-3 px-4 text-slate-400 font-mono">
-                      {prod.submittedAt}
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      {prod.status === "approved" ? (
-                        <Badge variant="success" className="gap-1">
-                          <CheckCircle2 className="h-3 w-3" /> Approved
-                        </Badge>
-                      ) : prod.status === "rejected" ? (
-                        <Badge variant="destructive" className="gap-1">
-                          <XCircle className="h-3 w-3" /> Rejected
-                        </Badge>
-                      ) : (
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="inline-flex items-center gap-1 font-semibold text-slate-200">
+                          <Store className="h-3 w-3 text-purple-400" />
+                          {prod.seller?.storeName || "Vendor"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-slate-400">{prod.category?.name || "General"}</td>
+                      <td className="py-3 px-4">
+                        <p className="font-bold text-white">
+                          ৳ {prod.basePrice.toLocaleString()}
+                        </p>
+                      </td>
+                      <td className="py-3 px-4 text-slate-400 font-mono">
+                        {new Date(prod.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="py-3 px-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Button
                             size="xs"
                             variant="brand"
                             onClick={() => handleApprove(prod.id)}
-                            className="bg-emerald-600 hover:bg-emerald-500 text-white gap-1"
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white gap-1 cursor-pointer"
                           >
                             <CheckCircle2 className="h-3 w-3" />
                             Approve
@@ -611,16 +592,16 @@ export default function AdminDashboardPage() {
                             size="xs"
                             variant="destructive"
                             onClick={() => handleReject(prod.id)}
-                            className="gap-1"
+                            className="gap-1 cursor-pointer"
                           >
                             <XCircle className="h-3 w-3" />
                             Reject
                           </Button>
                         </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

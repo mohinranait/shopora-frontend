@@ -19,8 +19,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  useGetProductsQuery,
+  useGetSellerProductsQuery,
   useDeleteProductMutation,
+  useGetSellerDashboardStatsQuery,
 } from "@/redux";
 import { getApiErrorMessage } from "@/services/api";
 import { IProductItem } from "@/types";
@@ -30,7 +31,10 @@ export default function SellerProductsPage() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
 
-  const { data, isLoading, isFetching, refetch } = useGetProductsQuery({ limit: 50 });
+  const { data: dashboardData } = useGetSellerDashboardStatsQuery();
+  const profile = dashboardData?.profile;
+
+  const { data, isLoading, isFetching, refetch } = useGetSellerProductsQuery({ limit: 50 });
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
 
   const allProducts = data?.products || [];
@@ -98,6 +102,19 @@ export default function SellerProductsPage() {
           </Link>
         </div>
       </div>
+
+      {/* Account Pending Approval Notice */}
+      {profile && profile.status === "PENDING" && (
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3 text-amber-300">
+          <Clock className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
+          <div className="text-xs space-y-1">
+            <p className="font-bold text-amber-200">Seller Account Pending Approval</p>
+            <p className="text-amber-300/80 leading-relaxed">
+              Your vendor registration is currently under review by our administration team. You can manage your products here once approved.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Filter Tabs & Search Bar */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">

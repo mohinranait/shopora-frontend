@@ -1,19 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   Package,
   Plus,
   Search,
-
   CheckCircle2,
   XCircle,
-
   Edit,
   Trash2,
   Store,
-
   AlertTriangle,
   RefreshCw,
   Loader2,
@@ -23,12 +21,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
-import {
-  useGetProductsQuery,
+  useGetAdminProductsQuery,
   useReviewProductApprovalMutation,
   useDeleteProductMutation,
 } from "@/redux";
@@ -36,21 +31,31 @@ import { getApiErrorMessage } from "@/services/api";
 import { IProductItem } from "@/types";
 import { toast } from "sonner";
 
-export default function AdminProductsPage() {
-  const { data, isLoading: loading, isFetching, refetch } = useGetProductsQuery({ limit: 50 });
+function AdminProductsInner() {
+  const searchParams = useSearchParams();
+  const filterParam = searchParams.get("filter");
+
+  const { data, isLoading: loading, isFetching, refetch } = useGetAdminProductsQuery({ limit: 100 });
   const [reviewProductApproval] = useReviewProductApprovalMutation();
   const [deleteProduct] = useDeleteProductMutation();
 
   const products = data?.products || [];
   const [activeTab, setActiveTab] = useState<
     "all" | "platform" | "vendor" | "pending" | "low_stock"
-  >("all");
+  >(filterParam === "pending" ? "pending" : "all");
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    if (filterParam === "pending") {
+      setActiveTab("pending");
+    }
+  }, [filterParam]);
 
   const handleApprove = async (id: string | number) => {
     try {
       await reviewProductApproval({ id, status: "APPROVED" }).unwrap();
       toast.success("Product approved and published successfully.");
+      refetch();
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
     }
@@ -62,6 +67,7 @@ export default function AdminProductsPage() {
     try {
       await reviewProductApproval({ id, status: "REJECTED", rejectionReason: reason }).unwrap();
       toast.info("Product marked as rejected.");
+      refetch();
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
     }
@@ -72,6 +78,7 @@ export default function AdminProductsPage() {
     try {
       await deleteProduct(prod.id).unwrap();
       toast.success(`Product "${prod.name}" deleted successfully.`);
+      refetch();
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
     }
@@ -98,23 +105,19 @@ export default function AdminProductsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-white tracking-tight">
-              Products & Catalog Management
-            </h1>
-            <Badge variant="brand" className="text-[10px] uppercase font-bold">
-              Dynamic Database Live
-            </Badge>
-          </div>
+          <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
+            <Package className="h-7 w-7 text-brand" />
+            <span>Product Master Catalog</span>
+          </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Manage your retail inventory, multi-vendor submissions, attributes, and stock levels.
+            Review vendor listing submissions, oversee system-wide inventory, pricing, and variant matrixes.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             size="sm"
             variant="outline"
@@ -122,11 +125,11 @@ export default function AdminProductsPage() {
             disabled={isFetching}
             className="text-xs gap-1.5"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin text-sky-400" : ""}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
             <span>Refresh</span>
           </Button>
 
-          <Link href="/admin/attributes">
+          <Link href="/admin/products/attributes">
             <Button size="sm" variant="outline" className="gap-1.5 text-xs">
               <SlidersHorizontal className="h-3.5 w-3.5" />
               <span>Attributes</span>
@@ -148,7 +151,7 @@ export default function AdminProductsPage() {
         <div className="flex flex-wrap items-center bg-slate-900 border border-slate-800 rounded-lg p-1 text-xs font-semibold gap-1">
           <button
             onClick={() => setActiveTab("all")}
-            className={`px-3 py-1.5 rounded-md transition ${
+            className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
               activeTab === "all"
                 ? "bg-brand text-white"
                 : "text-slate-400 hover:text-white"
@@ -158,7 +161,7 @@ export default function AdminProductsPage() {
           </button>
           <button
             onClick={() => setActiveTab("platform")}
-            className={`px-3 py-1.5 rounded-md transition ${
+            className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
               activeTab === "platform"
                 ? "bg-brand text-white"
                 : "text-slate-400 hover:text-white"
@@ -168,7 +171,7 @@ export default function AdminProductsPage() {
           </button>
           <button
             onClick={() => setActiveTab("vendor")}
-            className={`px-3 py-1.5 rounded-md transition ${
+            className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
               activeTab === "vendor"
                 ? "bg-brand text-white"
                 : "text-slate-400 hover:text-white"
@@ -178,20 +181,26 @@ export default function AdminProductsPage() {
           </button>
           <button
             onClick={() => setActiveTab("pending")}
-            className={`px-3 py-1.5 rounded-md transition flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-md transition flex items-center gap-1.5 cursor-pointer ${
               activeTab === "pending"
                 ? "bg-amber-500 text-slate-950 font-bold"
                 : "text-amber-400 hover:text-amber-300"
             }`}
           >
             <span>Pending Review</span>
-            <span className="h-4 px-1.5 rounded-full bg-amber-400/20 text-[10px] font-bold">
+            <span
+              className={`h-4 px-1.5 rounded-full text-[10px] font-bold ${
+                activeTab === "pending"
+                  ? "bg-slate-950/20 text-slate-950"
+                  : "bg-amber-400/20 text-amber-400"
+              }`}
+            >
               {pendingCount}
             </span>
           </button>
           <button
             onClick={() => setActiveTab("low_stock")}
-            className={`px-3 py-1.5 rounded-md transition flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-md transition flex items-center gap-1.5 cursor-pointer ${
               activeTab === "low_stock"
                 ? "bg-rose-600 text-white"
                 : "text-rose-400 hover:text-rose-300"
@@ -204,32 +213,32 @@ export default function AdminProductsPage() {
           </button>
         </div>
 
-        {/* Search */}
+        {/* Search Input */}
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
           <input
             type="text"
+            placeholder="Search products or SKU..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, SKU..."
-            className="w-full h-9 rounded-lg border border-slate-700 bg-slate-900 pl-9 pr-3 text-xs text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand"
+            className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand"
           />
         </div>
       </div>
 
       {/* Products Table Card */}
-      <Card>
+      <Card className="border-slate-800 bg-slate-900 overflow-hidden">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-900/80 text-slate-400 font-semibold border-b border-slate-800">
+              <thead className="bg-slate-950/50 text-slate-400 font-semibold border-b border-slate-800">
                 <tr>
-                  <th className="py-3 px-4">Product Details</th>
-                  <th className="py-3 px-4">SKU / Brand</th>
-                  <th className="py-3 px-4">Source / Seller</th>
-                  <th className="py-3 px-4">Price (BDT)</th>
-                  <th className="py-3 px-4">Stock</th>
-                  <th className="py-3 px-4">Approval Status</th>
+                  <th className="py-3 px-4">Product Info</th>
+                  <th className="py-3 px-4">SKU &amp; Brand</th>
+                  <th className="py-3 px-4">Origin / Vendor</th>
+                  <th className="py-3 px-4">Price / MSRP</th>
+                  <th className="py-3 px-4">Stock Status</th>
+                  <th className="py-3 px-4">Moderation</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -237,35 +246,49 @@ export default function AdminProductsPage() {
                 {loading ? (
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-slate-400">
-                      <Loader2 className="h-6 w-6 text-sky-400 animate-spin mx-auto mb-2" />
-                      Loading catalog from database...
+                      <Loader2 className="h-6 w-6 animate-spin text-brand mx-auto mb-2" />
+                      Loading product catalog...
                     </td>
                   </tr>
                 ) : filteredProducts.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-slate-500">
-                      No products found matching your criteria.
+                    <td colSpan={7} className="py-12 text-center text-slate-400">
+                      <Package className="h-8 w-8 text-slate-600 mx-auto mb-2" />
+                      <p className="font-semibold text-slate-300">No products found</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        {activeTab === "pending"
+                          ? "There are currently no seller products pending moderation."
+                          : "Try adjusting your search criteria or tab filters."}
+                      </p>
                     </td>
                   </tr>
                 ) : (
                   filteredProducts.map((prod) => (
                     <tr
                       key={prod.id}
-                      className="hover:bg-slate-900/50 transition-colors"
+                      className={`hover:bg-slate-850/50 transition-colors ${
+                        prod.approvalStatus === "PENDING" ? "bg-amber-500/5" : ""
+                      }`}
                     >
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={prod.mainImage}
-                            alt={prod.name}
-                            className="h-11 w-11 rounded-lg object-cover border border-slate-700 bg-slate-900 shrink-0"
-                          />
-                          <div className="min-w-0">
-                            <p className="font-bold text-white truncate max-w-xs sm:max-w-sm">
+                          <div className="h-10 w-10 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden shrink-0 flex items-center justify-center">
+                            {prod.mainImage ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={prod.mainImage}
+                                alt={prod.name}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <Package className="h-5 w-5 text-slate-500" />
+                            )}
+                          </div>
+                          <div className="min-w-0 max-w-xs sm:max-w-md">
+                            <p className="font-bold text-white truncate hover:text-brand transition cursor-pointer">
                               {prod.name}
                             </p>
-                            <div className="flex items-center gap-1.5 mt-1">
+                            <div className="flex items-center gap-2 mt-0.5">
                               {prod.productType === "VARIABLE" ? (
                                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20">
                                   <Sparkles className="h-2.5 w-2.5" />
@@ -280,11 +303,6 @@ export default function AdminProductsPage() {
                               <span className="text-[11px] text-slate-400">
                                 {prod.category?.name || "General"}
                               </span>
-                              {prod.mainImageUseMediaId && (
-                                <Badge variant="brand" className="text-[9px] font-mono py-0 px-1">
-                                  Media #{prod.mainImageUseMediaId}
-                                </Badge>
-                              )}
                             </div>
                           </div>
                         </div>
@@ -292,7 +310,7 @@ export default function AdminProductsPage() {
 
                       <td className="py-3 px-4">
                         <p className="font-mono text-slate-300 font-semibold">
-                          {prod.sku}
+                          {prod.sku || "N/A"}
                         </p>
                         <p className="text-[11px] text-slate-400">
                           {prod.brand?.name || "Unbranded"}
@@ -313,12 +331,8 @@ export default function AdminProductsPage() {
                       </td>
 
                       <td className="py-3 px-4">
-                        <p className="font-bold text-white font-mono text-sm">
-                          {prod.productType === "VARIABLE" && prod.variants && prod.variants.length > 0 ? (
-                            <>৳ {Math.min(...prod.variants.map((v) => v.price)).toLocaleString()}</>
-                          ) : (
-                            <>৳ {prod.basePrice.toLocaleString()}</>
-                          )}
+                        <p className="font-bold text-white">
+                          ৳ {prod.basePrice.toLocaleString()}
                         </p>
                         {prod.comparePrice && prod.comparePrice > prod.basePrice && (
                           <p className="text-[10px] text-slate-400 line-through">
@@ -342,7 +356,9 @@ export default function AdminProductsPage() {
 
                       <td className="py-3 px-4">
                         {prod.approvalStatus === "PENDING" ? (
-                          <Badge variant="warning">Pending Review</Badge>
+                          <Badge variant="warning" className="animate-pulse">
+                            Pending Review
+                          </Badge>
                         ) : prod.approvalStatus === "APPROVED" ? (
                           <Badge variant="success">Approved</Badge>
                         ) : (
@@ -356,15 +372,15 @@ export default function AdminProductsPage() {
                             <>
                               <button
                                 onClick={() => handleApprove(prod.id)}
-                                className="p-1.5 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 transition"
-                                title="Approve Product"
+                                className="p-1.5 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 transition cursor-pointer"
+                                title="Approve & Publish to Storefront"
                               >
                                 <CheckCircle2 className="h-4 w-4" />
                               </button>
                               <button
                                 onClick={() => handleReject(prod.id)}
-                                className="p-1.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition"
-                                title="Reject Product"
+                                className="p-1.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition cursor-pointer"
+                                title="Reject with Reason"
                               >
                                 <XCircle className="h-4 w-4" />
                               </button>
@@ -377,17 +393,19 @@ export default function AdminProductsPage() {
                           >
                             <Edit className="h-4 w-4" />
                           </Link>
-                          <Link
-                            href={`/products/${prod.slug}`}
-                            target="_blank"
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-                            title="Preview on Storefront"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Link>
+                          {prod.slug && prod.approvalStatus === "APPROVED" && (
+                            <Link
+                              href={`/products/${prod.slug}`}
+                              target="_blank"
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                              title="Preview on Storefront"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Link>
+                          )}
                           <button
                             onClick={() => handleDelete(prod)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition cursor-pointer"
                             title="Delete Product"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -403,5 +421,20 @@ export default function AdminProductsPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function AdminProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-12 text-center text-slate-400">
+          <Loader2 className="h-6 w-6 animate-spin text-brand mx-auto mb-2" />
+          Loading products...
+        </div>
+      }
+    >
+      <AdminProductsInner />
+    </Suspense>
   );
 }

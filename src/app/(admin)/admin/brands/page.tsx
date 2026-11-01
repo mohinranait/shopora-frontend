@@ -240,7 +240,6 @@ export default function AdminBrandsPage() {
                 <tr>
                   <th className="py-3 px-4">Brand Logo & Details</th>
                   <th className="py-3 px-4">Slug</th>
-                  <th className="py-3 px-4">UseMedia Reference</th>
                   <th className="py-3 px-4">Official Website</th>
                   <th className="py-3 px-4">Status</th>
                   <th className="py-3 px-4 text-right">Actions</th>
@@ -291,25 +290,14 @@ export default function AdminBrandsPage() {
                         </td>
 
                         <td className="py-3 px-4 font-mono text-slate-400 text-xs">
-                          /{brand.slug}
-                        </td>
-
-                        <td className="py-3 px-4">
-                          {brand.logoId || brand.useMediaId ? (
-                            <div className="space-y-0.5">
-                              <Badge variant="brand" className="text-[10px] font-mono">
-                                UseMedia #{brand.logoId || brand.useMediaId}
-                              </Badge>
-                              {brand.useMedia?.alt && (
-                                <p className="text-[10px] text-slate-400 truncate max-w-[180px]">
+                          Slug: {brand.slug}
+                           {brand.useMedia?.alt && (
+                                <p className="text-[10px] text-slate-400 truncate max-w-45">
                                   Alt: &quot;{brand.useMedia.alt}&quot;
                                 </p>
                               )}
-                            </div>
-                          ) : (
-                            <span className="text-[11px] text-slate-500">None</span>
-                          )}
                         </td>
+
 
                         <td className="py-3 px-4">
                           {brand.website ? (

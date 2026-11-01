@@ -570,7 +570,11 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
         toast.success(`Product "${name}" updated successfully!`);
       } else {
         const created = await createProduct(payload).unwrap();
-        toast.success(`Product "${created.name}" created and published successfully!`);
+        if (created.approvalStatus === "PENDING") {
+          toast.success(`Product "${created.name}" created and submitted for admin review!`);
+        } else {
+          toast.success(`Product "${created.name}" created and published successfully!`);
+        }
       }
 
       router.push(backUrl);

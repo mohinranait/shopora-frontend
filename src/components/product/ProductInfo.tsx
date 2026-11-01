@@ -499,7 +499,7 @@ export function ProductInfo({
 
         {product.seller?.storeSlug && (
           <Link
-            href={`/sellers/${product.seller.storeSlug}`}
+            href={`/vendors/${product.seller.storeSlug}`}
             className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 hover:border-brand hover:text-brand transition"
           >
             Visit Store

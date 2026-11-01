@@ -228,14 +228,10 @@ export default function AdminCategoriesPage() {
                     <div>
                       <h3 className="font-bold text-white text-base flex items-center gap-2">
                         <span>{cat.name}</span>
-                        {(cat.imageId || cat.useMediaId) && (
-                          <Badge variant="brand" className="text-[10px] font-mono py-0">
-                            UseMedia #{cat.imageId || cat.useMediaId}
-                          </Badge>
-                        )}
+                        
                       </h3>
                       <p className="text-xs text-slate-400 font-mono">
-                        /{cat.slug} {cat.description && `• ${cat.description}`}
+                        /{cat.slug} 
                       </p>
                     </div>
                   </div>
@@ -393,7 +389,7 @@ export default function AdminCategoriesPage() {
                   label="Category Cover Image"
                   value={formImage}
                   onChange={setFormImage}
-                  helperText="Select cover image from WordPress-style Media Library or upload new image to Cloudinary."
+                  helperText="Select cover image from Media Library or upload new image for this category."
                   modalTitle="Select Category Cover Asset"
                 />
               </div>

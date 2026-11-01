@@ -15,22 +15,28 @@ import {
   AlertCircle,
   Truck,
   ExternalLink,
+  ShieldAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   useGetSellerDashboardStatsQuery,
   useUpdateSellerProfileMutation,
+  useGetNotificationsQuery,
 } from "@/redux";
 import { toast } from "sonner";
 
 export default function SellerDashboardPage() {
   const { data: dashboard, isLoading, refetch } = useGetSellerDashboardStatsQuery();
+  const { data: notifData } = useGetNotificationsQuery({ limit: 10, isRead: false });
   const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateSellerProfileMutation();
 
   const metrics = dashboard?.metrics;
   const profile = dashboard?.profile;
   const recentOrders = dashboard?.recentOrders || [];
+
+  const unreadNotifs = notifData?.notifications || [];
+  const adminNotices = unreadNotifs.filter((n) => n.type === "SYSTEM");
 
   const handleToggleHolidayMode = async () => {
     if (!profile) return;
@@ -69,6 +75,65 @@ export default function SellerDashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* Official Admin Notices & Warnings Alert Banner */}
+      {adminNotices.length > 0 && (
+        <div className="space-y-3">
+          {adminNotices.map((notice) => (
+            <div
+              key={notice.id}
+              className="p-4 sm:p-5 rounded-2xl bg-amber-500/15 border-2 border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg shadow-amber-500/5 animate-in fade-in"
+            >
+              <div className="flex items-start gap-3.5 min-w-0">
+                <div className="p-2.5 rounded-xl bg-amber-500/25 text-amber-400 shrink-0 mt-0.5">
+                  <ShieldAlert className="h-5 w-5" />
+                </div>
+                <div className="space-y-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant="outline" className="bg-amber-500/20 border-amber-500/40 text-amber-300 text-[10px] font-bold uppercase tracking-wider">
+                      ⚠️ Official Admin Notice / Warning
+                    </Badge>
+                    <span className="text-[11px] text-amber-200/70">
+                      {new Date(notice.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-bold text-white">{notice.title}</h4>
+                  <p className="text-xs text-amber-200/90 leading-relaxed whitespace-pre-wrap">
+                    {notice.message}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                <Link href="/seller/notifications">
+                  <Button size="sm" variant="brand" className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs h-8">
+                    View In Notices
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Account Pending Approval Notice Banner */}
+      {profile && profile.status === "PENDING" && (
+        <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-400 shrink-0">
+              <Clock className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-amber-300">Seller Account Pending Approval</h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Your store registration has been submitted and is currently pending review by platform administrators.
+              </p>
+            </div>
+          </div>
+          <Badge variant="outline" className="text-amber-400 border-amber-500/30 bg-amber-500/10 text-xs px-2.5 py-1 shrink-0">
+            Under Review
+          </Badge>
+        </div>
+      )}
+
       {/* Holiday Mode Notice Banner (if active) */}
       {profile?.isHolidayMode && (
         <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-transparent border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -102,9 +167,23 @@ export default function SellerDashboardPage() {
             <h1 className="text-2xl font-black text-white tracking-tight">
               {profile?.storeName || "My Store"}
             </h1>
-            <Badge variant="outline" className="text-emerald-400 border-emerald-500/30 bg-emerald-500/10 text-[10px]">
-              Active Merchant
-            </Badge>
+            {profile?.status === "APPROVED" ? (
+              <Badge variant="outline" className="text-emerald-400 border-emerald-500/30 bg-emerald-500/10 text-[10px]">
+                Active Merchant
+              </Badge>
+            ) : profile?.status === "PENDING" ? (
+              <Badge variant="outline" className="text-amber-400 border-amber-500/30 bg-amber-500/10 text-[10px]">
+                Pending Approval
+              </Badge>
+            ) : profile?.status === "REJECTED" ? (
+              <Badge variant="destructive" className="text-[10px]">
+                Application Rejected
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="text-slate-400 border-slate-700 bg-slate-800 text-[10px]">
+                {profile?.status || "Partner"}
+              </Badge>
+            )}
           </div>
           <p className="text-xs text-slate-400 mt-1">
             Manage your inventory, fulfill customer orders, and track your escrow earnings.

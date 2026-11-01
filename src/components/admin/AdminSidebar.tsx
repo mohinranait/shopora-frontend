@@ -29,6 +29,7 @@ import {
   LogOut,
   Sparkles,
   Bell,
+  Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -64,8 +65,13 @@ const navSections: NavSection[] = [
         label: "All Products",
         href: "/admin/products",
         icon: Package,
-        badge: 12,
-        badgeVariant: "brand",
+      },
+      {
+        label: "Pending Review",
+        href: "/admin/products?filter=pending",
+        icon: Clock,
+        badge: "Review",
+        badgeVariant: "warning",
       },
       { label: "Categories", href: "/admin/categories", icon: Layers },
       { label: "Brands", href: "/admin/brands", icon: Tag },

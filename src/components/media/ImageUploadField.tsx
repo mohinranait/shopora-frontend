@@ -74,18 +74,18 @@ export function ImageUploadField({
             {/* Info */}
             <div className="min-w-0 flex-1 space-y-1">
               <div className="flex items-center gap-2">
-                <Badge variant="brand" className="text-[10px] font-mono px-1.5 py-0">
+                {/* <Badge variant="brand" className="text-[10px] font-mono px-1.5 py-0">
                   {value.useMediaId ? `UseMedia #${value.useMediaId}` : "Linked"}
-                </Badge>
+                </Badge> */}
                 {value.alt && (
                   <span className="text-[11px] text-slate-400 truncate max-w-xs font-medium">
-                    &quot;{value.alt}&quot;
+                  Alt:  &quot;{value.alt}&quot;
                   </span>
                 )}
               </div>
-              <p className="text-xs font-mono text-slate-400 truncate">
+              {/* <p className="text-xs font-mono text-slate-400 truncate">
                 {value.url}
-              </p>
+              </p> */}
             </div>
           </div>
 

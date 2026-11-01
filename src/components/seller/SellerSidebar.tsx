@@ -15,9 +15,10 @@ import {
   Palmtree,
   ShieldCheck,
   PlusCircle,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useGetSellerDashboardStatsQuery } from "@/redux";
+import { useGetSellerDashboardStatsQuery, useGetUnreadNotificationCountQuery } from "@/redux";
 
 interface SellerSidebarProps {
   isMobileOpen: boolean;
@@ -28,6 +29,10 @@ export function SellerSidebar({ isMobileOpen, onMobileClose }: SellerSidebarProp
   const pathname = usePathname();
   const router = useRouter();
   const { data: dashboardData } = useGetSellerDashboardStatsQuery();
+  const { data: unreadData } = useGetUnreadNotificationCountQuery(undefined, {
+    pollingInterval: 30000,
+  });
+  const unreadCount = unreadData?.unreadCount ?? 0;
   const profile = dashboardData?.profile;
 
   const handleLogout = () => {
@@ -46,12 +51,14 @@ export function SellerSidebar({ isMobileOpen, onMobileClose }: SellerSidebarProp
       href: "/seller/dashboard",
       icon: LayoutDashboard,
       badge: null,
+      isDanger: false,
     },
     {
       title: "My Products",
       href: "/seller/products",
       icon: Package,
       badge: dashboardData?.metrics?.totalProducts || null,
+      isDanger: false,
     },
     {
       title: "Orders & Shipping",
@@ -60,18 +67,28 @@ export function SellerSidebar({ isMobileOpen, onMobileClose }: SellerSidebarProp
       badge: dashboardData?.metrics?.pendingOrders
         ? `${dashboardData.metrics.pendingOrders} pending`
         : null,
+      isDanger: false,
     },
     {
       title: "Wallet & Escrow",
       href: "/seller/wallet",
       icon: Wallet,
       badge: null,
+      isDanger: false,
+    },
+    {
+      title: "Notifications & Notices",
+      href: "/seller/notifications",
+      icon: Bell,
+      badge: unreadCount > 0 ? `${unreadCount} new` : null,
+      isDanger: unreadCount > 0,
     },
     {
       title: "Store Settings",
       href: "/seller/settings",
       icon: Settings,
       badge: profile?.isHolidayMode ? "Vacation" : null,
+      isDanger: false,
     },
   ];
 
@@ -143,6 +160,8 @@ export function SellerSidebar({ isMobileOpen, onMobileClose }: SellerSidebarProp
                     "px-2 py-0.5 rounded-full text-[10px] font-bold",
                     isActive
                       ? "bg-white/20 text-white"
+                      : item.isDanger
+                      ? "bg-rose-500/20 text-rose-300 border border-rose-500/30"
                       : "bg-slate-800 text-slate-300 border border-slate-700"
                   )}
                 >
