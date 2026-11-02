@@ -64,25 +64,34 @@ export interface IThermalPackagingSlipItem {
 }
 
 export interface IThermalPackagingSlip {
-  slipType: string;
+  slipType?: string;
   orderNumber: string;
   subOrderNumber: string;
-  storeName: string;
-  customer: {
+  storeName?: string;
+  store?: {
+    name: string;
+    phone?: string;
+    address?: string;
+  };
+  customer?: {
     name: string;
     phone: string;
     address: string;
   };
-  financials: {
+  financials?: {
     codAmount: number;
     shippingFee: number;
     itemsTotal: number;
   };
-  courier: {
+  courier?: {
     name: string;
     consignmentId: string;
     trackingCode: string;
   };
+  courierName?: string;
+  trackingNumber?: string;
+  consignmentId?: string;
+  amountToCollectCOD?: number;
   items: IThermalPackagingSlipItem[];
 }
 

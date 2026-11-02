@@ -55,7 +55,11 @@ export const orderApiSlice = baseApi.injectEndpoints({
         method: "PATCH",
         body: { status, trackingNumber, courierName },
       }),
-      invalidatesTags: (_r, _e, { orderId }) => [{ type: "Order", id: orderId }, { type: "Orders", id: "LIST" }],
+      invalidatesTags: (_r, _e, { orderId, subOrderId }) => [
+        { type: "Order", id: orderId },
+        { type: "Order", id: subOrderId },
+        { type: "Orders", id: "LIST" },
+      ],
     }),
 
     updatePaymentStatus: builder.mutation<unknown, { id: string | number; paymentStatus: PaymentStatus; transactionId?: string }>({

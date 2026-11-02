@@ -39,6 +39,22 @@ import {
 } from "@/types";
 import { toast } from "sonner";
 
+const STATUS_STEPS: { status: OrderStatus; label: string; action: string; description: string }[] = [
+  { status: "PENDING", label: "Pending", action: "Order Placed", description: "Customer placed the order" },
+  { status: "CONFIRMED", label: "Confirmed", action: "Confirm Order", description: "Accept and confirm this order" },
+  { status: "PROCESSING", label: "Processing", action: "Start Processing", description: "Pack items and prepare parcel" },
+  { status: "SHIPPED", label: "Shipped", action: "Mark as Shipped", description: "Handed over to courier partner" },
+  { status: "DELIVERED", label: "Delivered", action: "Mark as Delivered", description: "Customer received the package" },
+];
+
+const STATUS_RANKS: Record<string, number> = {
+  PENDING: 0,
+  CONFIRMED: 1,
+  PROCESSING: 2,
+  SHIPPED: 3,
+  DELIVERED: 4,
+};
+
 function SellerSubOrderDetailInner() {
   const params = useParams();
   const id = params?.id as string;
@@ -119,7 +135,6 @@ function SellerSubOrderDetailInner() {
     );
   }
 
-  const shippingAddr = subOrder.order?.shippingAddress;
   const packageTotal = subOrder.totalAmount ?? 0;
   const packageShipping = subOrder.shippingCost ?? subOrder.shippingFee ?? 0;
   const commission = subOrder.commissionAmount ?? 0;
@@ -155,16 +170,22 @@ function SellerSubOrderDetailInner() {
                 {subOrder.status}
               </Badge>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Parent Order ID: {subOrder.order?.orderNumber || subOrder.orderId} • Created on{" "}
-              {new Date(subOrder.createdAt).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400 mt-0.5">
+              <span>
+                Master Order: <strong className="text-white font-mono">{subOrder.orderNumber || subOrder.order?.orderNumber || `#${subOrder.orderId.slice(0, 8)}`}</strong>
+              </span>
+              <span>•</span>
+              <span>
+                Created on{" "}
+                {new Date(subOrder.createdAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -180,14 +201,6 @@ function SellerSubOrderDetailInner() {
             <Printer className="h-3.5 w-3.5 text-sky-400" />
             {isLoadingSlip ? "Generating Slip..." : "Thermal Packaging Slip"}
           </Button>
-
-          {/* Master invoice link */}
-          <Link href={`/orders/${subOrder.orderId}`} target="_blank">
-            <Button size="sm" variant="ghost" className="text-xs text-slate-400 hover:text-white gap-1">
-              Customer Invoice
-              <ExternalLink className="h-3.5 w-3.5" />
-            </Button>
-          </Link>
         </div>
       </div>
 
@@ -365,49 +378,117 @@ function SellerSubOrderDetailInner() {
           </div>
         </div>
 
-        {/* Right 1 Col: Customer Address, Financial Summary & Status Control */}
+        {/* Right 1 Col: Delivery Info, Financial Summary & Status Control */}
         <div className="space-y-6">
           {/* Fulfillment Status Control */}
           <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-            <h3 className="text-sm font-bold text-white">Update Shipment Status</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-white">Update Shipment Status</h3>
+              <span className="text-[10px] text-slate-400">Step-by-Step</span>
+            </div>
             <div className="space-y-2">
-              {(["PENDING", "PROCESSING", "SHIPPED", "DELIVERED"] as OrderStatus[]).map((st) => (
-                <button
-                  key={st}
-                  onClick={() => handleStatusChange(st)}
-                  disabled={isUpdatingStatus || subOrder.status === st}
-                  className={`w-full py-2 px-3 rounded-xl text-xs font-semibold text-left transition-colors flex items-center justify-between ${
-                    subOrder.status === st
-                      ? "bg-brand-600 text-white font-bold"
-                      : "bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white"
-                  }`}
-                >
-                  <span>Mark as {st}</span>
-                  {subOrder.status === st && <CheckCircle2 className="h-4 w-4" />}
-                </button>
-              ))}
+              {(() => {
+                const currentRank = STATUS_RANKS[subOrder.status] ?? -1;
+                const isTerminal =
+                  subOrder.status === "DELIVERED" ||
+                  subOrder.status === "CANCELLED" ||
+                  subOrder.status === "RETURNED";
+
+                return STATUS_STEPS.map((step) => {
+                  const stepRank = STATUS_RANKS[step.status];
+                  const isPast = currentRank > stepRank;
+                  const isCurrent = currentRank === stepRank;
+                  const isNext = currentRank + 1 === stepRank;
+
+                  if (isPast) {
+                    return (
+                      <div
+                        key={step.status}
+                        className="w-full py-2 px-3 rounded-xl text-xs flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 text-emerald-300"
+                      >
+                        <span className="flex items-center gap-1.5 font-medium">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                          {step.label}
+                        </span>
+                        <span className="text-[10px] text-emerald-400/80">Completed</span>
+                      </div>
+                    );
+                  }
+
+                  if (isCurrent) {
+                    return (
+                      <div
+                        key={step.status}
+                        className="w-full py-2 px-3 rounded-xl text-xs flex items-center justify-between bg-brand-600 text-white font-bold shadow-sm"
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <Clock className="h-3.5 w-3.5 text-brand-200" />
+                          Current: {step.label}
+                        </span>
+                        <Badge variant="outline" className="border-white/40 text-white text-[10px]">
+                          Active
+                        </Badge>
+                      </div>
+                    );
+                  }
+
+                  if (isNext && !isTerminal) {
+                    return (
+                      <button
+                        key={step.status}
+                        onClick={() => handleStatusChange(step.status)}
+                        disabled={isUpdatingStatus}
+                        className="w-full py-2.5 px-3 rounded-xl text-xs font-bold text-left transition-all flex items-center justify-between bg-gradient-to-r from-brand-600 to-indigo-600 text-white hover:brightness-110 shadow-md ring-1 ring-brand-400/30"
+                      >
+                        <div className="flex flex-col">
+                          <span>{step.action}</span>
+                          <span className="text-[10px] font-normal text-white/80">{step.description}</span>
+                        </div>
+                        <ArrowLeft className="h-4 w-4 rotate-180" />
+                      </button>
+                    );
+                  }
+
+                  return (
+                    <div
+                      key={step.status}
+                      className="w-full py-2 px-3 rounded-xl text-xs flex items-center justify-between bg-slate-800/40 text-slate-500 cursor-not-allowed"
+                    >
+                      <span>{step.label}</span>
+                      <span className="text-[10px] text-slate-600">Locked</span>
+                    </div>
+                  );
+                });
+              })()}
             </div>
           </div>
 
-          {/* Customer & Shipping Destination */}
+          {/* Delivery Information (Customer Privacy Protected) */}
           <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-brand-500" />
+              <ShieldCheck className="h-4 w-4 text-emerald-400" />
               Delivery Destination
             </h3>
-            <div className="text-xs text-slate-300 space-y-1.5 pt-1">
-              <div className="font-bold text-white flex items-center gap-1.5">
-                <User className="h-3.5 w-3.5 text-slate-400" />
-                {shippingAddr?.fullName || "Recipient"}
-              </div>
-              <div className="flex items-center gap-1.5 text-slate-400">
-                <Phone className="h-3.5 w-3.5" />
-                {shippingAddr?.phone || "N/A"}
-              </div>
-              <div className="text-slate-300 pl-5 leading-normal">
-                {shippingAddr?.streetAddress || "Address not provided"}
-                {shippingAddr?.city ? `, ${shippingAddr.city}` : ""}
-                {shippingAddr?.state ? `, ${shippingAddr.state}` : ""}
+            <div className="space-y-2 pt-1 text-xs text-slate-300">
+              <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Customer Details:</span>
+                  <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-[10px]">
+                    Privacy Protected
+                  </Badge>
+                </div>
+                {subOrder.destinationCity && (
+                  <div className="flex justify-between text-slate-300">
+                    <span className="text-slate-400">Destination City:</span>
+                    <span className="font-semibold text-white">
+                      {subOrder.destinationCity}
+                      {subOrder.destinationState ? `, ${subOrder.destinationState}` : ""}
+                    </span>
+                  </div>
+                )}
+                <p className="text-[11px] text-slate-400 leading-relaxed pt-2 border-t border-slate-800/80">
+                  Customer phone number and street address are hidden from sellers. All delivery coordinates are securely transmitted directly to courier partner upon parcel dispatch.
+                </p>
               </div>
             </div>
           </div>
@@ -465,7 +546,9 @@ function SellerSubOrderDetailInner() {
             {/* Slip Paper View */}
             <div id="thermal-slip-content" className="p-4 border-2 border-dashed border-slate-400 rounded-lg space-y-3 font-mono text-xs">
               <div className="text-center pb-2 border-b border-slate-300">
-                <div className="font-black text-sm tracking-widest">{packagingSlip.storeName}</div>
+                <div className="font-black text-sm tracking-widest">
+                  {packagingSlip.storeName || packagingSlip.store?.name || "Merchant Store"}
+                </div>
                 <div className="text-[10px] text-slate-600">Merchant Fulfillment Manifest</div>
               </div>
 
@@ -476,14 +559,14 @@ function SellerSubOrderDetailInner() {
 
               <div className="p-2 bg-slate-100 rounded text-[11px] space-y-1">
                 <div><strong>SHIP TO:</strong></div>
-                <div>{packagingSlip.customer.name}</div>
-                <div>{packagingSlip.customer.phone}</div>
-                <div>{packagingSlip.customer.address}</div>
+                <div>{packagingSlip.customer?.name || "Customer (Privacy Protected)"}</div>
+                <div>{packagingSlip.customer?.phone || "Protected"}</div>
+                <div>{packagingSlip.customer?.address || "Courier Dispatched"}</div>
               </div>
 
               <div className="border-t border-b border-slate-300 py-2 space-y-1">
-                <div className="font-bold text-[10px]">ITEMS MANIFEST ({packagingSlip.items.length}):</div>
-                {packagingSlip.items.map((it: IThermalPackagingSlipItem, idx: number) => (
+                <div className="font-bold text-[10px]">ITEMS MANIFEST ({packagingSlip.items?.length || 0}):</div>
+                {packagingSlip.items?.map((it: IThermalPackagingSlipItem, idx: number) => (
                   <div key={idx} className="flex justify-between text-[10px]">
                     <span className="truncate max-w-[180px]">
                       {it.quantity}x {it.name} {it.variantSku ? `(${it.variantSku})` : ""}
@@ -495,13 +578,13 @@ function SellerSubOrderDetailInner() {
 
               <div className="flex justify-between font-bold text-xs">
                 <span>COLLECT ON DELIVERY:</span>
-                <span>৳{packagingSlip.financials.codAmount}</span>
+                <span>৳{(packagingSlip.financials?.codAmount ?? packagingSlip.amountToCollectCOD ?? 0).toLocaleString()}</span>
               </div>
 
               <div className="text-center pt-2 text-[10px] font-bold text-slate-700">
-                <div>COURIER: {packagingSlip.courier.name}</div>
+                <div>COURIER: {packagingSlip.courier?.name || packagingSlip.courierName || "Courier Partner"}</div>
                 <div className="text-sm font-mono tracking-widest mt-1">
-                  ||||| {packagingSlip.courier.trackingCode} |||||
+                  ||||| {packagingSlip.courier?.trackingCode || packagingSlip.trackingNumber || packagingSlip.consignmentId || "PENDING"} |||||
                 </div>
               </div>
             </div>

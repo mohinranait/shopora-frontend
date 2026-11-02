@@ -49,6 +49,8 @@ export interface ISubOrder {
   consignmentId?: string | null;
   createdAt: string;
   updatedAt: string;
+  destinationCity?: string | null;
+  destinationState?: string | null;
   store: { id: string; storeName: string; storeSlug: string; phone?: string | null } | null;
   items: IOrderItem[];
   order?: {
