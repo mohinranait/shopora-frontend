@@ -14,6 +14,7 @@ export interface IOrderItem {
   productImage: string | null;
   sku: string | null;
   price: number;
+  costPrice?: number | null;
   quantity: number;
   totalPrice: number;
   unitPrice?: number;
@@ -30,6 +31,7 @@ export interface IOrderItem {
 export interface ISubOrder {
   id: string;
   subOrderNumber: string;
+  orderNumber?: string;
   orderId: string;
   sellerId: string | null;
   isPlatformOwned: boolean;

@@ -25,6 +25,7 @@ import {
   CreditCard,
   Building2,
   ShieldCheck,
+  Boxes,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +39,7 @@ import {
 import {
   useGetAdminProductsQuery,
   useReviewProductApprovalMutation,
+  useGetAdminAnalyticsQuery,
 } from "@/redux";
 import { toast } from "sonner";
 
@@ -45,18 +47,26 @@ export default function AdminDashboardPage() {
   const [timeRange, setTimeRange] = useState<"today" | "7d" | "30d" | "year">("7d");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Real backend products query for admin
+  // Real backend products & analytics query for admin
   const { data: adminProductsData, refetch: refetchAdminProducts } = useGetAdminProductsQuery({ limit: 100 });
+  const { data: analytics, refetch: refetchAnalytics } = useGetAdminAnalyticsQuery();
   const [reviewProductApproval] = useReviewProductApprovalMutation();
 
   const allAdminProducts = adminProductsData?.products || [];
   const realPendingProducts = allAdminProducts.filter((p) => p.approvalStatus === "PENDING");
+
+  const grossSales = analytics?.revenue?.grossSales || 0;
+  const directSales = analytics?.revenue?.directSalesRevenue || 0;
+  const vendorSales = Math.max(0, grossSales - directSales);
+  const directPercent = grossSales > 0 ? Math.round((directSales / grossSales) * 100) : 50;
+  const vendorPercent = grossSales > 0 ? 100 - directPercent : 50;
 
   const handleApprove = async (id: string | number) => {
     try {
       await reviewProductApproval({ id, status: "APPROVED" }).unwrap();
       toast.success("Product approved and published successfully.");
       refetchAdminProducts();
+      refetchAnalytics();
     } catch {
       toast.error("Failed to approve product");
     }
@@ -69,6 +79,7 @@ export default function AdminDashboardPage() {
       await reviewProductApproval({ id, status: "REJECTED", rejectionReason: reason }).unwrap();
       toast.info("Product marked as rejected.");
       refetchAdminProducts();
+      refetchAnalytics();
     } catch {
       toast.error("Failed to reject product");
     }
@@ -76,6 +87,8 @@ export default function AdminDashboardPage() {
 
   const handleRefresh = () => {
     setIsRefreshing(true);
+    refetchAdminProducts();
+    refetchAnalytics();
     setTimeout(() => setIsRefreshing(false), 800);
   };
 
@@ -238,105 +251,112 @@ export default function AdminDashboardPage() {
             </div>
             <div className="mt-2">
               <p className="text-2xl font-black text-white tracking-tight">
-                ৳ 4,85,600
+                ৳ {(analytics?.revenue?.grossSales ?? 0).toLocaleString()}
               </p>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="text-xs font-bold text-emerald-400 flex items-center">
-                  <ArrowUpRight className="h-3.5 w-3.5" /> +18.4%
+                  Direct: ৳ {(analytics?.revenue?.directSalesRevenue ?? 0).toLocaleString()}
                 </span>
-                <span className="text-[11px] text-slate-400">vs last month</span>
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
               <span className="text-slate-400">Platform Commission:</span>
-              <span className="font-bold text-sky-400">৳ 48,560 (10%)</span>
+              <span className="font-bold text-sky-400">
+                ৳ {(analytics?.revenue?.platformCommission ?? 0).toLocaleString()}
+              </span>
             </div>
           </CardContent>
         </Card>
 
-        {/* Metric 2: Total Orders */}
+        {/* Metric 2: Net Platform Profit */}
+        <Card className="hover:border-slate-700 transition">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between text-slate-400">
+              <span className="text-xs font-semibold uppercase tracking-wider">
+                Platform Net Profit
+              </span>
+              <div className="h-8 w-8 rounded-lg bg-brand/10 border border-brand/20 flex items-center justify-center text-brand">
+                <TrendingUp className="h-4 w-4" />
+              </div>
+            </div>
+            <div className="mt-2">
+              <p className="text-2xl font-black text-white tracking-tight">
+                ৳ {(analytics?.revenue?.netPlatformProfit ?? 0).toLocaleString()}
+              </p>
+              <div className="flex items-center gap-1.5 mt-1">
+                <span className="text-xs font-bold text-emerald-400 flex items-center">
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                  {analytics?.revenue?.profitMarginPercent ?? 0}% Margin
+                </span>
+                <span className="text-[11px] text-slate-400">Realized Profit</span>
+              </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+              <span className="text-slate-400">Direct Retail Profit:</span>
+              <span className="font-bold text-emerald-400">
+                ৳ {(analytics?.revenue?.directSalesProfit ?? 0).toLocaleString()}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Metric 3: Active Stock Investment */}
+        <Card className="hover:border-slate-700 transition">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between text-slate-400">
+              <span className="text-xs font-semibold uppercase tracking-wider">
+                Active Stock Investment
+              </span>
+              <div className="h-8 w-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                <Boxes className="h-4 w-4" />
+              </div>
+            </div>
+            <div className="mt-2">
+              <p className="text-2xl font-black text-white tracking-tight">
+                ৳ {(analytics?.revenue?.activeStockInvestment ?? 0).toLocaleString()}
+              </p>
+              <div className="flex items-center gap-1.5 mt-1">
+                <span className="text-xs font-bold text-amber-400">
+                  Shopora Direct Inventory
+                </span>
+              </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+              <span className="text-slate-400">Total Ecosystem Capital:</span>
+              <span className="font-bold text-sky-400">
+                ৳ {(analytics?.revenue?.totalCatalogInvestment ?? 0).toLocaleString()}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Metric 4: Total Orders */}
         <Card className="hover:border-slate-700 transition">
           <CardContent className="p-5">
             <div className="flex items-center justify-between text-slate-400">
               <span className="text-xs font-semibold uppercase tracking-wider">
                 Total Orders
               </span>
-              <div className="h-8 w-8 rounded-lg bg-brand/10 border border-brand/20 flex items-center justify-center text-brand">
+              <div className="h-8 w-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
                 <ShoppingCart className="h-4 w-4" />
               </div>
             </div>
             <div className="mt-2">
               <p className="text-2xl font-black text-white tracking-tight">
-                1,248
+                {(analytics?.orders?.total ?? 0).toLocaleString()}
               </p>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="text-xs font-bold text-emerald-400 flex items-center">
-                  <ArrowUpRight className="h-3.5 w-3.5" /> +12.1%
+                  <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+                  {analytics?.orders?.delivered ?? 0} Delivered
                 </span>
-                <span className="text-[11px] text-slate-400">89 orders today</span>
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
               <span className="text-slate-400">Pending Fulfillment:</span>
-              <span className="font-bold text-amber-400">42 Orders</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Metric 3: Active Vendors */}
-        <Card className="hover:border-slate-700 transition">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between text-slate-400">
-              <span className="text-xs font-semibold uppercase tracking-wider">
-                Multi-Vendor Stores
+              <span className="font-bold text-amber-400">
+                {analytics?.orders?.pending ?? 0} Orders
               </span>
-              <div className="h-8 w-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
-                <Store className="h-4 w-4" />
-              </div>
-            </div>
-            <div className="mt-2">
-              <p className="text-2xl font-black text-white tracking-tight">
-                128
-              </p>
-              <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-xs font-bold text-purple-400 flex items-center">
-                  <ArrowUpRight className="h-3.5 w-3.5" /> +8 this month
-                </span>
-                <span className="text-[11px] text-slate-400">94.2% SLA</span>
-              </div>
-            </div>
-            <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-              <span className="text-slate-400">Pending KYC Review:</span>
-              <span className="font-bold text-rose-400">3 Vendors</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Metric 4: Total Catalog */}
-        <Card className="hover:border-slate-700 transition">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between text-slate-400">
-              <span className="text-xs font-semibold uppercase tracking-wider">
-                Catalog Inventory
-              </span>
-              <div className="h-8 w-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-                <Package className="h-4 w-4" />
-              </div>
-            </div>
-            <div className="mt-2">
-              <p className="text-2xl font-black text-white tracking-tight">
-                3,490
-              </p>
-              <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-xs font-bold text-sky-400">
-                  12 Seeder Prods Live
-                </span>
-                <span className="text-[11px] text-slate-400">in DB</span>
-              </div>
-            </div>
-            <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-              <span className="text-slate-400">Awaiting Approval:</span>
-              <span className="font-bold text-amber-400">{realPendingProducts.length} Products</span>
             </div>
           </CardContent>
         </Card>
@@ -432,12 +452,12 @@ export default function AdminDashboardPage() {
                 <span className="text-purple-400">Vendor Network (3rd Party)</span>
               </div>
               <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden flex">
-                <div className="h-full bg-brand" style={{ width: "42%" }} />
-                <div className="h-full bg-purple-500" style={{ width: "58%" }} />
+                <div className="h-full bg-brand" style={{ width: `${directPercent}%` }} />
+                <div className="h-full bg-purple-500" style={{ width: `${vendorPercent}%` }} />
               </div>
               <div className="flex justify-between text-[11px] text-slate-400 mt-1 font-mono">
-                <span>৳ 2,03,952 (42%)</span>
-                <span>৳ 2,81,648 (58%)</span>
+                <span>৳ {directSales.toLocaleString()} ({directPercent}%)</span>
+                <span>৳ {vendorSales.toLocaleString()} ({vendorPercent}%)</span>
               </div>
             </div>
 
@@ -481,7 +501,9 @@ export default function AdminDashboardPage() {
           </CardContent>
           <div className="p-4 border-t border-slate-800/80 bg-slate-950/60 rounded-b-xl flex items-center justify-between text-xs">
             <span className="text-slate-400">Net Profit Margin:</span>
-            <span className="font-bold text-emerald-400">14.8% (Healthy)</span>
+            <span className="font-bold text-emerald-400">
+              {analytics?.revenue?.profitMarginPercent ?? 0}% (Healthy)
+            </span>
           </div>
         </Card>
       </div>

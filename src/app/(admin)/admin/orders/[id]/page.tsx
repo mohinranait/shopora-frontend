@@ -699,9 +699,9 @@ function OrderDetailInner() {
 
               <div className="p-2 bg-slate-100 rounded text-[11px] space-y-1">
                 <div><strong>SHIP TO:</strong></div>
-                <div>{packagingSlip.customer.name}</div>
-                <div>{packagingSlip.customer.phone}</div>
-                <div>{packagingSlip.customer.address}</div>
+                <div>{packagingSlip.customer?.name}</div>
+                <div>{packagingSlip.customer?.phone}</div>
+                <div>{packagingSlip.customer?.address}</div>
               </div>
 
               <div className="border-t border-b border-slate-300 py-2 space-y-1">
@@ -718,13 +718,13 @@ function OrderDetailInner() {
 
               <div className="flex justify-between font-bold text-xs">
                 <span>COLLECT ON DELIVERY:</span>
-                <span>৳{packagingSlip.financials.codAmount}</span>
+                <span>৳{packagingSlip.financials?.codAmount ?? packagingSlip.amountToCollectCOD ?? 0}</span>
               </div>
 
               <div className="text-center pt-2 text-[10px] font-bold text-slate-700">
-                <div>COURIER: {packagingSlip.courier.name}</div>
+                <div>COURIER: {packagingSlip.courier?.name ?? packagingSlip.courierName}</div>
                 <div className="text-sm font-mono tracking-widest mt-1">
-                  ||||| {packagingSlip.courier.trackingCode} |||||
+                  ||||| {packagingSlip.courier?.trackingCode ?? packagingSlip.trackingNumber} |||||
                 </div>
               </div>
             </div>

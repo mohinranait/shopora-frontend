@@ -187,6 +187,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       imageId: v.imageId ?? v.useMediaId,
       useMediaId: v.imageId ?? v.useMediaId,
       barcode: v.barcode,
+      weightKg: v.weightKg,
       isDefault: v.isDefault,
       isActive: v.isActive,
       attributeValueIds: v.attributeValues?.map((av) => av.attributeValueId) || [],
@@ -196,7 +197,10 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
 
   // Bulk Edit Inputs
   const [bulkPrice, setBulkPrice] = useState<string>("");
+  const [bulkCostPrice, setBulkCostPrice] = useState<string>("");
   const [bulkStock, setBulkStock] = useState<string>("");
+  const [bulkLowStock, setBulkLowStock] = useState<string>("");
+  const [expandedRowIndices, setExpandedRowIndices] = useState<Record<number, boolean>>({});
 
   // ==========================================
   // Form State: 6. Shipping & Dimensions
@@ -364,12 +368,13 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
           sku: existingRow?.sku || `${skuBase}-${v.suggestedSkuSuffix || `VAR${i + 1}`}`,
           price: existingRow?.price || (typeof basePrice === "number" ? basePrice : 0),
           comparePrice: existingRow?.comparePrice || (typeof comparePrice === "number" ? comparePrice : null),
-          costPrice: existingRow?.costPrice || (typeof costPrice === "number" ? costPrice : null),
-          stock: existingRow?.stock || 0,
-          lowStockThreshold: existingRow?.lowStockThreshold || 5,
+          costPrice: existingRow?.costPrice ?? (typeof costPrice === "number" ? costPrice : null),
+          stock: existingRow?.stock ?? (typeof stock === "number" ? stock : 0),
+          lowStockThreshold: existingRow?.lowStockThreshold ?? (typeof lowStockThreshold === "number" ? lowStockThreshold : 5),
           image: existingRow?.image || null,
           useMediaId: existingRow?.useMediaId || null,
           barcode: existingRow?.barcode || null,
+          weightKg: existingRow?.weightKg ?? (typeof weightKg === "number" ? weightKg : null),
           isDefault: i === 0,
           isActive: true,
           attributeValueIds: v.attributeValueIds,
@@ -408,6 +413,38 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
     setVariantRows((prev) => prev.map((r) => ({ ...r, stock: num })));
     toast.success(`Updated stock to ${num} units on all ${variantRows.length} variants.`);
     setBulkStock("");
+  };
+
+  // Bulk Apply Cost Price
+  const handleApplyBulkCostPrice = () => {
+    const num = parseFloat(bulkCostPrice);
+    if (isNaN(num) || num < 0) {
+      toast.error("Please enter a valid cost price");
+      return;
+    }
+    setVariantRows((prev) => prev.map((r) => ({ ...r, costPrice: num })));
+    toast.success(`Updated cost price to ৳${num} on all ${variantRows.length} variants.`);
+    setBulkCostPrice("");
+  };
+
+  // Bulk Apply Low Stock Alert Threshold
+  const handleApplyBulkLowStock = () => {
+    const num = parseInt(bulkLowStock, 10);
+    if (isNaN(num) || num < 0) {
+      toast.error("Please enter a valid low stock threshold");
+      return;
+    }
+    setVariantRows((prev) => prev.map((r) => ({ ...r, lowStockThreshold: num })));
+    toast.success(`Updated low stock threshold to ${num} units on all ${variantRows.length} variants.`);
+    setBulkLowStock("");
+  };
+
+  // Toggle Row Expansion for Barcode & Weight
+  const toggleRowExpanded = (idx: number) => {
+    setExpandedRowIndices((prev) => ({
+      ...prev,
+      [idx]: !prev[idx],
+    }));
   };
 
   // Delete Individual Variant Row
@@ -537,7 +574,32 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
         mainImageUseMediaId,
         images: imagesPayload,
         selectedAttributes: selectedAttributesPayload,
-        variants: productType === "VARIABLE" ? variantRows : [],
+        variants:
+          productType === "VARIABLE"
+            ? variantRows.map((v) => ({
+                ...v,
+                price: Number(v.price) || 0,
+                comparePrice:
+                  typeof v.comparePrice === "number" && !isNaN(v.comparePrice)
+                    ? v.comparePrice
+                    : null,
+                costPrice:
+                  typeof v.costPrice === "number" && !isNaN(v.costPrice)
+                    ? v.costPrice
+                    : null,
+                stock: Math.max(0, parseInt(String(v.stock), 10) || 0),
+                lowStockThreshold:
+                  typeof v.lowStockThreshold === "number" && !isNaN(v.lowStockThreshold)
+                    ? v.lowStockThreshold
+                    : 5,
+                barcode: v.barcode ? v.barcode.trim() : null,
+                weightKg:
+                  typeof v.weightKg === "number" && !isNaN(v.weightKg)
+                    ? v.weightKg
+                    : null,
+                isActive: v.isActive !== false,
+              }))
+            : [],
         tags: parsedTags,
         bundleProductIds: selectedBundleProductIds,
         warranty: warranty.trim() || undefined,
@@ -1357,7 +1419,8 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
 
                   {/* Bulk Action Controls */}
                   <div className="flex flex-wrap items-center gap-2">
-                    <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 rounded-lg p-1">
+                    {/* Bulk Price */}
+                    <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 rounded-lg p-1" title="Set price for all variations">
                       <input
                         type="number"
                         placeholder="Price ৳"
@@ -1376,7 +1439,28 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                       </Button>
                     </div>
 
-                    <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 rounded-lg p-1">
+                    {/* Bulk Cost Price */}
+                    <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 rounded-lg p-1" title="Set cost price for profit calculation on all variations">
+                      <input
+                        type="number"
+                        placeholder="Cost ৳"
+                        value={bulkCostPrice}
+                        onChange={(e) => setBulkCostPrice(e.target.value)}
+                        className="w-20 h-7 bg-transparent px-2 text-xs text-slate-300 focus:outline-none"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="secondary"
+                        onClick={handleApplyBulkCostPrice}
+                        className="h-7 text-[10px] px-2"
+                      >
+                        Set All
+                      </Button>
+                    </div>
+
+                    {/* Bulk Stock */}
+                    <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 rounded-lg p-1" title="Set stock units for all variations">
                       <input
                         type="number"
                         placeholder="Stock"
@@ -1394,160 +1478,361 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                         Set All
                       </Button>
                     </div>
+
+                    {/* Bulk Low Stock Alert */}
+                    <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 rounded-lg p-1" title="Set low stock alert threshold for all variations">
+                      <input
+                        type="number"
+                        placeholder="Alert ≤"
+                        value={bulkLowStock}
+                        onChange={(e) => setBulkLowStock(e.target.value)}
+                        className="w-16 h-7 bg-transparent px-2 text-xs text-amber-300 focus:outline-none"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="secondary"
+                        onClick={handleApplyBulkLowStock}
+                        className="h-7 text-[10px] px-2"
+                      >
+                        Set All
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
                 {/* Table */}
-                <div className="rounded-xl border border-slate-800 overflow-x-auto">
-                  <table className="w-full text-left text-xs min-w-[700px]">
+                <div className="rounded-xl border border-slate-800 overflow-x-auto shadow-inner">
+                  <table className="w-full text-left text-xs min-w-[950px]">
                     <thead className="bg-slate-950 text-[11px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">
                       <tr>
                         <th className="py-2.5 px-3">Image</th>
                         <th className="py-2.5 px-3">Variant Combination</th>
                         <th className="py-2.5 px-3">SKU</th>
+                        <th className="py-2.5 px-3">Cost (৳)</th>
                         <th className="py-2.5 px-3">Price (৳)</th>
                         <th className="py-2.5 px-3">Compare (৳)</th>
-                        <th className="py-2.5 px-3">Stock</th>
+                        <th className="py-2.5 px-3">Stock Units</th>
+                        <th className="py-2.5 px-3">Low Alert</th>
+                        <th className="py-2.5 px-3 text-center">Specs</th>
                         <th className="py-2.5 px-3 text-center">Default</th>
                         <th className="py-2.5 px-3 text-right">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800 bg-slate-900/60">
+                    <tbody className="divide-y divide-slate-800/80 bg-slate-900/60">
                       {variantRows.map((v, idx) => (
-                        <tr key={idx} className="hover:bg-slate-800/30 transition">
-                          {/* Image */}
-                          <td className="py-2 px-3">
-                            <div
-                              onClick={() => {
-                                setMediaTarget({ variantIndex: idx });
-                                setIsMediaModalOpen(true);
-                              }}
-                              className="h-10 w-10 rounded-lg border border-slate-700 bg-slate-950 flex items-center justify-center cursor-pointer hover:border-brand overflow-hidden shrink-0 group relative"
-                              title="Click to select image for this variant"
-                            >
-                              {v.image ? (
-                                <img
-                                  src={v.image}
-                                  alt={v.title}
-                                  className="h-full w-full object-contain"
+                        <React.Fragment key={idx}>
+                          <tr className="hover:bg-slate-800/30 transition">
+                            {/* Image */}
+                            <td className="py-2 px-3">
+                              <div
+                                onClick={() => {
+                                  setMediaTarget({ variantIndex: idx });
+                                  setIsMediaModalOpen(true);
+                                }}
+                                className="h-10 w-10 rounded-lg border border-slate-700 bg-slate-950 flex items-center justify-center cursor-pointer hover:border-brand overflow-hidden shrink-0 group relative"
+                                title="Click to select image for this variant"
+                              >
+                                {v.image ? (
+                                  <img
+                                    src={v.image}
+                                    alt={v.title}
+                                    className="h-full w-full object-contain"
+                                  />
+                                ) : (
+                                  <Upload className="h-3.5 w-3.5 text-slate-500 group-hover:text-brand" />
+                                )}
+                              </div>
+                            </td>
+
+                            {/* Variant Title */}
+                            <td className="py-2 px-3 font-semibold text-white">
+                              <div className="flex items-center gap-1.5">
+                                <span>{v.title}</span>
+                                {v.isActive === false && (
+                                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 font-normal">
+                                    Disabled
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+
+                            {/* SKU */}
+                            <td className="py-2 px-3">
+                              <input
+                                type="text"
+                                value={v.sku || ""}
+                                onChange={(e) =>
+                                  setVariantRows((prev) =>
+                                    prev.map((r, i) =>
+                                      i === idx ? { ...r, sku: e.target.value } : r
+                                    )
+                                  )
+                                }
+                                className="w-32 h-8 px-2 rounded-lg border border-slate-800 bg-slate-950 text-[11px] font-mono text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand"
+                                placeholder="SKU"
+                              />
+                            </td>
+
+                            {/* Cost Price */}
+                            <td className="py-2 px-3">
+                              <input
+                                type="number"
+                                min={0}
+                                step="any"
+                                placeholder="Cost ৳"
+                                value={v.costPrice ?? ""}
+                                onChange={(e) =>
+                                  setVariantRows((prev) =>
+                                    prev.map((r, i) =>
+                                      i === idx
+                                        ? {
+                                            ...r,
+                                            costPrice: e.target.value ? Number(e.target.value) : null,
+                                          }
+                                        : r
+                                    )
+                                  )
+                                }
+                                className="w-24 h-8 px-2 rounded-lg border border-slate-800 bg-slate-950 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-brand"
+                                title="Merchant cost price for profit calculation"
+                              />
+                            </td>
+
+                            {/* Price */}
+                            <td className="py-2 px-3">
+                              <input
+                                type="number"
+                                min={0}
+                                step="any"
+                                required
+                                placeholder="Price ৳"
+                                value={v.price}
+                                onChange={(e) =>
+                                  setVariantRows((prev) =>
+                                    prev.map((r, i) =>
+                                      i === idx
+                                        ? { ...r, price: Number(e.target.value) || 0 }
+                                        : r
+                                    )
+                                  )
+                                }
+                                className="w-24 h-8 px-2 rounded-lg border border-slate-800 bg-slate-950 text-xs font-bold text-white focus:outline-none focus:ring-1 focus:ring-brand"
+                              />
+                            </td>
+
+                            {/* Compare Price */}
+                            <td className="py-2 px-3">
+                              <input
+                                type="number"
+                                min={0}
+                                step="any"
+                                placeholder="Optional"
+                                value={v.comparePrice ?? ""}
+                                onChange={(e) =>
+                                  setVariantRows((prev) =>
+                                    prev.map((r, i) =>
+                                      i === idx
+                                        ? {
+                                            ...r,
+                                            comparePrice: e.target.value
+                                              ? Number(e.target.value)
+                                              : null,
+                                          }
+                                        : r
+                                    )
+                                  )
+                                }
+                                className="w-24 h-8 px-2 rounded-lg border border-slate-800 bg-slate-950 text-xs text-slate-400 focus:outline-none focus:ring-1 focus:ring-brand"
+                              />
+                            </td>
+
+                            {/* Stock */}
+                            <td className="py-2 px-3">
+                              <div className="flex items-center gap-1.5">
+                                <input
+                                  type="number"
+                                  min={0}
+                                  value={v.stock}
+                                  onChange={(e) =>
+                                    setVariantRows((prev) =>
+                                      prev.map((r, i) =>
+                                        i === idx
+                                          ? {
+                                              ...r,
+                                              stock: Math.max(0, parseInt(e.target.value, 10) || 0),
+                                            }
+                                          : r
+                                      )
+                                    )
+                                  }
+                                  className={`w-20 h-8 px-2 rounded-lg border bg-slate-950 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-brand ${
+                                    v.stock === 0
+                                      ? "border-rose-500/60 text-rose-400"
+                                      : v.stock <= (v.lowStockThreshold ?? 5)
+                                      ? "border-amber-500/60 text-amber-300"
+                                      : "border-slate-800 text-white"
+                                  }`}
                                 />
-                              ) : (
-                                <Upload className="h-3.5 w-3.5 text-slate-500 group-hover:text-brand" />
-                              )}
-                            </div>
-                          </td>
+                                {v.stock === 0 ? (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold">
+                                    OOS
+                                  </span>
+                                ) : v.stock <= (v.lowStockThreshold ?? 5) ? (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold">
+                                    Low
+                                  </span>
+                                ) : null}
+                              </div>
+                            </td>
 
-                          {/* Variant Title */}
-                          <td className="py-2 px-3 font-semibold text-white">
-                            <span>{v.title}</span>
-                          </td>
-
-                          {/* SKU */}
-                          <td className="py-2 px-3">
-                            <input
-                              type="text"
-                              value={v.sku || ""}
-                              onChange={(e) =>
-                                setVariantRows((prev) =>
-                                  prev.map((r, i) =>
-                                    i === idx ? { ...r, sku: e.target.value } : r
+                            {/* Low Stock Alert Threshold */}
+                            <td className="py-2 px-3">
+                              <input
+                                type="number"
+                                min={0}
+                                placeholder="Alert"
+                                value={v.lowStockThreshold ?? 5}
+                                onChange={(e) =>
+                                  setVariantRows((prev) =>
+                                    prev.map((r, i) =>
+                                      i === idx
+                                        ? {
+                                            ...r,
+                                            lowStockThreshold: e.target.value
+                                              ? Math.max(0, parseInt(e.target.value, 10) || 0)
+                                              : 5,
+                                          }
+                                        : r
+                                    )
                                   )
-                                )
-                              }
-                              className="w-32 h-8 px-2 rounded-lg border border-slate-800 bg-slate-950 text-[11px] font-mono text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand"
-                            />
-                          </td>
+                                }
+                                className="w-16 h-8 px-2 rounded-lg border border-slate-800 bg-slate-950 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-brand"
+                                title="Threshold to trigger low stock notification"
+                              />
+                            </td>
 
-                          {/* Price */}
-                          <td className="py-2 px-3">
-                            <input
-                              type="number"
-                              min={0}
-                              step="any"
-                              required
-                              value={v.price}
-                              onChange={(e) =>
-                                setVariantRows((prev) =>
-                                  prev.map((r, i) =>
-                                    i === idx
-                                      ? { ...r, price: Number(e.target.value) || 0 }
-                                      : r
-                                  )
-                                )
-                              }
-                              className="w-24 h-8 px-2 rounded-lg border border-slate-800 bg-slate-950 text-xs font-bold text-white focus:outline-none focus:ring-1 focus:ring-brand"
-                            />
-                          </td>
+                            {/* More Specs Button (Barcode, Weight) */}
+                            <td className="py-2 px-3 text-center">
+                              <button
+                                type="button"
+                                onClick={() => toggleRowExpanded(idx)}
+                                className={`px-2 py-1 rounded-lg border transition text-xs font-semibold inline-flex items-center gap-1 cursor-pointer ${
+                                  expandedRowIndices[idx]
+                                    ? "border-purple-600 bg-purple-500/20 text-purple-300"
+                                    : v.barcode || v.weightKg
+                                    ? "border-sky-500/40 bg-sky-500/10 text-sky-400"
+                                    : "border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800"
+                                }`}
+                                title="Toggle extra specs: Barcode & Shipping Weight"
+                              >
+                                <SlidersHorizontal className="h-3 w-3" />
+                                <span className="text-[10px]">{expandedRowIndices[idx] ? "Hide" : "More"}</span>
+                              </button>
+                            </td>
 
-                          {/* Compare Price */}
-                          <td className="py-2 px-3">
-                            <input
-                              type="number"
-                              min={0}
-                              step="any"
-                              placeholder="Optional"
-                              value={v.comparePrice ?? ""}
-                              onChange={(e) =>
-                                setVariantRows((prev) =>
-                                  prev.map((r, i) =>
-                                    i === idx
-                                      ? {
-                                          ...r,
-                                          comparePrice: e.target.value
-                                            ? Number(e.target.value)
-                                            : null,
+                            {/* Is Default */}
+                            <td className="py-2 px-3 text-center">
+                              <input
+                                type="radio"
+                                name="defaultVariantRadio"
+                                checked={v.isDefault}
+                                onChange={() => handleSetDefaultVariant(idx)}
+                                className="h-4 w-4 text-purple-600 focus:ring-purple-500 cursor-pointer"
+                                title="Set as default storefront variant"
+                              />
+                            </td>
+
+                            {/* Delete Action */}
+                            <td className="py-2 px-3 text-right">
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveVariantRow(idx)}
+                                className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-slate-800 transition cursor-pointer"
+                                title="Remove Variant"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </td>
+                          </tr>
+
+                          {/* Expanded Specifications Row */}
+                          {expandedRowIndices[idx] && (
+                            <tr className="bg-slate-950/80 border-b border-purple-900/40 animate-in fade-in duration-150">
+                              <td colSpan={11} className="py-2.5 px-4">
+                                <div className="flex flex-wrap items-center gap-4 text-xs">
+                                  {/* Barcode */}
+                                  <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-semibold text-slate-400">
+                                      Barcode (UPC/EAN):
+                                    </label>
+                                    <input
+                                      type="text"
+                                      placeholder="Scan or type barcode"
+                                      value={v.barcode || ""}
+                                      onChange={(e) =>
+                                        setVariantRows((prev) =>
+                                          prev.map((r, i) =>
+                                            i === idx ? { ...r, barcode: e.target.value || null } : r
+                                          )
+                                        )
+                                      }
+                                      className="w-48 h-7 px-2 rounded-lg border border-slate-800 bg-slate-900 text-xs font-mono text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand"
+                                    />
+                                  </div>
+
+                                  {/* Weight for courier */}
+                                  <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-semibold text-slate-400">
+                                      Weight (Kg) for Shipping:
+                                    </label>
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      step="0.01"
+                                      placeholder="e.g. 0.25"
+                                      value={v.weightKg ?? ""}
+                                      onChange={(e) =>
+                                        setVariantRows((prev) =>
+                                          prev.map((r, i) =>
+                                            i === idx
+                                              ? {
+                                                  ...r,
+                                                  weightKg: e.target.value
+                                                    ? parseFloat(e.target.value)
+                                                    : null,
+                                                }
+                                              : r
+                                          )
+                                        )
+                                      }
+                                      className="w-28 h-7 px-2 rounded-lg border border-slate-800 bg-slate-900 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand"
+                                    />
+                                  </div>
+
+                                  {/* Active for sale */}
+                                  <div className="flex items-center gap-2 ml-auto">
+                                    <label className="flex items-center gap-1.5 cursor-pointer text-[11px] text-slate-300 select-none">
+                                      <input
+                                        type="checkbox"
+                                        checked={v.isActive !== false}
+                                        onChange={(e) =>
+                                          setVariantRows((prev) =>
+                                            prev.map((r, i) =>
+                                              i === idx ? { ...r, isActive: e.target.checked } : r
+                                            )
+                                          )
                                         }
-                                      : r
-                                  )
-                                )
-                              }
-                              className="w-24 h-8 px-2 rounded-lg border border-slate-800 bg-slate-950 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-brand"
-                            />
-                          </td>
-
-                          {/* Stock */}
-                          <td className="py-2 px-3">
-                            <input
-                              type="number"
-                              min={0}
-                              value={v.stock}
-                              onChange={(e) =>
-                                setVariantRows((prev) =>
-                                  prev.map((r, i) =>
-                                    i === idx
-                                      ? { ...r, stock: Number(e.target.value) || 0 }
-                                      : r
-                                  )
-                                )
-                              }
-                              className="w-20 h-8 px-2 rounded-lg border border-slate-800 bg-slate-950 text-xs font-semibold text-white focus:outline-none focus:ring-1 focus:ring-brand"
-                            />
-                          </td>
-
-                          {/* Is Default */}
-                          <td className="py-2 px-3 text-center">
-                            <input
-                              type="radio"
-                              name="defaultVariantRadio"
-                              checked={v.isDefault}
-                              onChange={() => handleSetDefaultVariant(idx)}
-                              className="h-4 w-4 text-purple-600 focus:ring-purple-500 cursor-pointer"
-                              title="Set as default storefront variant"
-                            />
-                          </td>
-
-                          {/* Delete Action */}
-                          <td className="py-2 px-3 text-right">
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveVariantRow(idx)}
-                              className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-slate-800 transition"
-                              title="Remove Variant"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </td>
-                        </tr>
+                                        className="h-3.5 w-3.5 rounded border-slate-700 bg-slate-900 text-brand focus:ring-brand cursor-pointer"
+                                      />
+                                      <span>Active for sale</span>
+                                    </label>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
                       ))}
                     </tbody>
                   </table>

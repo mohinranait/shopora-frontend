@@ -16,6 +16,8 @@ import {
   Truck,
   ExternalLink,
   ShieldAlert,
+  Boxes,
+  DollarSign,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -210,6 +212,68 @@ export default function SellerDashboardPage() {
               </Button>
             </Link>
           )}
+        </div>
+      </div>
+
+      {/* Financial Investment & Profit Intelligence */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Active Stock Investment */}
+        <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 shadow-sm relative overflow-hidden group hover:border-slate-700 transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Active Stock Investment</span>
+            <div className="p-2 rounded-xl bg-sky-500/10 text-sky-400">
+              <Boxes className="h-5 w-5" />
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="text-2xl font-black text-white">
+              ৳{metrics?.activeStockInvestment ? metrics.activeStockInvestment.toLocaleString() : 0}
+            </div>
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800/80 text-[11px]">
+              <span className="text-slate-400">Capital tied in unsold inventory</span>
+              <span className="font-semibold text-sky-400">Asset Value</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Gross Sales Revenue */}
+        <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 shadow-sm relative overflow-hidden group hover:border-slate-700 transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Gross Sales Revenue</span>
+            <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400">
+              <DollarSign className="h-5 w-5" />
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="text-2xl font-black text-white">
+              ৳{metrics?.grossSales ? metrics.grossSales.toLocaleString() : 0}
+            </div>
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800/80 text-[11px]">
+              <span className="text-slate-400">COGS (মালের কেনা দাম):</span>
+              <span className="font-bold text-slate-300">৳{metrics?.costOfGoodsSold ? metrics.costOfGoodsSold.toLocaleString() : 0}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Realized Net Profit */}
+        <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-950 border border-emerald-500/30 shadow-sm relative overflow-hidden group hover:border-emerald-500/50 transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">Shop Net Profit (আসল লাভ)</span>
+            <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400">
+              <TrendingUp className="h-5 w-5" />
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="text-2xl font-black text-emerald-300">
+              ৳{metrics?.netProfit ? metrics.netProfit.toLocaleString() : 0}
+            </div>
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-emerald-500/20 text-[11px]">
+              <span className="text-slate-400">Net Profit Margin:</span>
+              <span className="font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                {metrics?.profitMarginPercent ? `${metrics.profitMarginPercent}% Margin` : "0% Margin"}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 

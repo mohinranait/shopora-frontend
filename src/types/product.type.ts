@@ -34,6 +34,7 @@ export interface IProductVariantItem {
   useMediaId?: string | null;
   useMedia?: IUseMediaItem | null;
   barcode?: string | null;
+  weightKg?: number | null;
   attributes?: Record<string, string>;
   attributeValueIds?: string[];
   attributeValues?: Array<{

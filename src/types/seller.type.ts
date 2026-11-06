@@ -157,6 +157,11 @@ export interface ISellerDashboardOverview {
     pendingBalance: number;
     totalEarnings: number;
     totalCommissionPaid: number;
+    activeStockInvestment?: number;
+    grossSales?: number;
+    costOfGoodsSold?: number;
+    netProfit?: number;
+    profitMarginPercent?: number;
   };
   recentOrders: any[];
 }
