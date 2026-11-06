@@ -31,6 +31,7 @@ import {
 } from "@/redux";
 import { INotification } from "@/types";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export default function AdminNotificationsPage() {
   const router = useRouter();
@@ -90,11 +91,13 @@ export default function AdminNotificationsPage() {
     }
   };
 
-  const handleClearRead = async () => {
-    if (!confirm("Are you sure you want to clear all read notifications?")) return;
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+  const confirmClearRead = async () => {
     try {
       await clearReadNotifications().unwrap();
       toast.success("Cleared read notifications");
+      setShowClearConfirm(false);
     } catch {
       toast.error("Failed to clear notifications");
     }
@@ -181,7 +184,7 @@ export default function AdminNotificationsPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleClearRead}
+            onClick={() => setShowClearConfirm(true)}
             disabled={isClearing}
             className="text-xs gap-1.5 text-rose-400 hover:text-rose-300 hover:border-rose-500/40"
           >
@@ -391,6 +394,18 @@ export default function AdminNotificationsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Clear Read Notifications Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showClearConfirm}
+        onClose={() => setShowClearConfirm(false)}
+        onConfirm={confirmClearRead}
+        isLoading={isClearing}
+        title="Clear Read Notifications"
+        description="Are you sure you want to permanently clear all read notifications? This action cannot be undone."
+        confirmText="Clear Notifications"
+        variant="danger"
+      />
     </div>
   );
 }

@@ -26,6 +26,7 @@ import {
 import { getApiErrorMessage } from "@/services/api";
 import { IProductItem } from "@/types";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export default function SellerProductsPage() {
   const [search, setSearch] = useState("");
@@ -54,14 +55,14 @@ export default function SellerProductsPage() {
     return true;
   });
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!window.confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) {
-      return;
-    }
+  const [productToDelete, setProductToDelete] = useState<{ id: string; name: string } | null>(null);
 
+  const confirmDelete = async () => {
+    if (!productToDelete) return;
     try {
-      await deleteProduct(id).unwrap();
-      toast.success(`Product "${name}" deleted.`);
+      await deleteProduct(productToDelete.id).unwrap();
+      toast.success(`Product "${productToDelete.name}" deleted.`);
+      setProductToDelete(null);
       refetch();
     } catch (err) {
       toast.error(getApiErrorMessage(err));
@@ -331,7 +332,7 @@ export default function SellerProductsPage() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => handleDelete(String(p.id), p.name)}
+                            onClick={() => setProductToDelete({ id: String(p.id), name: p.name })}
                             disabled={isDeleting}
                             className="h-7 w-7 p-0 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10"
                             title="Delete product"
@@ -348,6 +349,18 @@ export default function SellerProductsPage() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(productToDelete)}
+        onClose={() => setProductToDelete(null)}
+        onConfirm={confirmDelete}
+        isLoading={isDeleting}
+        title="Delete Product"
+        description={`Are you sure you want to permanently delete "${productToDelete?.name}"? This action cannot be undone.`}
+        confirmText="Delete Product"
+        variant="danger"
+      />
     </div>
   );
 }

@@ -62,6 +62,7 @@ import {
   SelectedMediaPayload,
 } from "@/types";
 import { MediaLibraryModal } from "@/components/media/MediaLibraryModal";
+import { CategoryTreeSelector } from "./CategoryTreeSelector";
 import { toast } from "sonner";
 
 /* ========================================================================== */
@@ -775,44 +776,40 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
             </div>
           </div>
 
-          {/* Category & Brand Dropdowns */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-            <div className="space-y-1.5">
+          {/* Category Selection (Hierarchical Tree & Cascading Drilldown) */}
+          <div className="space-y-2 pt-1">
+            <div className="flex items-center justify-between">
               <label className="block text-xs font-semibold text-slate-300">
-                Primary Category <span className="text-rose-500">*</span>
+                Primary Product Category <span className="text-rose-500">*</span>
               </label>
-              <select
-                required
-                value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand font-medium"
-              >
-                <option value="">-- Choose Category --</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.parent ? `— ${c.name} (${c.parent.name})` : c.name}
-                  </option>
-                ))}
-              </select>
+              <span className="text-[11px] text-slate-400">
+                Main Category → Subcategory hierarchy
+              </span>
             </div>
+            <CategoryTreeSelector
+              value={categoryId}
+              onChange={(id) => setCategoryId(id)}
+              required
+            />
+          </div>
 
-            <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-slate-300">
-                Brand / Manufacturer (Optional)
-              </label>
-              <select
-                value={brandId}
-                onChange={(e) => setBrandId(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand font-medium"
-              >
-                <option value="">-- Select Brand (No Brand) --</option>
-                {brands.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Brand Selection */}
+          <div className="space-y-1.5 pt-1">
+            <label className="block text-xs font-semibold text-slate-300">
+              Brand / Manufacturer (Optional)
+            </label>
+            <select
+              value={brandId}
+              onChange={(e) => setBrandId(e.target.value)}
+              className="w-full h-10 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand font-medium"
+            >
+              <option value="">-- Select Brand (No Brand) --</option>
+              {brands.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Short Description */}

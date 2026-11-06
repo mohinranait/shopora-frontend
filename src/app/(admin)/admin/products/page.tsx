@@ -30,6 +30,7 @@ import {
 import { getApiErrorMessage } from "@/services/api";
 import { IProductItem } from "@/types";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 function AdminProductsInner() {
   const searchParams = useSearchParams();
@@ -73,14 +74,21 @@ function AdminProductsInner() {
     }
   };
 
-  const handleDelete = async (prod: IProductItem) => {
-    if (!confirm(`Are you sure you want to delete product "${prod.name}"?`)) return;
+  const [productToDelete, setProductToDelete] = useState<IProductItem | null>(null);
+  const [isDeletingProduct, setIsDeletingProduct] = useState(false);
+
+  const confirmDeleteProduct = async () => {
+    if (!productToDelete) return;
     try {
-      await deleteProduct(prod.id).unwrap();
-      toast.success(`Product "${prod.name}" deleted successfully.`);
+      setIsDeletingProduct(true);
+      await deleteProduct(productToDelete.id).unwrap();
+      toast.success(`Product "${productToDelete.name}" deleted successfully.`);
+      setProductToDelete(null);
       refetch();
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
+    } finally {
+      setIsDeletingProduct(false);
     }
   };
 
@@ -404,7 +412,7 @@ function AdminProductsInner() {
                             </Link>
                           )}
                           <button
-                            onClick={() => handleDelete(prod)}
+                            onClick={() => setProductToDelete(prod)}
                             className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition cursor-pointer"
                             title="Delete Product"
                           >
@@ -420,6 +428,18 @@ function AdminProductsInner() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(productToDelete)}
+        onClose={() => setProductToDelete(null)}
+        onConfirm={confirmDeleteProduct}
+        isLoading={isDeletingProduct}
+        title="Delete Product"
+        description={`Are you sure you want to permanently delete "${productToDelete?.name}"? All associated inventory and variant combinations will be permanently removed.`}
+        confirmText="Delete Product"
+        variant="danger"
+      />
     </div>
   );
 }

@@ -15,6 +15,7 @@ import {
   groupByStore,
 } from "@/components/cart/CartParts";
 import { CouponField, OrderTotals, TrustBadges } from "@/components/cart/OrderSummary";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 function CartSkeleton() {
   return (
@@ -68,6 +69,7 @@ function EmptyCart() {
 export default function CartPage() {
   const { items, subtotal, totalItems, status, clear } = useCart();
   const { quote, loading, couponCode, couponRejected, applyCoupon, removeCoupon } = useOrderQuote(items);
+  const [showClearCartConfirm, setShowClearCartConfirm] = React.useState(false);
   const groups = groupByStore(items);
   const unavailableCount = items.filter((i) => !i.isAvailable || !i.inStock).length;
 
@@ -179,7 +181,7 @@ export default function CartPage() {
               <button
                 type="button"
                 onClick={() => {
-                  if (window.confirm("Remove all items from your cart?")) void clear();
+                  setShowClearCartConfirm(true);
                 }}
                 className="text-sm font-medium text-slate-500 underline-offset-2 hover:text-rose-600 hover:underline"
               >
@@ -231,6 +233,20 @@ export default function CartPage() {
           </Link>
         </div>
       )}
+
+      {/* Clear Cart Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showClearCartConfirm}
+        onClose={() => setShowClearCartConfirm(false)}
+        onConfirm={() => {
+          void clear();
+          setShowClearCartConfirm(false);
+        }}
+        title="Clear Cart"
+        description="Are you sure you want to remove all items from your shopping cart?"
+        confirmText="Clear Cart"
+        variant="danger"
+      />
     </div>
   );
 }

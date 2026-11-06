@@ -29,6 +29,7 @@ import { getApiErrorMessage } from "@/services/api";
 import { ISliderItem, SliderType, ImageValue } from "@/types";
 import { toast } from "sonner";
 import { ImageUploadField } from "@/components/media/ImageUploadField";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 const GRADIENT_PRESETS = [
   { label: "Indigo & Purple", value: "from-blue-600 via-indigo-700 to-purple-800" },
@@ -166,15 +167,21 @@ export default function AdminSlidersPage() {
     }
   };
 
-  // Delete Slider
-  const handleDeleteSlider = async (slider: ISliderItem) => {
-    if (!confirm(`Are you sure you want to delete this slider?`)) return;
+  // Delete Confirmation State
+  const [sliderToDelete, setSliderToDelete] = useState<ISliderItem | null>(null);
+  const [isDeletingSlider, setIsDeletingSlider] = useState(false);
 
+  const confirmDeleteSlider = async () => {
+    if (!sliderToDelete) return;
     try {
-      await deleteSlider(slider.id).unwrap();
+      setIsDeletingSlider(true);
+      await deleteSlider(sliderToDelete.id).unwrap();
       toast.success("Slider removed successfully.");
+      setSliderToDelete(null);
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
+    } finally {
+      setIsDeletingSlider(false);
     }
   };
 
@@ -496,7 +503,7 @@ export default function AdminSlidersPage() {
                       <Edit className="h-4 w-4" />
                     </button>
                     <button
-                      onClick={() => handleDeleteSlider(slider)}
+                      onClick={() => setSliderToDelete(slider)}
                       className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
                       title="Delete slide"
                     >
@@ -802,6 +809,18 @@ export default function AdminSlidersPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Slider Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(sliderToDelete)}
+        onClose={() => setSliderToDelete(null)}
+        onConfirm={confirmDeleteSlider}
+        isLoading={isDeletingSlider}
+        title="Delete Slider"
+        description="Are you sure you want to permanently delete this banner slider from the homepage?"
+        confirmText="Delete Slider"
+        variant="danger"
+      />
     </div>
   );
 }

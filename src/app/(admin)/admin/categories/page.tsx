@@ -25,6 +25,7 @@ import { getApiErrorMessage } from "@/services/api";
 import { ICategory, ImageValue } from "@/types";
 import { toast } from "sonner";
 import { ImageUploadField } from "@/components/media/ImageUploadField";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export default function AdminCategoriesPage() {
   const {
@@ -141,15 +142,21 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  // Handle Delete Category
-  const handleDeleteCategory = async (cat: ICategory) => {
-    if (!confirm(`Are you sure you want to delete category "${cat.name}"?`)) return;
+  // Delete Confirmation State
+  const [categoryToDelete, setCategoryToDelete] = useState<ICategory | null>(null);
+  const [isDeletingCategory, setIsDeletingCategory] = useState(false);
 
+  const confirmDeleteCategory = async () => {
+    if (!categoryToDelete) return;
     try {
-      await deleteCategory(cat.id).unwrap();
-      toast.success(`Category "${cat.name}" removed successfully.`);
+      setIsDeletingCategory(true);
+      await deleteCategory(categoryToDelete.id).unwrap();
+      toast.success(`Category "${categoryToDelete.name}" removed successfully.`);
+      setCategoryToDelete(null);
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
+    } finally {
+      setIsDeletingCategory(false);
     }
   };
 
@@ -258,7 +265,7 @@ export default function AdminCategoriesPage() {
                     <Button
                       size="xs"
                       variant="destructive"
-                      onClick={() => handleDeleteCategory(cat)}
+                      onClick={() => setCategoryToDelete(cat)}
                       className="text-xs p-1.5"
                       title="Delete category"
                     >
@@ -310,7 +317,7 @@ export default function AdminCategoriesPage() {
                                 <Edit className="h-3.5 w-3.5" />
                               </button>
                               <button
-                                onClick={() => handleDeleteCategory(sub)}
+                                onClick={() => setCategoryToDelete(sub)}
                                 className="p-1 rounded text-slate-400 hover:text-rose-400 transition"
                                 title="Delete subcategory"
                               >
@@ -467,6 +474,18 @@ export default function AdminCategoriesPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(categoryToDelete)}
+        onClose={() => setCategoryToDelete(null)}
+        onConfirm={confirmDeleteCategory}
+        isLoading={isDeletingCategory}
+        title="Delete Category"
+        description={`Are you sure you want to permanently delete "${categoryToDelete?.name}"? Any subcategories or products linked to this category may be affected.`}
+        confirmText="Delete Category"
+        variant="danger"
+      />
     </div>
   );
 }

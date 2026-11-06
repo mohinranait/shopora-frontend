@@ -25,6 +25,7 @@ import { getApiErrorMessage } from "@/services/api";
 import { IBrand, ImageValue } from "@/types";
 import { toast } from "sonner";
 import { ImageUploadField } from "@/components/media/ImageUploadField";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export default function AdminBrandsPage() {
   const { data: brands = [], isLoading: loading, isFetching, refetch } = useGetBrandsQuery(true);
@@ -119,15 +120,21 @@ export default function AdminBrandsPage() {
     }
   };
 
-  // Handle Delete Brand
-  const handleDeleteBrand = async (brand: IBrand) => {
-    if (!confirm(`Are you sure you want to delete brand "${brand.name}"?`)) return;
+  // Delete Confirmation State
+  const [brandToDelete, setBrandToDelete] = useState<IBrand | null>(null);
+  const [isDeletingBrand, setIsDeletingBrand] = useState(false);
 
+  const confirmDeleteBrand = async () => {
+    if (!brandToDelete) return;
     try {
-      await deleteBrand(brand.id).unwrap();
-      toast.success(`Brand "${brand.name}" removed successfully.`);
+      setIsDeletingBrand(true);
+      await deleteBrand(brandToDelete.id).unwrap();
+      toast.success(`Brand "${brandToDelete.name}" removed successfully.`);
+      setBrandToDelete(null);
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
+    } finally {
+      setIsDeletingBrand(false);
     }
   };
 
@@ -333,7 +340,7 @@ export default function AdminBrandsPage() {
                               <Edit className="h-4 w-4" />
                             </button>
                             <button
-                              onClick={() => handleDeleteBrand(brand)}
+                              onClick={() => setBrandToDelete(brand)}
                               className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
                               title="Delete Brand"
                             >
@@ -473,6 +480,18 @@ export default function AdminBrandsPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(brandToDelete)}
+        onClose={() => setBrandToDelete(null)}
+        onConfirm={confirmDeleteBrand}
+        isLoading={isDeletingBrand}
+        title="Delete Brand"
+        description={`Are you sure you want to permanently delete "${brandToDelete?.name}"? Products currently assigned to this brand will lose their brand association.`}
+        confirmText="Delete Brand"
+        variant="danger"
+      />
     </div>
   );
 }

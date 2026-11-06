@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -71,6 +72,7 @@ export function ProfileManageTab({ user }: { user: IAuthUser }) {
 
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
   const [deletingAddressId, setDeletingAddressId] = useState<string | number | null>(null);
+  const [addressToDelete, setAddressToDelete] = useState<string | number | null>(null);
 
   // Profile Form
   const {
@@ -155,11 +157,13 @@ export function ProfileManageTab({ user }: { user: IAuthUser }) {
     }
   };
 
-  const onDeleteAddress = async (id: string | number) => {
+  const handleConfirmDeleteAddress = async () => {
+    if (!addressToDelete) return;
     try {
-      setDeletingAddressId(id);
-      await deleteAddressMutation(id).unwrap();
+      setDeletingAddressId(addressToDelete);
+      await deleteAddressMutation(addressToDelete).unwrap();
       toast.success("Address removed!");
+      setAddressToDelete(null);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to delete address";
       toast.error(msg);
@@ -386,7 +390,7 @@ export function ProfileManageTab({ user }: { user: IAuthUser }) {
                       )}
                       <button
                         type="button"
-                        onClick={() => onDeleteAddress(addr.id)}
+                        onClick={() => setAddressToDelete(addr.id)}
                         disabled={deletingAddressId !== null && String(deletingAddressId) === String(addr.id)}
                         className="rounded-md p-1 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition cursor-pointer"
                         title="Delete Address"
@@ -590,6 +594,18 @@ export function ProfileManageTab({ user }: { user: IAuthUser }) {
           </div>
         </div>
       )}
+
+      {/* Delete Address Confirmation Modal */}
+      <ConfirmDialog
+        isOpen={Boolean(addressToDelete)}
+        onClose={() => setAddressToDelete(null)}
+        onConfirm={handleConfirmDeleteAddress}
+        title="Delete Address"
+        description="Are you sure you want to remove this delivery address from your account? This action cannot be undone."
+        confirmText="Delete Address"
+        variant="danger"
+        isLoading={deletingAddressId !== null}
+      />
     </div>
   );
 }

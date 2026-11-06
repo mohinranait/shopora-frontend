@@ -25,6 +25,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
   useGetAdminOrderQuery,
   useUpdateAdminOrderStatusMutation,
@@ -126,6 +127,7 @@ function ShipmentPanel({
   const [courier, setCourier] = useState(shipment.courierName ?? "");
   const [tracking, setTracking] = useState(shipment.trackingNumber ?? "");
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [showReturnConfirm, setShowReturnConfirm] = useState(false);
   const next = NEXT_STATUS[shipment.status];
   const terminal = shipment.status === "CANCELLED" || shipment.status === "RETURNED";
   const trackingDirty = courier !== (shipment.courierName ?? "") || tracking !== (shipment.trackingNumber ?? "");
@@ -361,11 +363,7 @@ function ShipmentPanel({
             {(shipment.status === "SHIPPED" || shipment.status === "DELIVERED") && (
               <button
                 type="button"
-                onClick={async () => {
-                  if (window.confirm("Mark this package as returned? Stock is restored and any seller credit is reversed.")) {
-                    await run("RETURNED", "Package marked returned");
-                  }
-                }}
+                onClick={() => setShowReturnConfirm(true)}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-3.5 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800"
               >
                 <RotateCcw className="h-3.5 w-3.5" /> Mark returned
@@ -387,6 +385,20 @@ function ShipmentPanel({
           }}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={showReturnConfirm}
+        onClose={() => setShowReturnConfirm(false)}
+        onConfirm={async () => {
+          setShowReturnConfirm(false);
+          await run("RETURNED", "Package marked returned");
+        }}
+        title="Mark Package as Returned?"
+        description="Are you sure you want to mark this package as returned? Stock will be restored and any seller credit will be reversed."
+        confirmText="Mark Returned"
+        variant="warning"
+        isLoading={isLoading}
+      />
     </Card>
   );
 }
@@ -461,6 +473,7 @@ function OrderDetailInner() {
   const [updateOrderStatus, { isLoading: updating }] = useUpdateAdminOrderStatusMutation();
   const [dialog, setDialog] = useState<null | "cancel">(null);
   const [packagingSlip, setPackagingSlip] = useState<IThermalPackagingSlip | null>(null);
+  const [showReturnAllConfirm, setShowReturnAllConfirm] = useState(false);
 
   if (isLoading) {
     return (
@@ -543,11 +556,7 @@ function OrderDetailInner() {
           {canReturn && (
             <button
               type="button"
-              onClick={async () => {
-                if (window.confirm("Mark the whole order as returned? Stock is restored and seller credits are reversed.")) {
-                  await setWholeStatus("RETURNED");
-                }
-              }}
+              onClick={() => setShowReturnAllConfirm(true)}
               disabled={updating}
               className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-4 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-800"
             >
@@ -740,6 +749,20 @@ function OrderDetailInner() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={showReturnAllConfirm}
+        onClose={() => setShowReturnAllConfirm(false)}
+        onConfirm={async () => {
+          setShowReturnAllConfirm(false);
+          await setWholeStatus("RETURNED");
+        }}
+        title="Mark Whole Order as Returned?"
+        description="Are you sure you want to mark the entire order as returned? Stock will be restored and seller credits will be reversed."
+        confirmText="Mark Order Returned"
+        variant="warning"
+        isLoading={updating}
+      />
     </div>
   );
 }

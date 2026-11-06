@@ -26,6 +26,7 @@ import {
 import { getApiErrorMessage } from "@/services/api";
 import { IMediaItem, SelectedMediaPayload } from "@/types";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export type { SelectedMediaPayload };
 
@@ -124,18 +125,25 @@ export function MediaLibraryModal({
     }
   };
 
-  // Handle Delete Raw Media
-  const handleDeleteMedia = async (id: string | number) => {
-    if (!confirm("Are you sure you want to permanently delete this media asset?")) return;
+  // Delete Media Confirmation
+  const [mediaToDelete, setMediaToDelete] = useState<string | number | null>(null);
+  const [isDeletingMedia, setIsDeletingMedia] = useState(false);
+
+  const confirmDeleteMedia = async () => {
+    if (!mediaToDelete) return;
     try {
-      await deleteMediaMutation(id).unwrap();
-      if (String(userSelectedMedia?.id) === String(id)) {
+      setIsDeletingMedia(true);
+      await deleteMediaMutation(mediaToDelete).unwrap();
+      if (String(userSelectedMedia?.id) === String(mediaToDelete)) {
         setUserSelectedMedia(null);
         setCustomAltText(null);
       }
       toast.success("Media asset deleted.");
+      setMediaToDelete(null);
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
+    } finally {
+      setIsDeletingMedia(false);
     }
   };
 
@@ -441,7 +449,7 @@ export function MediaLibraryModal({
                     {/* Delete Action */}
                     <div className="pt-2">
                       <button
-                        onClick={() => handleDeleteMedia(selectedMedia.id)}
+                        onClick={() => setMediaToDelete(selectedMedia.id)}
                         className="text-[11px] text-rose-400 hover:text-rose-300 flex items-center gap-1 transition"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -502,6 +510,18 @@ export function MediaLibraryModal({
           </div>
         </div>
       </div>
+
+      {/* Delete Media Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(mediaToDelete)}
+        onClose={() => setMediaToDelete(null)}
+        onConfirm={confirmDeleteMedia}
+        isLoading={isDeletingMedia}
+        title="Delete Media Asset"
+        description="Are you sure you want to permanently delete this media asset? Any product, category, or slider using this image may be affected."
+        confirmText="Delete Media"
+        variant="danger"
+      />
     </div>
   );
 }

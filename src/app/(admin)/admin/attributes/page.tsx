@@ -38,6 +38,7 @@ import {
 import { getApiErrorMessage } from "@/services/api";
 import { IAttribute, IAttributeValue, AttributeDisplayType } from "@/types";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export default function AdminAttributesPage() {
   const { data: attributes = [], isLoading: loading, isFetching, refetch } = useGetAttributesQuery(true);
@@ -177,22 +178,42 @@ export default function AdminAttributesPage() {
     }
   };
 
-  // Delete Attribute
-  const handleDeleteAttribute = async (attr: IAttribute, e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    if (!confirm(`Are you sure you want to permanently delete attribute "${attr.name}" and all its values?`)) {
-      return;
-    }
+  // Delete Confirmation States
+  const [attrToDelete, setAttrToDelete] = useState<IAttribute | null>(null);
+  const [isDeletingAttr, setIsDeletingAttr] = useState(false);
 
+  const confirmDeleteAttribute = async () => {
+    if (!attrToDelete) return;
     try {
-      await deleteAttribute(attr.id).unwrap();
-      toast.success(`Attribute "${attr.name}" removed.`);
-      if (String(selectedAttributeId) === String(attr.id)) {
-        const remaining = attributes.filter((a) => a.id !== attr.id);
+      setIsDeletingAttr(true);
+      await deleteAttribute(attrToDelete.id).unwrap();
+      toast.success(`Attribute "${attrToDelete.name}" removed.`);
+      if (String(selectedAttributeId) === String(attrToDelete.id)) {
+        const remaining = attributes.filter((a) => a.id !== attrToDelete.id);
         setSelectedAttributeId(remaining.length > 0 ? remaining[0].id : null);
       }
+      setAttrToDelete(null);
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
+    } finally {
+      setIsDeletingAttr(false);
+    }
+  };
+
+  const [valToDelete, setValToDelete] = useState<IAttributeValue | null>(null);
+  const [isDeletingVal, setIsDeletingVal] = useState(false);
+
+  const confirmDeleteValue = async () => {
+    if (!valToDelete) return;
+    try {
+      setIsDeletingVal(true);
+      await deleteAttributeValue(valToDelete.id).unwrap();
+      toast.success(`Value "${valToDelete.value}" deleted.`);
+      setValToDelete(null);
+    } catch (err: unknown) {
+      toast.error(getApiErrorMessage(err));
+    } finally {
+      setIsDeletingVal(false);
     }
   };
 
@@ -261,17 +282,7 @@ export default function AdminAttributesPage() {
     }
   };
 
-  // Delete Attribute Value
-  const handleDeleteValue = async (val: IAttributeValue) => {
-    if (!confirm(`Are you sure you want to delete value "${val.value}"?`)) return;
 
-    try {
-      await deleteAttributeValue(val.id).unwrap();
-      toast.success(`Value "${val.value}" deleted.`);
-    } catch (err: unknown) {
-      toast.error(getApiErrorMessage(err));
-    }
-  };
 
   // Badge for Type
   const renderTypeBadge = (type: string) => {
@@ -475,7 +486,10 @@ export default function AdminAttributesPage() {
                         </button>
                         <button
                           type="button"
-                          onClick={(e) => handleDeleteAttribute(attr, e)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setAttrToDelete(attr);
+                          }}
                           className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
                           title="Delete Attribute"
                         >
@@ -620,7 +634,7 @@ export default function AdminAttributesPage() {
                                 </button>
                                 <button
                                   type="button"
-                                  onClick={() => handleDeleteValue(val)}
+                                  onClick={() => setValToDelete(val)}
                                   className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
                                   title="Delete Value"
                                 >
@@ -909,6 +923,30 @@ export default function AdminAttributesPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Attribute Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(attrToDelete)}
+        onClose={() => setAttrToDelete(null)}
+        onConfirm={confirmDeleteAttribute}
+        isLoading={isDeletingAttr}
+        title="Delete Attribute"
+        description={`Are you sure you want to permanently delete attribute "${attrToDelete?.name}" and all of its values? Any product variants utilizing this attribute will be affected.`}
+        confirmText="Delete Attribute"
+        variant="danger"
+      />
+
+      {/* Delete Value Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(valToDelete)}
+        onClose={() => setValToDelete(null)}
+        onConfirm={confirmDeleteValue}
+        isLoading={isDeletingVal}
+        title="Delete Attribute Value"
+        description={`Are you sure you want to delete value "${valToDelete?.value}" from ${selectedAttribute?.name || "this attribute"}?`}
+        confirmText="Delete Value"
+        variant="danger"
+      />
     </div>
   );
 }
