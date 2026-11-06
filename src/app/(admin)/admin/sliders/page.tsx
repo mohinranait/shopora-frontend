@@ -103,7 +103,7 @@ export default function AdminSlidersPage() {
     setFormDisplayOrder(slider.displayOrder);
     setFormIsActive(slider.isActive);
 
-    const imageUrl = slider.useMedia?.media?.url || slider.imageUrl;
+    const imageUrl = (slider.image as any)?.media?.url || slider.useMedia?.media?.url || slider.imageUrl || (typeof slider.image === "string" ? slider.image : "");
     if (imageUrl) {
       setFormImage({
         url: imageUrl,
@@ -366,7 +366,7 @@ export default function AdminSlidersPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredSliders.map((slider) => {
-            const displayImg = slider.useMedia?.media?.url || slider.imageUrl;
+            const displayImg = (slider.image as any)?.media?.url || slider.useMedia?.media?.url || slider.imageUrl || (typeof slider.image === "string" ? slider.image : null);
 
             return (
               <div

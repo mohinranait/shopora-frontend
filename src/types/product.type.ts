@@ -29,7 +29,7 @@ export interface IProductVariantItem {
   costPrice?: number | null;
   stock: number;
   lowStockThreshold?: number;
-  image?: string | null;
+  image?: string | IUseMediaItem | null;
   imageId?: string | null;
   useMediaId?: string | null;
   useMedia?: IUseMediaItem | null;
@@ -79,9 +79,9 @@ export interface IProductItem {
   categoryId: string;
   category?: { id: string; name: string; slug: string };
   brandId?: string | null;
-  brand?: { id: string; name: string; slug: string; logo?: string } | null;
+  brand?: { id: string; name: string; slug: string; logo?: string | IUseMediaItem | null } | null;
   sellerId?: string | null;
-  seller?: { id: string; storeName: string; storeSlug: string } | null;
+  seller?: { id: string; storeName: string; storeSlug: string; logo?: string | IUseMediaItem | null; storeLogo?: string | null } | null;
   isPlatformOwned: boolean;
   approvalStatus: ProductApprovalStatus;
   rejectionReason?: string | null;
@@ -92,7 +92,7 @@ export interface IProductItem {
   costPrice?: number | null;
   stock: number;
   lowStockThreshold: number;
-  mainImage: string;
+  mainImage: string | IUseMediaItem;
   mainImageId?: string | null;
   mainImageUseMediaId?: string | null;
   ratingAverage: number;
@@ -133,7 +133,7 @@ export interface IProductVariantInput {
   costPrice?: number | null;
   stock: number;
   lowStockThreshold?: number;
-  image?: string | null;
+  image?: string | IUseMediaItem | null;
   imageId?: string | null;
   useMediaId?: string | null;
   barcode?: string | null;

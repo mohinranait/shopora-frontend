@@ -5,7 +5,7 @@ export interface ICategory {
   name: string;
   slug: string;
   description?: string | null;
-  image?: string | null;
+  image?: IUseMediaItem | null;
   imageId?: string | null;
   icon?: string | null;
   useMediaId?: string | null;

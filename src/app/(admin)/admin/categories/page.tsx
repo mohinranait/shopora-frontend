@@ -93,7 +93,7 @@ export default function AdminCategoriesPage() {
 
     if (cat.image || cat.useMedia) {
       setFormImage({
-        url: cat.useMedia?.media?.url || cat.image || "",
+        url: cat.image?.media?.url || "",
         useMediaId: cat.imageId ?? cat.useMediaId ?? undefined,
         alt: cat.useMedia?.alt || `${cat.name} Category`,
         description: cat.useMedia?.description || "",
@@ -215,7 +215,7 @@ export default function AdminCategoriesPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {treeCategories.map((cat) => {
-            const displayImage = cat.useMedia?.media?.url || cat.image;
+            const displayImage = cat.image?.media?.url;
             return (
               <Card key={cat.id} className="overflow-hidden">
                 <div className="p-4 sm:p-5 bg-slate-900/60 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -282,7 +282,7 @@ export default function AdminCategoriesPage() {
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                       {cat.children.map((sub) => {
-                        const subImage = sub.useMedia?.media?.url || sub.image;
+                        const subImage = sub.image?.media?.url ;
                         return (
                           <div
                             key={sub.id}

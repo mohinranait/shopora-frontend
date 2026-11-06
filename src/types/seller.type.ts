@@ -1,3 +1,5 @@
+import { IUseMediaItem } from "./media.type";
+
 export type SellerStatus = "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED";
 
 export interface ISellerWallet {
@@ -19,6 +21,8 @@ export interface ISeller {
   storeSlug: string;
   storeLogo: string | null;
   storeBanner: string | null;
+  logo?: IUseMediaItem | null;
+  banner?: IUseMediaItem | null;
   logoId?: string | null;
   bannerId?: string | null;
   storeDescription: string | null;

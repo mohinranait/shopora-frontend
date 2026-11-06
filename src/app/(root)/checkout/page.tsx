@@ -414,7 +414,7 @@ export default function CheckoutPage() {
                     <span className="block h-14 w-14 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={item.variant?.image || item.product?.mainImage}
+                        src={((item.variant?.image as any)?.media?.url || (typeof item.variant?.image === "string" ? item.variant?.image : null) || (item.product?.mainImage as any)?.media?.url || (typeof item.product?.mainImage === "string" ? item.product?.mainImage : "")) as string}
                         alt={item.product?.name ?? ""}
                         className="h-full w-full object-contain p-1"
                       />

@@ -34,9 +34,9 @@ export function StoreLogo({ store, size = "md" }: { store: IPublicStore; size?: 
     <span
       className={`flex shrink-0 items-center justify-center overflow-hidden border-4 border-white bg-white shadow-md ${dims}`}
     >
-      {store.storeLogo ? (
+      {((store.logo as any)?.media?.url || (store.storeLogo as any)?.media?.url || store.storeLogo) ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={store.storeLogo} alt={`${store.storeName} logo`} className="h-full w-full object-cover" />
+        <img src={((store.logo as any)?.media?.url || (store.storeLogo as any)?.media?.url || store.storeLogo) as string} alt={`${store.storeName} logo`} className="h-full w-full object-cover" />
       ) : (
         <span
           className={`flex h-full w-full items-center justify-center bg-gradient-to-br font-black text-white ${storeGradient(store.id)}`}

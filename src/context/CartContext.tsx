@@ -91,7 +91,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                     id: p.id,
                     name: p.name,
                     slug: p.slug,
-                    mainImage: p.images?.[0]?.url || p.images?.[0] || p.mainImage || "",
+                    mainImage: (p.mainImage as any)?.media?.url || (typeof p.mainImage === "string" ? p.mainImage : "") || p.images?.[0]?.url || "",
                     basePrice: p.basePrice,
                     stock: p.stock,
                     isPlatformOwned: false,

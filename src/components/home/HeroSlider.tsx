@@ -169,8 +169,8 @@ export function HeroSlider() {
         {sliders.map((slide, idx) => {
           const isActive = idx === currentIndex;
           const displayImage =
-            slide.useMedia?.media?.url ||
             (slide as any).image?.media?.url ||
+            slide.useMedia?.media?.url ||
             slide.imageUrl ||
             "";
 

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -207,9 +207,9 @@ export const Header: React.FC = () => {
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors"
                           >
                             <div className="h-10 w-10 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden shrink-0 relative flex items-center justify-center">
-                              {p.mainImage ? (
+                              {((p.mainImage as any)?.media?.url || (typeof p.mainImage === "string" ? p.mainImage : null)) ? (
                                 <img
-                                  src={p.mainImage}
+                                  src={((p.mainImage as any)?.media?.url || (typeof p.mainImage === "string" ? p.mainImage : "")) as string}
                                   alt={p.name}
                                   className="h-full w-full object-cover"
                                 />

@@ -9,7 +9,7 @@ import { CATEGORY_ACCENTS, CategoryIcon } from "./categoryIcons";
 const categoryHref = (cat: ICategory) =>
   `/products?category=${encodeURIComponent(cat.slug || String(cat.id))}`;
 
-const getImage = (cat: ICategory) => cat.useMedia?.media?.url || cat.image || null;
+const getImage = (cat: ICategory) => (cat.image as any)?.media?.url || cat.useMedia?.media?.url || (typeof cat.image === "string" ? cat.image : null);
 
 const countDescendants = (cat: ICategory): number =>
   (cat.children ?? []).reduce((sum, child) => sum + 1 + countDescendants(child), 0);

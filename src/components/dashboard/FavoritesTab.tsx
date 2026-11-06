@@ -77,7 +77,7 @@ export function FavoritesTab() {
             id: product.id,
             name: product.name,
             slug: product.slug,
-            mainImage: product.mainImage || "",
+            mainImage: (product.mainImage as any)?.media?.url || (typeof product.mainImage === "string" ? product.mainImage : "") || "",
             basePrice: product.basePrice,
             stock: product.stock,
           },
@@ -187,10 +187,10 @@ export function FavoritesTab() {
                 >
                   {/* Top: Image, Badges & Remove Button */}
                   <div className="relative aspect-square w-full overflow-hidden rounded-md bg-slate-50 border border-slate-100 flex items-center justify-center">
-                    {product.mainImage ? (
+                    {Boolean((product.mainImage as any)?.media?.url || (typeof product.mainImage === "string" ? product.mainImage : null)) ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={product.mainImage}
+                        src={((product.mainImage as any)?.media?.url || (typeof product.mainImage === "string" ? product.mainImage : "")) as string}
                         alt={product.name}
                         className="h-full w-full object-contain p-2 transition-transform duration-200 group-hover:scale-105"
                       />

@@ -214,9 +214,9 @@ export default function SellerProductsPage() {
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
                           <div className="h-11 w-11 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden shrink-0 relative flex items-center justify-center">
-                            {p.mainImage ? (
+                            {((p.mainImage as any)?.media?.url || (typeof p.mainImage === "string" ? p.mainImage : null)) ? (
                               <Image
-                                src={p.mainImage}
+                                src={((p.mainImage as any)?.media?.url || (typeof p.mainImage === "string" ? p.mainImage : "")) as string}
                                 alt={p.name}
                                 fill
                                 sizes="44px"

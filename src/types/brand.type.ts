@@ -4,7 +4,7 @@ export interface IBrand {
   id: string;
   name: string;
   slug: string;
-  logo?: string | null;
+  logo?: IUseMediaItem | null;
   website?: string | null;
   description?: string | null;
   logoId?: string | null;

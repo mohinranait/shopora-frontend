@@ -84,7 +84,7 @@ export function StockNote({ item }: { item: ICartItem }) {
 }
 
 export function CartItemImage({ item, className = "h-20 w-20" }: { item: ICartItem; className?: string }) {
-  const src = item.variant?.image || item.product?.mainImage;
+  const src = (item.variant?.image as any)?.media?.url || (typeof item.variant?.image === "string" ? item.variant?.image : null) || (item.product?.mainImage as any)?.media?.url || (typeof item.product?.mainImage === "string" ? item.product?.mainImage : null);
   return (
     <Link
       href={item.product ? `/products/${item.product.slug}` : "#"}

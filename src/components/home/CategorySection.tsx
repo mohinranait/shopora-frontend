@@ -100,7 +100,7 @@ export async function CategorySection() {
       {/* Dynamic Categories Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
         {displayCategories.map((cat, idx) => {
-          const imageUrl = cat.useMedia?.media?.url || cat.image;
+          const imageUrl = (cat.image as any)?.media?.url || cat.useMedia?.media?.url || (typeof cat.image === "string" ? cat.image : null);
           const gradient = CATEGORY_COLORS[idx % CATEGORY_COLORS.length];
 
           return (

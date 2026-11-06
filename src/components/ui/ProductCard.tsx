@@ -133,8 +133,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   // Safe image resolution
   let imageUrl = "/images/placeholder-product.png";
-  if ("mainImage" in product && product.mainImage) {
-    imageUrl = product.mainImage;
+  if ((product as any).mainImage?.media?.url) {
+    imageUrl = (product as any).mainImage.media.url;
+  } else if ("mainImage" in product && typeof (product as any).mainImage === "string" && (product as any).mainImage) {
+    imageUrl = (product as any).mainImage;
   } else if ("mainImageUseMedia" in product && (product as any).mainImageUseMedia?.media?.url) {
     imageUrl = (product as any).mainImageUseMedia.media.url;
   } else if ("image" in product && typeof (product as any).image === "string" && (product as any).image) {

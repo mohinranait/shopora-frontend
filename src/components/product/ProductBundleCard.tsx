@@ -60,7 +60,7 @@ export function ProductBundleCard({ productId }: ProductBundleCardProps) {
           id: mainProduct.id,
           name: mainProduct.name,
           slug: mainProduct.slug,
-          mainImage: mainProduct.mainImage || "",
+          mainImage: (mainProduct.mainImage as any)?.media?.url || (typeof mainProduct.mainImage === "string" ? mainProduct.mainImage : "") || "",
           basePrice: mainProduct.basePrice,
           stock: mainProduct.stock,
         },
@@ -79,7 +79,7 @@ export function ProductBundleCard({ productId }: ProductBundleCardProps) {
             id: companion.id,
             name: companion.name,
             slug: companion.slug,
-            mainImage: companion.mainImage || "",
+            mainImage: (companion.mainImage as any)?.media?.url || (typeof companion.mainImage === "string" ? companion.mainImage : "") || "",
             basePrice: companion.basePrice,
             stock: companion.stock,
           },
@@ -120,9 +120,9 @@ export function ProductBundleCard({ productId }: ProductBundleCardProps) {
           {/* Main Product Thumbnail */}
           <div className="flex flex-col items-center">
             <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-2xl bg-white border-2 border-indigo-500/30 p-2 shadow-xs relative overflow-hidden flex items-center justify-center">
-              {mainProduct.mainImage ? (
+              {((mainProduct.mainImage as any)?.media?.url || (typeof mainProduct.mainImage === "string" ? mainProduct.mainImage : null)) ? (
                 <Image
-                  src={mainProduct.mainImage}
+                  src={((mainProduct.mainImage as any)?.media?.url || (typeof mainProduct.mainImage === "string" ? mainProduct.mainImage : "")) as string}
                   alt={mainProduct.name}
                   fill
                   sizes="96px"
@@ -161,9 +161,9 @@ export function ProductBundleCard({ productId }: ProductBundleCardProps) {
                       isSelected ? "border-brand" : "border-slate-200"
                     }`}
                   >
-                    {companion.mainImage && (
+                    {Boolean((companion.mainImage as any)?.media?.url || (typeof companion.mainImage === "string" ? companion.mainImage : null)) && (
                       <Image
-                        src={companion.mainImage}
+                        src={((companion.mainImage as any)?.media?.url || (typeof companion.mainImage === "string" ? companion.mainImage : "")) as string}
                         alt={companion.name}
                         fill
                         sizes="96px"

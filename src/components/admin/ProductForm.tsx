@@ -8,7 +8,6 @@ import {
   Layers,
   Sparkles,
   DollarSign,
-  Boxes,
   Truck,
   Globe,
   Upload,
@@ -16,20 +15,12 @@ import {
   Trash2,
   Check,
   X,
-  Eye,
-  AlertCircle,
-  HelpCircle,
   ArrowLeft,
   Loader2,
   Image as ImageIcon,
   CheckCircle2,
   Info,
-  ChevronDown,
-  ChevronUp,
-  Tag,
-  Palette,
-  Hash,
-  ExternalLink,
+
   SlidersHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -53,8 +44,6 @@ import {
 import { getApiErrorMessage } from "@/services/api";
 import {
   IProductItem,
-  IAttribute,
-  ICategory,
   ICreateProductPayload,
   IProductVariantInput,
   IProductImageInput,
@@ -138,7 +127,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
   // ==========================================
   // Form State: 4. Media
   // ==========================================
-  const [mainImageUrl, setMainImageUrl] = useState(initialData?.mainImage || "");
+  const [mainImageUrl, setMainImageUrl] = useState((initialData?.mainImage as any)?.media?.url || (typeof initialData?.mainImage === "string" ? initialData.mainImage : "") || "");
   const [mainImageUseMediaId, setMainImageUseMediaId] = useState<string | undefined>(
     (initialData?.mainImageId ?? initialData?.mainImageUseMediaId ?? undefined) as string | undefined
   );
@@ -146,7 +135,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
     Array<{ url: string; useMediaId?: string; imageId?: string; altText?: string }>
   >(
     initialData?.images?.map((img) => ({
-      url: img.url,
+      url: (img as any).image?.media?.url || (img as any).useMedia?.media?.url || img.url,
       imageId: (img.imageId ?? img.useMediaId ?? undefined) as string | undefined,
       useMediaId: (img.imageId ?? img.useMediaId ?? undefined) as string | undefined,
       altText: img.altText ?? undefined,
@@ -183,7 +172,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       costPrice: v.costPrice,
       stock: v.stock,
       lowStockThreshold: v.lowStockThreshold || 5,
-      image: v.image,
+      image: (v.image as any)?.media?.url || (typeof v.image === "string" ? v.image : null),
       imageId: v.imageId ?? v.useMediaId,
       useMediaId: v.imageId ?? v.useMediaId,
       barcode: v.barcode,
@@ -547,7 +536,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
 
       // Build Gallery Images Payload
       const imagesPayload: IProductImageInput[] = galleryImages.map((img, idx) => ({
-        url: img.url,
+        url: (img as any).image?.media?.url || (img as any).useMedia?.media?.url || img.url,
         imageId: img.imageId ?? img.useMediaId,
         useMediaId: img.imageId ?? img.useMediaId,
         altText: img.altText || name,
@@ -1535,7 +1524,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                               >
                                 {v.image ? (
                                   <img
-                                    src={v.image}
+                                    src={((v.image as any)?.media?.url || (typeof v.image === "string" ? v.image : "")) as string}
                                     alt={v.title}
                                     className="h-full w-full object-contain"
                                   />
@@ -1959,7 +1948,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                         <div className="h-9 w-9 rounded-lg bg-slate-800 overflow-hidden shrink-0 relative flex items-center justify-center">
                           {pItem?.mainImage ? (
                             <img
-                              src={pItem.mainImage}
+                              src={((pItem.mainImage as any)?.media?.url || (typeof pItem.mainImage === "string" ? pItem.mainImage : "")) as string}
                               alt={pItem.name}
                               className="h-full w-full object-cover"
                             />
@@ -2029,7 +2018,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                           <div className="h-8 w-8 rounded-lg bg-slate-800 overflow-hidden shrink-0 relative flex items-center justify-center">
                             {item.mainImage ? (
                               <img
-                                src={item.mainImage}
+                                src={((item.mainImage as any)?.media?.url || (typeof item.mainImage === "string" ? item.mainImage : "")) as string}
                                 alt={item.name}
                                 className="h-full w-full object-cover"
                               />

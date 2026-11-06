@@ -72,7 +72,7 @@ export default function AdminBrandsPage() {
 
     if (brand.logo || brand.useMedia) {
       setFormLogo({
-        url: brand.useMedia?.media?.url || brand.logo || "",
+        url: brand.logo?.media?.url || brand.useMedia?.media?.url || (typeof brand.logo === "string" ? brand.logo : "") || "",
         useMediaId: brand.logoId ?? brand.useMediaId ?? undefined,
         alt: brand.useMedia?.alt || `${brand.name} Logo`,
         description: brand.useMedia?.description || "",
@@ -268,7 +268,7 @@ export default function AdminBrandsPage() {
                   </tr>
                 ) : (
                   filteredBrands.map((brand) => {
-                    const displayLogo = brand.useMedia?.media?.url || brand.logo;
+                    const displayLogo = brand.logo?.media?.url;
                     return (
                       <tr key={brand.id} className="hover:bg-slate-900/50 transition-colors">
                         <td className="py-3 px-4">

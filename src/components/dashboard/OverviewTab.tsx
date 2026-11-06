@@ -205,11 +205,11 @@ export function OverviewTab({
                       href={`/products/${item.product?.slug || ""}`}
                       className="h-11 w-11 shrink-0 rounded-md border border-slate-200 bg-slate-50 p-1 overflow-hidden hover:border-brand transition"
                     >
-                      {item.product?.mainImage && (
+                      {Boolean((item.product?.mainImage as any)?.media?.url || (typeof item.product?.mainImage === "string" ? item.product.mainImage : null)) && (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={item.product.mainImage}
-                          alt={item.product.name}
+                          src={((item.product?.mainImage as any)?.media?.url || (typeof item.product?.mainImage === "string" ? item.product.mainImage : "")) as string}
+                          alt={item.product?.name ?? ""}
                           className="h-full w-full object-contain"
                         />
                       )}

@@ -119,8 +119,8 @@ export function ProductInfo({
     }
     const title = activeVariant ? `${product.name} (${activeVariant.title})` : product.name;
     const mainImg =
-      activeVariant?.image ||
-      product.mainImage ||
+      (activeVariant?.image as any)?.media?.url || (typeof activeVariant?.image === "string" ? activeVariant.image : null) ||
+      (product.mainImage as any)?.media?.url || (typeof product.mainImage === "string" ? product.mainImage : null) ||
       (product as any).mainImageUseMedia?.media?.url ||
       (product.images && product.images.length > 0 ? (product.images[0].url || (product.images[0] as any).useMedia?.media?.url) : "");
 
@@ -148,7 +148,7 @@ export function ProductInfo({
               sku: activeVariant.sku,
               price: activeVariant.price,
               stock: activeVariant.stock,
-              image: activeVariant.image || null,
+              image: (activeVariant.image as any)?.media?.url || (typeof activeVariant.image === "string" ? activeVariant.image : null),
               attributes: activeVariant.attributes || null,
             }
           : null,

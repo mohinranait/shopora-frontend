@@ -53,7 +53,7 @@ export function ProductDetailsView({
         <div className="lg:col-span-6 xl:col-span-5 max-w-lg lg:max-w-max lg:sticky top-24">
           <ProductGallery
             product={product}
-            selectedVariantImage={activeVariant?.image}
+            selectedVariantImage={(activeVariant?.image as any)?.media?.url || (typeof activeVariant?.image === "string" ? activeVariant.image : null)}
           />
         </div>
 

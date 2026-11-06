@@ -13,6 +13,8 @@ export interface IPublicStore {
   storeSlug: string;
   storeLogo: string | null;
   storeBanner: string | null;
+  logo?: any;
+  banner?: any;
   storeDescription: string | null;
   businessAddress: string | null;
   isVerified: boolean;

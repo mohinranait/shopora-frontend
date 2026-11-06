@@ -563,10 +563,10 @@ export default function AdminDashboardPage() {
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden shrink-0 flex items-center justify-center">
-                            {prod.mainImage ? (
+                            {((prod.mainImage as any)?.media?.url || (typeof prod.mainImage === "string" ? prod.mainImage : null)) ? (
                               // eslint-disable-next-line @next/next/no-img-element
                               <img
-                                src={prod.mainImage}
+                                src={((prod.mainImage as any)?.media?.url || (typeof prod.mainImage === "string" ? prod.mainImage : "")) as string}
                                 alt={prod.name}
                                 className="h-full w-full object-cover"
                               />

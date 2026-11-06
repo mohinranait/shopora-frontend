@@ -15,17 +15,16 @@ export function ProductGallery({ product, selectedVariantImage }: ProductGallery
   const allImages = useMemo(() => {
     const list: string[] = [];
 
-    if (product.mainImage) {
-      list.push(product.mainImage);
-    } else if ((product as any).mainImageUseMedia?.media?.url) {
-      list.push((product as any).mainImageUseMedia.media.url);
+    const mainUrl = (product.mainImage as any)?.media?.url || (typeof product.mainImage === "string" ? product.mainImage : null) || (product as any).mainImageUseMedia?.media?.url;
+    if (mainUrl) {
+      list.push(mainUrl);
     } else if ("image" in product && typeof (product as any).image === "string" && (product as any).image) {
       list.push((product as any).image);
     }
 
     if (product.images && Array.isArray(product.images)) {
       product.images.forEach((img: any) => {
-        const u = img.url || img.useMedia?.media?.url || img.image?.media?.url;
+        const u = img.image?.media?.url || img.useMedia?.media?.url || img.url;
         if (u && !list.includes(u)) {
           list.push(u);
         }
@@ -34,7 +33,7 @@ export function ProductGallery({ product, selectedVariantImage }: ProductGallery
 
     if (product.variants && Array.isArray(product.variants)) {
       product.variants.forEach((v: any) => {
-        const u = v.image || v.useMedia?.media?.url || v.image?.media?.url;
+        const u = v.image?.media?.url || (typeof v.image === "string" ? v.image : null) || v.useMedia?.media?.url;
         if (u && !list.includes(u)) {
           list.push(u);
         }

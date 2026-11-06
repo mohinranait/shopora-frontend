@@ -437,9 +437,9 @@ export default function AdminSellersPage() {
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-3">
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-700 bg-slate-800 font-bold text-brand overflow-hidden">
-                            {seller.storeLogo ? (
+                            {((seller.logo as any)?.media?.url || (seller.storeLogo as any)?.media?.url || seller.storeLogo) ? (
                               <img
-                                src={seller.storeLogo}
+                                src={((seller.logo as any)?.media?.url || (seller.storeLogo as any)?.media?.url || seller.storeLogo) as string}
                                 alt={seller.storeName}
                                 className="h-full w-full object-cover"
                               />

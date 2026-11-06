@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       product.shortDescription ||
       `Buy ${product.name} at the best price in Bangladesh. 100% authentic product with official warranty, verified seller rating, and fast home delivery.`;
 
-    const imageUrl = product.mainImage || "/images/placeholder-product.png";
+    const imageUrl = (product.mainImage as any)?.media?.url || (typeof product.mainImage === "string" ? product.mainImage : "") || "/images/placeholder-product.png";
 
     return {
       title,

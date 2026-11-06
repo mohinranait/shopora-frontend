@@ -143,7 +143,7 @@ export const cartSlice = createSlice({
                 id: payload.productId,
                 name: payload.product.name ?? payload.name ?? "Product",
                 slug: payload.product.slug ?? "",
-                mainImage: payload.product.mainImage ?? "",
+                mainImage: (payload.product.mainImage as any)?.media?.url || (typeof payload.product.mainImage === "string" ? payload.product.mainImage : "") || "",
                 basePrice: payload.product.basePrice ?? unitPrice,
                 stock: payload.product.stock ?? maxStock,
                 isPlatformOwned: payload.product.isPlatformOwned ?? false,
@@ -166,7 +166,7 @@ export const cartSlice = createSlice({
                 sku: payload.variant.sku ?? "",
                 price: payload.variant.price ?? unitPrice,
                 stock: payload.variant.stock ?? maxStock,
-                image: payload.variant.image ?? null,
+                image: (payload.variant.image as any)?.media?.url || (typeof payload.variant.image === "string" ? payload.variant.image : null),
                 attributes: payload.variant.attributes ?? null,
               }
             : null,
