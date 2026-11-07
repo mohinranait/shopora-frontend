@@ -201,9 +201,21 @@ export interface IUpdateProductPayload extends Partial<ICreateProductPayload> {
   status?: ProductStatus;
 }
 
+export interface IProductListMeta extends IPaginationMeta {
+  counts?: {
+    all?: number;
+    platform?: number;
+    vendor?: number;
+    pending?: number;
+    lowStock?: number;
+    approved?: number;
+    rejected?: number;
+  };
+}
+
 export interface IProductListResponse {
   products: IProductItem[];
-  meta?: IPaginationMeta;
+  meta?: IProductListMeta;
 }
 
 export interface IAutocompleteProduct {

@@ -1,4 +1,5 @@
 import { IUseMediaItem } from "./media.type";
+import { IPaginationMeta } from "./common.type";
 
 export interface IBrand {
   id: string;
@@ -23,3 +24,16 @@ export interface ICreateBrandPayload {
 }
 
 export type IUpdateBrandPayload = Partial<ICreateBrandPayload>;
+
+export interface IBrandListMeta extends IPaginationMeta {
+  counts?: {
+    all?: number;
+    active?: number;
+    inactive?: number;
+  };
+}
+
+export interface IBrandListResponse {
+  brands: IBrand[];
+  meta?: IBrandListMeta;
+}

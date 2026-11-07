@@ -131,7 +131,8 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
   // Global Data Catalogs (RTK Query Cache)
   // ==========================================
   // const { data: categories = [], isLoading: isCategoriesLoading } = useGetCategoriesQuery();
-  const { data: brands = [] } = useGetBrandsQuery(true);
+  const { data: brandsData } = useGetBrandsQuery(true);
+  const brands = brandsData?.brands || [];
   const { data: availableAttributes = [] } = useGetAttributesQuery(true);
   const [generateCombinations, { isLoading: isGenerating }] = useGenerateCombinationsMutation();
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();

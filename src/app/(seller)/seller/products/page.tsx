@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -27,33 +27,64 @@ import { getApiErrorMessage } from "@/services/api";
 import { IProductItem } from "@/types";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { Pagination } from "@/components/ui/Pagination";
 
 export default function SellerProductsPage() {
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Debounce search query to avoid excess API calls
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const handleFilterStatusChange = (status: string) => {
+    setFilterStatus(status);
+    setPage(1);
+  };
 
   const { data: dashboardData } = useGetSellerDashboardStatsQuery();
   const profile = dashboardData?.profile;
 
-  const { data, isLoading, isFetching, refetch } = useGetSellerProductsQuery({ limit: 50 });
+  // Build API query parameters for server-side filtering & pagination
+  const queryParams = useMemo(() => {
+    const params: Record<string, string | number | boolean | undefined> = {
+      page,
+      limit: pageSize,
+    };
+
+    if (debouncedSearch.trim()) {
+      params.search = debouncedSearch.trim();
+    }
+
+    if (filterStatus === "APPROVED") {
+      params.approvalStatus = "APPROVED";
+    } else if (filterStatus === "PENDING") {
+      params.approvalStatus = "PENDING";
+    } else if (filterStatus === "REJECTED") {
+      params.approvalStatus = "REJECTED";
+    } else if (filterStatus === "LOW_STOCK") {
+      params.isLowStock = true;
+    }
+
+    return params;
+  }, [page, pageSize, debouncedSearch, filterStatus]);
+
+  const { data, isLoading, isFetching, refetch } = useGetSellerProductsQuery(queryParams);
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
 
-  const allProducts = data?.products || [];
-
-  const filteredProducts = allProducts.filter((p: IProductItem) => {
-    const matchesSearch =
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      (p.sku && p.sku.toLowerCase().includes(search.toLowerCase()));
-
-    if (!matchesSearch) return false;
-
-    if (filterStatus === "APPROVED") return p.approvalStatus === "APPROVED";
-    if (filterStatus === "PENDING") return p.approvalStatus === "PENDING";
-    if (filterStatus === "REJECTED") return p.approvalStatus === "REJECTED";
-    if (filterStatus === "LOW_STOCK") return p.stock <= (p.lowStockThreshold || 5);
-
-    return true;
-  });
+  const products = data?.products || [];
+  const meta = data?.meta;
+  const totalItems = meta?.total ?? products.length;
+  const totalPages = meta?.totalPages ?? (totalItems > 0 ? Math.ceil(totalItems / pageSize) : 1);
+  const counts = meta?.counts;
 
   const [productToDelete, setProductToDelete] = useState<{ id: string; name: string } | null>(null);
 
@@ -121,31 +152,31 @@ export default function SellerProductsPage() {
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
         <div className="flex flex-wrap items-center gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800">
           {[
-            { id: "ALL", label: "All Items", count: allProducts.length },
+            { id: "ALL", label: "All Items", count: counts?.all ?? totalItems },
             {
               id: "APPROVED",
               label: "Live / Approved",
-              count: allProducts.filter((p) => p.approvalStatus === "APPROVED").length,
+              count: counts?.approved ?? 0,
             },
             {
               id: "PENDING",
               label: "Under Review",
-              count: allProducts.filter((p) => p.approvalStatus === "PENDING").length,
+              count: counts?.pending ?? 0,
             },
             {
               id: "REJECTED",
               label: "Action Needed",
-              count: allProducts.filter((p) => p.approvalStatus === "REJECTED").length,
+              count: counts?.rejected ?? 0,
             },
             {
               id: "LOW_STOCK",
               label: "Low Stock",
-              count: allProducts.filter((p) => p.stock <= (p.lowStockThreshold || 5)).length,
+              count: counts?.lowStock ?? 0,
             },
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setFilterStatus(tab.id)}
+              onClick={() => handleFilterStatusChange(tab.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
                 filterStatus === tab.id
                   ? "bg-brand-600 text-white"
@@ -179,7 +210,7 @@ export default function SellerProductsPage() {
             <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2 text-brand-500" />
             Loading catalog products...
           </div>
-        ) : filteredProducts.length === 0 ? (
+        ) : products.length === 0 ? (
           <div className="p-16 text-center text-slate-400 text-xs">
             <Package className="h-10 w-10 text-slate-600 mx-auto mb-3" />
             <p className="font-semibold text-slate-300">No products found matching criteria</p>
@@ -191,7 +222,8 @@ export default function SellerProductsPage() {
             </Link>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+            <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
               <thead className="bg-slate-950/60 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
                 <tr>
@@ -204,7 +236,7 @@ export default function SellerProductsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800 text-slate-300">
-                {filteredProducts.map((p: IProductItem) => {
+                {products.map((p: IProductItem) => {
                   const isLow = p.stock <= (p.lowStockThreshold || 5);
                   const isOut = p.stock === 0;
 
@@ -347,7 +379,27 @@ export default function SellerProductsPage() {
               </tbody>
             </table>
           </div>
-        )}
+
+          {/* Table Pagination */}
+          {totalItems > 0 && (
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setPage(1);
+              }}
+              pageSizeOptions={[10, 20, 50, 100]}
+              isLoading={isFetching}
+              itemLabel="products"
+              variant="dark"
+            />
+          )}
+        </>
+      )}
       </div>
 
       {/* Delete Confirmation Dialog */}

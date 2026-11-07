@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Tag,
   Plus,
@@ -26,15 +26,53 @@ import { IBrand, ImageValue } from "@/types";
 import { toast } from "sonner";
 import { ImageUploadField } from "@/components/media/ImageUploadField";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { Pagination } from "@/components/ui/Pagination";
 
 export default function AdminBrandsPage() {
-  const { data: brands = [], isLoading: loading, isFetching, refetch } = useGetBrandsQuery(true);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const handleStatusFilterChange = (status: "all" | "active" | "inactive") => {
+    setStatusFilter(status);
+    setPage(1);
+  };
+
+  const queryParams = useMemo(() => {
+    const params: Record<string, string | number | boolean | undefined> = {
+      page,
+      limit: pageSize,
+      includeInactive: true,
+    };
+    if (debouncedSearch.trim()) {
+      params.search = debouncedSearch.trim();
+    }
+    if (statusFilter !== "all") {
+      params.status = statusFilter;
+    }
+    return params;
+  }, [page, pageSize, debouncedSearch, statusFilter]);
+
+  const { data, isLoading: loading, isFetching, refetch } = useGetBrandsQuery(queryParams);
+  const brands = data?.brands || [];
+  const meta = data?.meta;
+  const totalItems = meta?.total ?? brands.length;
+  const totalPages = meta?.totalPages ?? (totalItems > 0 ? Math.ceil(totalItems / pageSize) : 1);
+  const counts = meta?.counts;
+
   const [createBrand] = useCreateBrandMutation();
   const [updateBrand] = useUpdateBrandMutation();
   const [deleteBrand] = useDeleteBrandMutation();
-
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
 
   // Modal State for Add / Edit Brand
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -137,17 +175,6 @@ export default function AdminBrandsPage() {
     }
   };
 
-  // Filtered List
-  const filteredBrands = brands.filter((b) => {
-    if (statusFilter === "active" && !b.isActive) return false;
-    if (statusFilter === "inactive" && b.isActive) return false;
-    if (search) {
-      const q = search.toLowerCase();
-      return b.name.toLowerCase().includes(q) || b.slug.toLowerCase().includes(q);
-    }
-    return true;
-  });
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -194,34 +221,34 @@ export default function AdminBrandsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-1 text-xs font-semibold gap-1">
           <button
-            onClick={() => setStatusFilter("all")}
-            className={`px-3 py-1.5 rounded-md transition ${
+            onClick={() => handleStatusFilterChange("all")}
+            className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
               statusFilter === "all"
                 ? "bg-brand text-white"
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            All Brands ({brands.length})
+            All Brands ({counts?.all !== undefined ? counts.all : totalItems})
           </button>
           <button
-            onClick={() => setStatusFilter("active")}
-            className={`px-3 py-1.5 rounded-md transition ${
+            onClick={() => handleStatusFilterChange("active")}
+            className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
               statusFilter === "active"
                 ? "bg-brand text-white"
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            Active
+            Active {counts?.active !== undefined ? `(${counts.active})` : ""}
           </button>
           <button
-            onClick={() => setStatusFilter("inactive")}
-            className={`px-3 py-1.5 rounded-md transition ${
+            onClick={() => handleStatusFilterChange("inactive")}
+            className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
               statusFilter === "inactive"
                 ? "bg-brand text-white"
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            Inactive
+            Inactive {counts?.inactive !== undefined ? `(${counts.inactive})` : ""}
           </button>
         </div>
 
@@ -254,19 +281,19 @@ export default function AdminBrandsPage() {
               <tbody className="divide-y divide-slate-800/80 text-slate-300">
                 {loading ? (
                   <tr>
-                    <td colSpan={6} className="py-12 text-center text-slate-400">
+                    <td colSpan={5} className="py-12 text-center text-slate-400">
                       <Loader2 className="h-6 w-6 text-sky-400 animate-spin mx-auto mb-2" />
                       Loading brands from database...
                     </td>
                   </tr>
-                ) : filteredBrands.length === 0 ? (
+                ) : brands.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-12 text-center text-slate-500">
+                    <td colSpan={5} className="py-12 text-center text-slate-500">
                       No brands found matching your criteria.
                     </td>
                   </tr>
                 ) : (
-                  filteredBrands.map((brand) => {
+                  brands.map((brand) => {
                     const displayLogo = brand.logo?.media?.url;
                     return (
                       <tr key={brand.id} className="hover:bg-slate-900/50 transition-colors">
@@ -354,6 +381,25 @@ export default function AdminBrandsPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Table Pagination */}
+          {totalItems > 0 && (
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setPage(1);
+              }}
+              pageSizeOptions={[10, 20, 50, 100]}
+              isLoading={isFetching}
+              itemLabel="brands"
+              variant="dark"
+            />
+          )}
         </CardContent>
       </Card>
 

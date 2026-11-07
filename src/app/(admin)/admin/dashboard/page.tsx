@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import  { useState } from "react";
 import Link from "next/link";
 import {
   DollarSign,
@@ -9,21 +9,14 @@ import {
   Package,
   TrendingUp,
   ArrowUpRight,
-  ArrowDownRight,
   CheckCircle2,
   XCircle,
-  Clock,
-  AlertTriangle,
   RefreshCw,
   Download,
   Eye,
-  MoreVertical,
   ChevronRight,
-  Filter,
-  Sparkles,
   SlidersHorizontal,
   CreditCard,
-  Building2,
   ShieldCheck,
   Boxes,
 } from "lucide-react";
@@ -400,10 +393,10 @@ export default function AdminDashboardPage() {
                   </div>
 
                   {/* Bar */}
-                  <div className="w-full max-w-[42px] bg-slate-800/80 rounded-t-lg overflow-hidden flex flex-col justify-end group-hover:bg-slate-700 transition">
+                  <div className="w-full max-w-10.5 bg-slate-800/80 rounded-t-lg overflow-hidden flex flex-col justify-end group-hover:bg-slate-700 transition">
                     <div
                       style={{ height: item.height }}
-                      className="w-full bg-gradient-to-t from-brand-deep to-brand rounded-t-lg transition-all duration-500 group-hover:from-sky-500 group-hover:to-cyan-400"
+                      className="w-full bg-linear-to-t from-brand-deep to-brand rounded-t-lg transition-all duration-500 group-hover:from-sky-500 group-hover:to-cyan-400"
                     />
                   </div>
 
@@ -563,10 +556,10 @@ export default function AdminDashboardPage() {
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden shrink-0 flex items-center justify-center">
-                            {((prod.mainImage as any)?.media?.url || (typeof prod.mainImage === "string" ? prod.mainImage : null)) ? (
+                            {prod.mainImage?.media?.url ? (
                               // eslint-disable-next-line @next/next/no-img-element
                               <img
-                                src={((prod.mainImage as any)?.media?.url || (typeof prod.mainImage === "string" ? prod.mainImage : "")) as string}
+                                src={prod.mainImage?.media?.url}
                                 alt={prod.name}
                                 className="h-full w-full object-cover"
                               />

@@ -3,28 +3,46 @@ import {
   IBrand,
   ICreateBrandPayload,
   IUpdateBrandPayload,
+  IBrandListResponse,
   IApiResponse,
 } from "@/types";
 
 export const brandApiSlice = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getBrands: builder.query<IBrand[], boolean | void>({
-      query: (includeInactive = true) => `/brands?includeInactive=${includeInactive}`,
-      transformResponse: (res: IApiResponse<IBrand[]>) =>
-        Array.isArray(res.data) ? res.data : [],
+    getBrands: builder.query<
+      IBrandListResponse,
+      Record<string, string | number | boolean | undefined> | boolean | void
+    >({
+      query: (params = true) => {
+        const query = new URLSearchParams();
+        if (typeof params === "boolean") {
+          query.set("includeInactive", String(params));
+        } else if (params && typeof params === "object") {
+          Object.entries(params).forEach(([key, val]) => {
+            if (val !== undefined && val !== null && val !== "") {
+              query.append(key, String(val));
+            }
+          });
+        }
+        return `/brands?${query.toString()}`;
+      },
+      transformResponse: (res: IApiResponse<IBrand[]>) => ({
+        brands: Array.isArray(res.data) ? res.data : [],
+        meta: res.meta,
+      }),
       providesTags: (result) =>
         result
           ? [
-              ...result.map(({ id }) => ({ type: "Brands" as const, id })),
-              { type: "Brands", id: "LIST" },
+              ...result.brands.map(({ id }) => ({ type: "Brands" as const, id })),
+              { type: "Brands" as const, id: "LIST" },
             ]
-          : [{ type: "Brands", id: "LIST" }],
+          : [{ type: "Brands" as const, id: "LIST" }],
     }),
 
     getBrandById: builder.query<IBrand, string | number>({
       query: (id) => `/brands/${id}`,
       transformResponse: (res: IApiResponse<IBrand>) => res.data,
-      providesTags: (result, error, id) => [{ type: "Brand", id }],
+      providesTags: (result, error, id) => [{ type: "Brand" as const, id }],
     }),
 
     createBrand: builder.mutation<IBrand, ICreateBrandPayload>({
@@ -34,7 +52,7 @@ export const brandApiSlice = baseApi.injectEndpoints({
         body,
       }),
       transformResponse: (res: IApiResponse<IBrand>) => res.data,
-      invalidatesTags: [{ type: "Brands", id: "LIST" }],
+      invalidatesTags: [{ type: "Brands" as const, id: "LIST" }],
     }),
 
     updateBrand: builder.mutation<
@@ -48,8 +66,8 @@ export const brandApiSlice = baseApi.injectEndpoints({
       }),
       transformResponse: (res: IApiResponse<IBrand>) => res.data,
       invalidatesTags: (result, error, { id }) => [
-        { type: "Brands", id: "LIST" },
-        { type: "Brand", id },
+        { type: "Brands" as const, id: "LIST" },
+        { type: "Brand" as const, id },
       ],
     }),
 
@@ -59,7 +77,7 @@ export const brandApiSlice = baseApi.injectEndpoints({
         method: "DELETE",
       }),
       transformResponse: (res: IApiResponse<{ message: string; id: number }>) => res.data,
-      invalidatesTags: [{ type: "Brands", id: "LIST" }],
+      invalidatesTags: [{ type: "Brands" as const, id: "LIST" }],
     }),
   }),
 });

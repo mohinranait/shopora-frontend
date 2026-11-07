@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -31,6 +31,7 @@ import { getApiErrorMessage } from "@/services/api";
 import { IProductItem } from "@/types";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { Pagination } from "@/components/ui/Pagination";
 
 type TabType = "all" | "platform" | "vendor" | "pending" | "low_stock";
 
@@ -45,19 +46,72 @@ function AdminProductsInner() {
   const searchParams = useSearchParams();
   const filterParam = searchParams.get("filter");
 
-  const { data, isLoading: loading, isFetching, refetch } = useGetAdminProductsQuery({ limit: 100 });
-  const [reviewProductApproval] = useReviewProductApprovalMutation();
-  const [deleteProduct] = useDeleteProductMutation();
-
-  const products = data?.products || [];
   const [prevFilterParam, setPrevFilterParam] = useState(filterParam);
   const [activeTab, setActiveTab] = useState<TabType>(() => getInitialTab(filterParam));
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   if (filterParam !== prevFilterParam) {
     setPrevFilterParam(filterParam);
     setActiveTab(getInitialTab(filterParam));
+    setPage(1);
   }
+
+  // Debounce search query to avoid firing API requests on every single keystroke
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    setPage(1);
+  };
+
+  // Build API query parameters for server-side filtering & pagination
+  const queryParams = useMemo(() => {
+    const params: Record<string, string | number | boolean | undefined> = {
+      page,
+      limit: pageSize,
+    };
+
+    if (debouncedSearch.trim()) {
+      params.search = debouncedSearch.trim();
+    }
+
+    if (activeTab === "platform") {
+      params.isPlatformOwned = true;
+    } else if (activeTab === "vendor") {
+      params.isPlatformOwned = false;
+    } else if (activeTab === "pending") {
+      params.approvalStatus = "PENDING";
+    } else if (activeTab === "low_stock") {
+      params.isLowStock = true;
+    }
+
+    return params;
+  }, [page, pageSize, debouncedSearch, activeTab]);
+
+  const { data, isLoading: loading, isFetching, refetch } = useGetAdminProductsQuery(queryParams);
+  const [reviewProductApproval] = useReviewProductApprovalMutation();
+  const [deleteProduct] = useDeleteProductMutation();
+
+  const products = data?.products || [];
+  const meta = data?.meta;
+  const totalItems = meta?.total ?? products.length;
+  const totalPages = meta?.totalPages ?? (totalItems > 0 ? Math.ceil(totalItems / pageSize) : 1);
+  const counts = meta?.counts;
+
+  const allCount = counts?.all ?? totalItems;
+  const platformCount = counts?.platform ?? 0;
+  const vendorCount = counts?.vendor ?? 0;
+  const pendingCount = counts?.pending ?? 0;
+  const lowStockCount = counts?.lowStock ?? 0;
 
   const handleApprove = async (id: string | number) => {
     try {
@@ -98,25 +152,6 @@ function AdminProductsInner() {
       setIsDeletingProduct(false);
     }
   };
-
-  const filteredProducts = products.filter((prod) => {
-    if (activeTab === "platform" && !prod.isPlatformOwned) return false;
-    if (activeTab === "vendor" && prod.isPlatformOwned) return false;
-    if (activeTab === "pending" && prod.approvalStatus !== "PENDING") return false;
-    if (activeTab === "low_stock" && prod.stock > prod.lowStockThreshold) return false;
-    if (
-      search &&
-      !prod.name.toLowerCase().includes(search.toLowerCase()) &&
-      !prod.sku.toLowerCase().includes(search.toLowerCase())
-    )
-      return false;
-    return true;
-  });
-
-  const platformCount = products.filter((p) => p.isPlatformOwned).length;
-  const vendorCount = products.filter((p) => !p.isPlatformOwned).length;
-  const pendingCount = products.filter((p) => p.approvalStatus === "PENDING").length;
-  const lowStockCount = products.filter((p) => p.stock <= p.lowStockThreshold).length;
 
   return (
     <div className="space-y-6">
@@ -165,17 +200,17 @@ function AdminProductsInner() {
         {/* Tab Pills */}
         <div className="flex flex-wrap items-center bg-slate-900 border border-slate-800 rounded-lg p-1 text-xs font-semibold gap-1">
           <button
-            onClick={() => setActiveTab("all")}
+            onClick={() => handleTabChange("all")}
             className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
               activeTab === "all"
                 ? "bg-brand text-white"
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            All Products ({products.length})
+            All Products ({allCount})
           </button>
           <button
-            onClick={() => setActiveTab("platform")}
+            onClick={() => handleTabChange("platform")}
             className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
               activeTab === "platform"
                 ? "bg-brand text-white"
@@ -185,7 +220,7 @@ function AdminProductsInner() {
             Shopora Direct ({platformCount})
           </button>
           <button
-            onClick={() => setActiveTab("vendor")}
+            onClick={() => handleTabChange("vendor")}
             className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
               activeTab === "vendor"
                 ? "bg-brand text-white"
@@ -195,7 +230,7 @@ function AdminProductsInner() {
             Vendor Products ({vendorCount})
           </button>
           <button
-            onClick={() => setActiveTab("pending")}
+            onClick={() => handleTabChange("pending")}
             className={`px-3 py-1.5 rounded-md transition flex items-center gap-1.5 cursor-pointer ${
               activeTab === "pending"
                 ? "bg-amber-500 text-slate-950 font-bold"
@@ -214,7 +249,7 @@ function AdminProductsInner() {
             </span>
           </button>
           <button
-            onClick={() => setActiveTab("low_stock")}
+            onClick={() => handleTabChange("low_stock")}
             className={`px-3 py-1.5 rounded-md transition flex items-center gap-1.5 cursor-pointer ${
               activeTab === "low_stock"
                 ? "bg-rose-600 text-white"
@@ -265,7 +300,7 @@ function AdminProductsInner() {
                       Loading product catalog...
                     </td>
                   </tr>
-                ) : filteredProducts.length === 0 ? (
+                ) : products.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-slate-400">
                       <Package className="h-8 w-8 text-slate-600 mx-auto mb-2" />
@@ -278,7 +313,7 @@ function AdminProductsInner() {
                     </td>
                   </tr>
                 ) : (
-                  filteredProducts.map((prod) => (
+                  products.map((prod) => (
                     <tr
                       key={prod.id}
                       className={`hover:bg-slate-850/50 transition-colors ${
@@ -433,6 +468,25 @@ function AdminProductsInner() {
               </tbody>
             </table>
           </div>
+
+          {/* Table Pagination */}
+          {totalItems > 0 && (
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setPage(1);
+              }}
+              pageSizeOptions={[10, 20, 50, 100]}
+              isLoading={isFetching}
+              itemLabel="products"
+              variant="dark"
+            />
+          )}
         </CardContent>
       </Card>
 
