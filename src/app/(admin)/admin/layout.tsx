@@ -1,50 +1,61 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminRouteGuard } from "@/components/admin/AdminRouteGuard";
 import { AdminThemeProvider, useAdminTheme } from "@/context/AdminThemeContext";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import "@/styles/admin-theme.css";
 
 function AdminLayoutContent({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { theme } = useAdminTheme();
+
+  React.useEffect(() => {
+    const root = document.documentElement;
+    if (theme === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+    return () => {
+      root.classList.remove("dark");
+    };
+  }, [theme]);
 
   return (
     <AdminRouteGuard>
       <div
         data-admin-theme={theme}
         className={cn(
-          "min-h-screen flex antialiased transition-colors duration-200",
-          theme === "light"
-            ? "admin-theme-light bg-slate-100/90 text-slate-900"
-            : "admin-theme-dark bg-slate-950 text-slate-100"
+          "min-h-screen flex w-full antialiased transition-colors duration-200",
+          theme === "dark"
+            ? "dark bg-background text-foreground"
+            : "bg-slate-100/90 text-foreground"
         )}
       >
-        {/* Sidebar (Desktop Collapsible & Mobile Slide-over) */}
-        <AdminSidebar
-          isMobileOpen={mobileSidebarOpen}
-          onMobileClose={() => setMobileSidebarOpen(false)}
-        />
+        <TooltipProvider delay={150}>
+          <SidebarProvider defaultOpen={true} className="min-h-screen w-full flex">
+            {/* Sidebar (Desktop Collapsible & Mobile Slide-over) */}
+            <AdminSidebar />
 
-        {/* Main Administrative Container */}
-        <div className="flex-1 flex flex-col min-w-0 lg:pl-64 transition-all duration-300">
-          {/* Header Bar */}
-          <AdminHeader
-            onMobileToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-          />
+            {/* Main Administrative Container */}
+            <SidebarInset className="flex-1 flex flex-col min-w-0 bg-transparent transition-all duration-200">
+              {/* Header Bar */}
+              <AdminHeader />
 
-          {/* Dynamic Route Content */}
-          <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-            <div className="max-w-7xl mx-auto space-y-6">{children}</div>
-          </main>
-        </div>
+              {/* Dynamic Route Content */}
+              <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+                <div className="max-w-7xl mx-auto space-y-6">{children}</div>
+              </main>
+            </SidebarInset>
+          </SidebarProvider>
+        </TooltipProvider>
       </div>
     </AdminRouteGuard>
   );

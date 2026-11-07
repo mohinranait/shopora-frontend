@@ -116,7 +116,7 @@ export default function AdminBrandsPage() {
           const displayLogo = brand.logo?.media?.url;
           return (
             <div className="flex items-center gap-3">
-              <div className="h-11 w-11 rounded-lg overflow-hidden border border-slate-700 bg-slate-900 shrink-0 flex items-center justify-center p-1">
+              <div className="h-11 w-11 rounded-lg overflow-hidden border border-border bg-muted/40 shrink-0 flex items-center justify-center p-1">
                 {displayLogo ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -125,13 +125,13 @@ export default function AdminBrandsPage() {
                     className="w-full h-full object-contain"
                   />
                 ) : (
-                  <Tag className="h-5 w-5 text-slate-600" />
+                  <Tag className="h-5 w-5 text-muted-foreground" />
                 )}
               </div>
               <div className="min-w-0">
-                <p className="font-bold text-white text-sm">{brand.name}</p>
+                <p className="font-bold text-foreground text-sm">{brand.name}</p>
                 {brand.description && (
-                  <p className="text-[11px] text-slate-400 truncate max-w-xs">
+                  <p className="text-[11px] text-muted-foreground truncate max-w-xs">
                     {brand.description}
                   </p>
                 )}
@@ -146,10 +146,10 @@ export default function AdminBrandsPage() {
         cell: ({ row }) => {
           const brand = row.original;
           return (
-            <div className="font-mono text-slate-400 text-xs">
+            <div className="font-mono text-muted-foreground text-xs">
               <span>Slug: {brand.slug}</span>
               {brand.logo?.alt && (
-                <p className="text-[10px] text-slate-400 truncate max-w-45">
+                <p className="text-[10px] text-muted-foreground/80 truncate max-w-45">
                   Alt: &quot;{brand.logo.alt}&quot;
                 </p>
               )}
@@ -167,13 +167,13 @@ export default function AdminBrandsPage() {
               href={brand.website}
               target="_blank"
               rel="noreferrer"
-              className="text-sky-400 hover:underline flex items-center gap-1 font-mono text-[11px]"
+              className="text-brand hover:underline flex items-center gap-1 font-mono text-[11px]"
             >
               <span>{brand.website.replace(/^https?:\/\//, "")}</span>
               <ExternalLink className="h-3 w-3 shrink-0" />
             </a>
           ) : (
-            <span className="text-slate-500 text-[11px]">—</span>
+            <span className="text-muted-foreground/60 text-[11px]">—</span>
           );
         },
       },
@@ -198,14 +198,14 @@ export default function AdminBrandsPage() {
             <div className="flex items-center justify-end gap-1.5">
               <button
                 onClick={() => handleOpenEdit(brand)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-sky-400 hover:bg-slate-800 transition cursor-pointer"
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-brand hover:bg-muted transition cursor-pointer"
                 title="Edit Brand"
               >
                 <Edit className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setBrandToDelete(brand)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition cursor-pointer"
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 transition cursor-pointer"
                 title="Delete Brand"
               >
                 <Trash2 className="h-4 w-4" />
@@ -221,17 +221,17 @@ export default function AdminBrandsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-white tracking-tight">
+            <h1 className="text-2xl font-black text-foreground tracking-tight">
               Brand Management
             </h1>
             <Badge variant="brand" className="text-[10px] uppercase font-bold">
               Dynamic API & Media Library
             </Badge>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Manage manufacturer brands, official store logos, and SEO UseMedia metadata.
           </p>
         </div>
@@ -242,9 +242,9 @@ export default function AdminBrandsPage() {
             variant="outline"
             onClick={() => refetch()}
             disabled={loading || isFetching}
-            className="text-xs gap-1.5"
+            className="text-xs gap-1.5 cursor-pointer shadow-xs"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin text-sky-400" : ""}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin text-brand" : "text-muted-foreground"}`} />
             <span>Refresh</span>
           </Button>
 
@@ -252,7 +252,7 @@ export default function AdminBrandsPage() {
             size="sm"
             variant="brand"
             onClick={handleOpenCreate}
-            className="gap-1.5 text-xs font-bold"
+            className="gap-1.5 text-xs font-bold cursor-pointer shadow-xs"
           >
             <Plus className="h-4 w-4" />
             <span>Add Brand</span>
@@ -262,13 +262,13 @@ export default function AdminBrandsPage() {
 
       {/* Filter Tabs & Search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-1 text-xs font-semibold gap-1">
+        <div className="flex items-center bg-card border border-border rounded-lg p-1 text-xs font-semibold gap-1 shadow-xs">
           <button
             onClick={() => handleStatusFilterChange("all")}
             className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
               statusFilter === "all"
-                ? "bg-brand text-white"
-                : "text-slate-400 hover:text-white"
+                ? "bg-brand text-white shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
             }`}
           >
             All Brands ({counts?.all !== undefined ? counts.all : totalItems})
@@ -277,8 +277,8 @@ export default function AdminBrandsPage() {
             onClick={() => handleStatusFilterChange("active")}
             className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
               statusFilter === "active"
-                ? "bg-brand text-white"
-                : "text-slate-400 hover:text-white"
+                ? "bg-brand text-white shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
             }`}
           >
             Active {counts?.active !== undefined ? `(${counts.active})` : ""}
@@ -287,8 +287,8 @@ export default function AdminBrandsPage() {
             onClick={() => handleStatusFilterChange("inactive")}
             className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
               statusFilter === "inactive"
-                ? "bg-brand text-white"
-                : "text-slate-400 hover:text-white"
+                ? "bg-brand text-white shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
             }`}
           >
             Inactive {counts?.inactive !== undefined ? `(${counts.inactive})` : ""}
@@ -296,13 +296,13 @@ export default function AdminBrandsPage() {
         </div>
 
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search brand name, slug..."
-            className="w-full h-9 rounded-lg border border-slate-700 bg-slate-900 pl-9 pr-3 text-xs text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand"
+            className="w-full h-9 rounded-lg border border-border bg-card pl-9 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand shadow-xs transition"
           />
         </div>
       </div>

@@ -9,6 +9,8 @@ import { getApiErrorMessage } from "@/services/api";
 import { IBrand, ImageValue } from "@/types";
 import { toast } from "sonner";
 import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Label } from "../ui/label";
 
 export interface BrandFormProps {
   mode: "create" | "edit";
@@ -102,17 +104,18 @@ export function BrandForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Brand Name */}
       <div>
-        <label className="block text-xs font-semibold text-slate-200">
+        <Label htmlFor="brand-name" className="block text-xs font-semibold text-foreground">
           Brand Name <span className="text-rose-400">*</span>
-        </label>
+        </Label>
         <Input
+          id="brand-name"
           type="text"
           required
           placeholder="e.g. Sony, Anker, Apple"
           value={name}
           onChange={(e) => setName(e.target.value)}
           disabled={isSubmitting}
-          className="mt-1 "
+          className="mt-1"
         />
       </div>
 
@@ -129,39 +132,41 @@ export function BrandForm({
 
       {/* Official Website */}
       <div>
-        <label className="block text-xs font-semibold text-slate-200">
+        <Label htmlFor="brand-website" className="block text-xs font-semibold text-foreground">
           Official Website
-        </label>
-        <input
+        </Label>
+        <Input
+          id="brand-website"
           type="url"
           placeholder="https://example.com"
           value={website}
           onChange={(e) => setWebsite(e.target.value)}
           disabled={isSubmitting}
-          className="mt-1 w-full h-9 rounded-lg border border-slate-700 bg-slate-950 px-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand font-mono disabled:opacity-50"
+          className="mt-1"
         />
       </div>
 
       {/* Description */}
       <div>
-        <label className="block text-xs font-semibold text-slate-200">
+        <Label htmlFor="brand-description" className="block text-xs font-semibold text-foreground">
           Description
-        </label>
-        <textarea
+        </Label>
+        <Textarea
+          id="brand-description"
           rows={3}
           placeholder="Short overview about the brand and product portfolio..."
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           disabled={isSubmitting}
-          className="mt-1 w-full p-2.5 rounded-lg border border-slate-700 bg-slate-950 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand resize-none disabled:opacity-50"
+          className="mt-1"
         />
       </div>
 
       {/* Active Toggle */}
-      <div className="flex items-center justify-between p-3 rounded-lg border border-slate-800 bg-slate-950/60">
+      <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/30">
         <div>
-          <p className="text-xs font-bold text-white">Active Status</p>
-          <p className="text-[11px] text-slate-400">
+          <p className="text-xs font-bold text-foreground">Active Status</p>
+          <p className="text-[11px] text-muted-foreground">
             Visible in catalog filters and storefront navigation
           </p>
         </div>
@@ -170,12 +175,12 @@ export function BrandForm({
           checked={isActive}
           onChange={(e) => setIsActive(e.target.checked)}
           disabled={isSubmitting}
-          className="h-4 w-4 rounded border-slate-700 text-sky-500 focus:ring-brand disabled:opacity-50 cursor-pointer"
+          className="h-4 w-4 rounded border-border text-brand focus:ring-brand disabled:opacity-50 cursor-pointer"
         />
       </div>
 
       {/* Form Buttons */}
-      <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+      <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border">
         <Button
           type="button"
           variant="outline"

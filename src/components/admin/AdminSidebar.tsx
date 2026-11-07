@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -35,6 +35,23 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface NavItem {
   label: string;
@@ -150,15 +167,17 @@ const navSections: NavSection[] = [
   },
 ];
 
-interface AdminSidebarProps {
-  isMobileOpen: boolean;
-  onMobileClose: () => void;
+export interface AdminSidebarProps {
+  isMobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
-export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps) {
+export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps = {}) {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
+  const { toggleSidebar, state, isMobile, setOpenMobile } = useSidebar();
   const { user, logout } = useAuth();
+
+  const isCollapsed = state === "collapsed" && !isMobile;
 
   const getInitials = (name?: string) => {
     if (!name) return "SA";
@@ -174,79 +193,93 @@ export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps)
     logout();
   };
 
-  return (
-    <>
-      {/* Mobile Backdrop */}
-      {isMobileOpen && (
-        <div
-          onClick={onMobileClose}
-          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm lg:hidden transition-opacity"
-        />
-      )}
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+      onMobileClose?.();
+    }
+  };
 
-      {/* Sidebar Container */}
-      <aside
-        className={cn(
-          "admin-sidebar fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-slate-950 border-r border-slate-800 text-slate-300 transition-all duration-300 select-none",
-          // Mobile state
-          isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-          // Desktop collapsed vs expanded
-          collapsed ? "lg:w-20" : "lg:w-64",
-          "w-72" // Default width for mobile drawer
-        )}
-      >
-        {/* Brand Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800/80 bg-slate-950">
+  return (
+    <Sidebar
+      collapsible="icon"
+      className="admin-sidebar border-r border-sidebar-border bg-sidebar text-sidebar-foreground select-none"
+    >
+      {/* Brand Header */}
+      <SidebarHeader className="p-0 border-b border-sidebar-border">
+        <div className="h-16 flex items-center justify-between px-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 transition-all duration-200">
+          {/* Expanded Brand View */}
           <Link
             href="/admin/dashboard"
-            className="flex items-center gap-3 overflow-hidden group"
+            onClick={handleNavClick}
+            className="flex items-center gap-2.5 overflow-hidden min-w-0 group-data-[collapsible=icon]:hidden"
           >
-            <div className="h-10 w-10 shrink-0 rounded-xl bg-gradient-to-br from-brand to-brand-deep flex items-center justify-center text-white">
+            <div className="h-9 w-9 shrink-0 rounded-xl bg-gradient-to-br from-brand to-brand-deep flex items-center justify-center text-white shadow-md">
               <Sparkles className="h-5 w-5" />
             </div>
-            {!collapsed && (
-              <div className="flex flex-col min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-extrabold text-base tracking-tight text-white">
-                    Shopora
-                  </span>
-                  <span className="rounded bg-sky-500/20 text-sky-400 text-[10px] font-bold px-1.5 py-0.2 border border-sky-500/30">
-                    PRO
-                  </span>
-                </div>
-                <span className="text-[11px] text-slate-400 truncate">
-                  Admin Command Center
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="font-extrabold text-base tracking-tight text-sidebar-foreground truncate">
+                  Shopora
+                </span>
+                <span className="rounded bg-sky-500/15 text-sky-500 dark:text-sky-400 text-[10px] font-bold px-1.5 py-0.2 border border-sky-500/30">
+                  PRO
                 </span>
               </div>
-            )}
+              <span className="text-[11px] text-muted-foreground truncate">
+                Admin Command Center
+              </span>
+            </div>
           </Link>
 
-          {/* Desktop Collapse Toggle */}
+          {/* Desktop Collapse Trigger (Expanded state) */}
           <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="hidden lg:flex h-7 w-7 rounded-lg items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition border border-slate-800"
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            type="button"
+            onClick={toggleSidebar}
+            className="hidden md:flex h-7 w-7 rounded-lg items-center justify-center text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent transition border border-sidebar-border shrink-0 cursor-pointer group-data-[collapsible=icon]:hidden"
+            title="Collapse sidebar"
           >
-            {collapsed ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <ChevronLeft className="h-4 w-4" />
-            )}
+            <ChevronLeft className="h-4 w-4" />
           </button>
+
+          {/* Collapsed Brand Icon & Trigger (Centered, with hover tooltip) */}
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  type="button"
+                  onClick={toggleSidebar}
+                  className="hidden group-data-[collapsible=icon]:flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-brand to-brand-deep text-white shadow-md hover:ring-2 hover:ring-brand/50 transition cursor-pointer relative group/collapse-btn"
+                />
+              }
+            >
+              <Sparkles className="h-5 w-5 transition group-hover/collapse-btn:scale-110" />
+              <span className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-sidebar border border-sidebar-border flex items-center justify-center text-muted-foreground group-hover/collapse-btn:text-sidebar-foreground shadow-sm">
+                <ChevronRight className="h-2.5 w-2.5" />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              Expand Sidebar
+            </TooltipContent>
+          </Tooltip>
         </div>
+      </SidebarHeader>
 
-        {/* Navigation Sections */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6 scrollbar-thin scrollbar-thumb-slate-800">
-          {navSections.map((section, idx) => (
-            <div key={idx} className="space-y-1">
-              {!collapsed ? (
-                <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
-                  {section.title}
-                </p>
-              ) : (
-                <div className="my-2 border-t border-slate-800/60" />
-              )}
+      {/* Navigation Sections */}
+      <SidebarContent className="px-2 py-3 space-y-4">
+        {navSections.map((section, idx) => (
+          <SidebarGroup key={section.title} className="p-0">
+            {/* Expanded Section Title */}
+            <SidebarGroupLabel className="px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1 group-data-[collapsible=icon]:hidden">
+              {section.title}
+            </SidebarGroupLabel>
 
+            {/* Collapsed Section Divider */}
+            {idx > 0 && (
+              <div className="hidden group-data-[collapsible=icon]:block my-2 border-t border-sidebar-border mx-2" />
+            )}
+
+            <SidebarMenu className="gap-1">
               {section.items.map((item) => {
                 const Icon = item.icon;
                 const isActive =
@@ -255,116 +288,138 @@ export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps)
                     : pathname.startsWith(item.href);
 
                 return (
-                  <Link
-                    key={`${section.title}-${item.label}`}
-                    href={item.href}
-                    onClick={() => {
-                      if (isMobileOpen) onMobileClose();
-                    }}
-                    title={collapsed ? item.label : undefined}
-                    className={cn(
-                      "flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all group relative",
-                      isActive
-                        ? "bg-gradient-to-r from-brand to-brand-deep text-white font-bold"
-                        : "text-slate-400 hover:text-slate-100 hover:bg-slate-900"
-                    )}
-                  >
-                    <Icon
+                  <SidebarMenuItem key={`${section.title}-${item.label}`}>
+                    <SidebarMenuButton
+                      render={
+                        <Link
+                          href={item.href}
+                          onClick={handleNavClick}
+                        />
+                      }
+                      isActive={isActive}
+                      tooltip={`${item.label}${item.badge !== undefined ? ` (${item.badge})` : ""}`}
                       className={cn(
-                        "h-4 w-4 shrink-0",
-                        isActive ? "text-white" : "text-slate-400 group-hover:text-sky-400"
+                        "h-9 px-3 text-xs font-semibold rounded-lg transition-all relative group-data-[collapsible=icon]:size-9 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:mx-auto",
+                        isActive
+                          ? "bg-gradient-to-r from-brand to-brand-deep text-white font-bold shadow-sm"
+                          : "text-sidebar-foreground/75 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent"
                       )}
-                    />
+                    >
+                      <Icon
+                        className={cn(
+                          "h-4 w-4 shrink-0 transition-colors",
+                          isActive
+                            ? "text-white"
+                            : "text-sidebar-foreground/70 group-hover/menu-button:text-brand"
+                        )}
+                      />
+                      <span className="truncate flex-1 group-data-[collapsible=icon]:hidden">
+                        {item.label}
+                      </span>
 
-                    {!collapsed && (
-                      <span className="truncate flex-1">{item.label}</span>
-                    )}
+                      {/* Expanded Mode Badge */}
+                      {item.badge !== undefined && (
+                        <Badge
+                          variant={item.badgeVariant || "secondary"}
+                          className="ml-auto text-[10px] px-1.5 py-0 h-4 font-bold shrink-0 group-data-[collapsible=icon]:hidden"
+                        >
+                          {item.badge}
+                        </Badge>
+                      )}
 
-                    {!collapsed && item.badge !== undefined && (
-                      <Badge
-                        variant={item.badgeVariant || "secondary"}
-                        className="text-[10px] px-1.5 py-0 h-4 font-bold shrink-0"
-                      >
-                        {item.badge}
-                      </Badge>
-                    )}
-
-                    {/* Collapsed Tooltip / Dot Badge */}
-                    {collapsed && item.badge !== undefined && (
-                      <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-sky-400 animate-pulse" />
-                    )}
-                  </Link>
+                      {/* Collapsed Mode Dot Badge */}
+                      {item.badge !== undefined && (
+                        <span
+                          className={cn(
+                            "hidden group-data-[collapsible=icon]:block absolute top-1.5 right-1.5 h-2 w-2 rounded-full ring-2 ring-sidebar",
+                            item.badgeVariant === "destructive"
+                              ? "bg-rose-500 animate-pulse"
+                              : item.badgeVariant === "success"
+                              ? "bg-emerald-400"
+                              : "bg-sky-400 animate-pulse"
+                          )}
+                        />
+                      )}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 );
               })}
-            </div>
-          ))}
-        </div>
+            </SidebarMenu>
+          </SidebarGroup>
+        ))}
+      </SidebarContent>
 
-        {/* Footer Actions */}
-        <div className="p-3 border-t border-slate-800/80 bg-slate-950/80 space-y-2">
-          {/* Quick link to live storefront */}
-          <Link
-            href="/"
-            target="_blank"
-            className={cn(
-              "flex items-center gap-2.5 rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-2 text-xs font-medium text-slate-300 hover:text-white hover:border-sky-500/50 hover:bg-slate-800 transition group",
-              collapsed && "justify-center px-0"
-            )}
-            title="View Live Storefront"
+      {/* Footer Actions */}
+      <SidebarFooter className="p-3 border-t border-sidebar-border space-y-2 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:space-y-2">
+        {/* Quick link to live storefront */}
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <Link
+                href="/"
+                target="_blank"
+                className="flex items-center gap-2.5 rounded-lg border border-sidebar-border bg-sidebar-accent/50 px-3 py-2 text-xs font-medium text-sidebar-foreground/80 hover:text-sidebar-foreground hover:border-brand/50 hover:bg-sidebar-accent transition group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:size-9 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:mx-auto"
+              />
+            }
           >
-            <ExternalLink className="h-3.5 w-3.5 text-sky-400 shrink-0" />
-            {!collapsed && (
-              <span className="truncate flex-1">View Storefront</span>
-            )}
-          </Link>
+            <ExternalLink className="h-3.5 w-3.5 text-brand shrink-0" />
+            <span className="truncate flex-1 group-data-[collapsible=icon]:hidden">
+              View Storefront
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            View Live Storefront
+          </TooltipContent>
+        </Tooltip>
 
-          {/* Dynamic Authenticated User Status Bar */}
-          <div
-            className={cn(
-              "flex items-center justify-between p-2 rounded-lg bg-slate-900/50 border border-slate-800",
-              collapsed && "justify-center"
-            )}
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="relative">
+        {/* Dynamic Authenticated User Status Bar */}
+        <div className="flex items-center justify-between p-2 rounded-lg bg-sidebar-accent/40 border border-sidebar-border group-data-[collapsible=icon]:p-1.5 group-data-[collapsible=icon]:justify-center">
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <div className="flex items-center gap-2.5 min-w-0 cursor-pointer" />
+              }
+            >
+              <div className="relative shrink-0">
                 {user?.avatar ? (
                   <img
                     src={user.avatar}
                     alt={user.name}
-                    className="h-8 w-8 rounded-full object-cover ring-2 ring-slate-800"
+                    className="h-8 w-8 rounded-full object-cover ring-2 ring-sidebar-border"
                   />
                 ) : (
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-slate-800">
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-sidebar-border">
                     {getInitials(user?.name)}
                   </div>
                 )}
-                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-slate-950" />
+                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-sidebar" />
               </div>
-              {!collapsed && (
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-white truncate">
-                    {user?.name || "Administrator"}
-                  </p>
-                  <p className="text-[10px] text-slate-400 truncate">
-                    {user?.email || "admin@shopora.com"}
-                  </p>
-                </div>
-              )}
-            </div>
+              <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
+                <p className="text-xs font-bold text-sidebar-foreground truncate">
+                  {user?.name || "Administrator"}
+                </p>
+                <p className="text-[10px] text-muted-foreground truncate">
+                  {user?.email || "admin@shopora.com"}
+                </p>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <div className="font-semibold text-xs">{user?.name || "Administrator"}</div>
+              <div className="text-[10px] text-muted-foreground">{user?.email || "admin@shopora.com"}</div>
+            </TooltipContent>
+          </Tooltip>
 
-            {!collapsed && (
-              <button
-                type="button"
-                onClick={handleSignOut}
-                title="Sign Out"
-                className="text-slate-400 hover:text-rose-400 p-1.5 rounded-md hover:bg-slate-800 transition"
-              >
-                <LogOut className="h-4 w-4" />
-              </button>
-            )}
-          </div>
+          {/* Logout action */}
+          <button
+            type="button"
+            onClick={handleSignOut}
+            title="Sign Out"
+            className="text-muted-foreground hover:text-rose-500 p-1.5 rounded-md hover:bg-sidebar-accent transition group-data-[collapsible=icon]:hidden cursor-pointer"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
         </div>
-      </aside>
-    </>
+      </SidebarFooter>
+    </Sidebar>
   );
 }

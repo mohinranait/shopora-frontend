@@ -12,7 +12,7 @@ export interface ButtonProps
     | "link"
     | "brand"
     | "brandDeep";
-  size?: "default" | "sm" | "lg" | "icon" | "xs";
+  size?: "default" | "sm" | "lg" | "icon" | "icon-sm" | "xs";
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -22,20 +22,20 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles: Record<string, string> = {
       default:
-        "bg-slate-900 text-white hover:bg-slate-800 focus-visible:ring-slate-900",
+        "bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring shadow-xs",
       destructive:
-        "bg-rose-600 text-white hover:bg-rose-700 focus-visible:ring-rose-600",
+        "bg-rose-600 text-white hover:bg-rose-700 focus-visible:ring-rose-600 shadow-xs",
       outline:
-        "border border-slate-700 bg-transparent text-slate-200 hover:bg-slate-800/80 hover:text-white focus-visible:ring-slate-700",
+        "border border-border bg-card text-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring shadow-xs",
       secondary:
-        "bg-slate-800 text-slate-100 hover:bg-slate-700 focus-visible:ring-slate-800",
+        "bg-secondary text-secondary-foreground hover:bg-secondary/80 focus-visible:ring-ring shadow-xs",
       ghost:
-        "text-slate-300 hover:bg-slate-800 hover:text-white focus-visible:ring-slate-700",
-      link: "text-sky-400 underline-offset-4 hover:underline",
+        "text-foreground/80 hover:bg-muted hover:text-foreground focus-visible:ring-ring",
+      link: "text-brand underline-offset-4 hover:underline",
       brand:
-        "bg-brand text-white hover:bg-brand-deep focus-visible:ring-brand",
+        "bg-brand text-white hover:bg-brand-deep focus-visible:ring-brand shadow-xs",
       brandDeep:
-        "bg-brand-deep text-white hover:bg-brand focus-visible:ring-brand-deep",
+        "bg-brand-deep text-white hover:bg-brand focus-visible:ring-brand-deep shadow-xs",
     };
 
     const sizeStyles: Record<string, string> = {
@@ -44,6 +44,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       sm: "h-8 px-3 text-xs rounded-md",
       lg: "h-11 px-6 text-base rounded-xl",
       icon: "h-9 w-9 p-0",
+      "icon-sm": "h-7 w-7 p-0",
     };
 
     return (

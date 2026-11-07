@@ -115,7 +115,7 @@ export const AlertDialogContent = React.forwardRef<
         role="alertdialog"
         aria-modal="true"
         className={cn(
-          "relative z-50 grid w-full max-w-lg gap-4 rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl animate-in zoom-in-95 duration-200",
+          "relative z-50 grid w-full max-w-lg gap-4 rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-2xl animate-in zoom-in-95 duration-200",
           className
         )}
         onClick={(e) => e.stopPropagation()}
@@ -159,7 +159,7 @@ export const AlertDialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h2
     ref={ref}
-    className={cn("text-lg font-bold text-white tracking-tight", className)}
+    className={cn("text-lg font-bold text-foreground tracking-tight", className)}
     {...props}
   />
 ));
@@ -171,7 +171,7 @@ export const AlertDialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-xs text-slate-400 leading-relaxed", className)}
+    className={cn("text-xs text-muted-foreground leading-relaxed", className)}
     {...props}
   />
 ));

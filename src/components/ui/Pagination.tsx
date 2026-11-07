@@ -113,25 +113,20 @@ export function Pagination({
   const startItem = totalItems !== undefined ? (totalItems === 0 ? 0 : (safeCurrentPage - 1) * pageSize + 1) : null;
   const endItem = totalItems !== undefined ? Math.min(safeCurrentPage * pageSize, totalItems) : null;
 
-  const isDark = variant === "dark";
-
   // Shared button style
   const btnBase =
     "inline-flex h-8 min-w-8 items-center justify-center rounded-lg border text-xs font-semibold transition-colors duration-150 cursor-pointer select-none disabled:pointer-events-none disabled:opacity-35";
 
-  const btnNormal = isDark
-    ? "border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white hover:border-slate-700"
-    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300";
+  const btnNormal =
+    "border-border bg-card text-foreground/80 hover:bg-muted hover:text-foreground hover:border-border";
 
-  const btnActive = isDark
-    ? "border-brand bg-brand text-white font-bold shadow-sm shadow-brand/20"
-    : "border-brand-deep bg-brand-deep text-white font-bold shadow-sm";
+  const btnActive =
+    "border-brand bg-brand text-white font-bold shadow-xs";
 
   return (
     <div
       className={cn(
-        "flex flex-col  sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 text-xs select-none",
-        isDark ? "text-slate-400 border-t  bg-slate-900/40" : "text-slate-600 border-t  border-slate-200 bg-slate-50/50",
+        "flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 text-xs select-none border-t border-border bg-card/40 text-muted-foreground",
         className
       )}
     >
@@ -142,14 +137,14 @@ export function Pagination({
             {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin text-brand" />}
             {totalItems !== undefined && startItem !== null && endItem !== null ? (
               <span>
-                Showing <strong className={isDark ? "text-slate-200 font-bold" : "text-slate-800 font-bold"}>{startItem}</strong>
-                {totalItems > 0 && <>–<strong className={isDark ? "text-slate-200 font-bold" : "text-slate-800 font-bold"}>{endItem}</strong></>} of{" "}
-                <strong className={isDark ? "text-slate-200 font-bold" : "text-slate-800 font-bold"}>{totalItems.toLocaleString()}</strong> {itemLabel}
+                Showing <strong className="text-foreground font-bold">{startItem}</strong>
+                {totalItems > 0 && <>–<strong className="text-foreground font-bold">{endItem}</strong></>} of{" "}
+                <strong className="text-foreground font-bold">{totalItems.toLocaleString()}</strong> {itemLabel}
               </span>
             ) : (
               <span>
-                Page <strong className={isDark ? "text-slate-200 font-bold" : "text-slate-800 font-bold"}>{safeCurrentPage}</strong> of{" "}
-                <strong className={isDark ? "text-slate-200 font-bold" : "text-slate-800 font-bold"}>{safeTotalPages}</strong>
+                Page <strong className="text-foreground font-bold">{safeCurrentPage}</strong> of{" "}
+                <strong className="text-foreground font-bold">{safeTotalPages}</strong>
               </span>
             )}
           </div>
@@ -157,20 +152,15 @@ export function Pagination({
 
         {/* Page size dropdown if onPageSizeChange is passed */}
         {onPageSizeChange && (
-          <div className="flex items-center gap-1.5 text-slate-400">
+          <div className="flex items-center gap-1.5 text-muted-foreground">
             <span className="text-[11px]">Rows:</span>
             <select
               value={pageSize}
               onChange={(e) => onPageSizeChange(Number(e.target.value))}
-              className={cn(
-                "h-7 rounded-md border text-xs px-2 py-0 font-medium focus:outline-none cursor-pointer",
-                isDark
-                  ? "bg-slate-900 border-slate-800 text-slate-200 focus:border-brand"
-                  : "bg-white border-slate-200 text-slate-700 focus:border-brand"
-              )}
+              className="h-7 rounded-md border text-xs px-2 py-0 font-medium focus:outline-none cursor-pointer bg-card border-border text-foreground focus:border-brand"
             >
               {pageSizeOptions.map((opt) => (
-                <option key={opt} value={opt}>
+                <option key={opt} value={opt} className="bg-popover text-popover-foreground">
                   {opt}
                 </option>
               ))}
@@ -213,7 +203,7 @@ export function Pagination({
             p === "..." ? (
               <span
                 key={`ellipsis-${idx}`}
-                className={cn("px-1 text-center font-bold tracking-widest", isDark ? "text-slate-600" : "text-slate-400")}
+                className="px-1 text-center font-bold tracking-widest text-muted-foreground/60"
               >
                 …
               </span>

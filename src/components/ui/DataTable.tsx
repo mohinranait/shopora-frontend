@@ -95,10 +95,10 @@ export function DataTable<TData>({
             <TableRow>
               <TableCell
                 colSpan={columns.length}
-                className="py-12 text-center text-slate-400"
+                className="py-12 text-center text-muted-foreground"
               >
                 <div className="flex flex-col items-center justify-center gap-2">
-                  <Loader2 className="h-6 w-6 text-sky-400 animate-spin" />
+                  <Loader2 className="h-6 w-6 text-brand animate-spin" />
                   <span className="text-xs">{loadingMessage}</span>
                 </div>
               </TableCell>
@@ -133,7 +133,7 @@ export function DataTable<TData>({
             <TableRow>
               <TableCell
                 colSpan={columns.length}
-                className="py-12 text-center text-slate-500"
+                className="py-12 text-center text-muted-foreground"
               >
                 {emptyMessage}
               </TableCell>
@@ -154,7 +154,6 @@ export function DataTable<TData>({
           pageSizeOptions={pagination.pageSizeOptions || [10, 20, 50, 100]}
           isLoading={isLoading}
           itemLabel={pagination.itemLabel}
-          variant="dark"
         />
       )}
     </div>

@@ -51,7 +51,7 @@ export function ImageUploadField({
   return (
     <div className="space-y-1.5 select-none">
       {label && (
-        <label className="block text-xs font-semibold text-slate-200">
+        <label className="block text-xs font-semibold text-foreground">
           {label} {required && <span className="text-rose-400">*</span>}
         </label>
       )}
@@ -59,10 +59,10 @@ export function ImageUploadField({
       {/* Main Field Card */}
       {value && value.url ? (
         /* Selected Image State */
-        <div className="relative rounded-xl border border-slate-700 bg-slate-900/90 p-3 flex items-center justify-between gap-4 group">
+        <div className="relative rounded-xl border border-border bg-card p-3 flex items-center justify-between gap-4 group">
           <div className="flex items-center gap-3.5 min-w-0">
             {/* Thumbnail Preview */}
-            <div className="relative h-16 w-16 rounded-lg overflow-hidden border border-slate-700 bg-slate-950 shrink-0">
+            <div className="relative h-16 w-16 rounded-lg overflow-hidden border border-border bg-muted shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={value.url}
@@ -74,18 +74,12 @@ export function ImageUploadField({
             {/* Info */}
             <div className="min-w-0 flex-1 space-y-1">
               <div className="flex items-center gap-2">
-                {/* <Badge variant="brand" className="text-[10px] font-mono px-1.5 py-0">
-                  {value.useMediaId ? `UseMedia #${value.useMediaId}` : "Linked"}
-                </Badge> */}
                 {value.alt && (
-                  <span className="text-[11px] text-slate-400 truncate max-w-xs font-medium">
-                  Alt:  &quot;{value.alt}&quot;
+                  <span className="text-[11px] text-muted-foreground truncate max-w-xs font-medium">
+                  Alt: &quot;{value.alt}&quot;
                   </span>
                 )}
               </div>
-              {/* <p className="text-xs font-mono text-slate-400 truncate">
-                {value.url}
-              </p> */}
             </div>
           </div>
 
@@ -117,18 +111,18 @@ export function ImageUploadField({
         /* Empty / Placeholder State */
         <div
           onClick={() => setModalOpen(true)}
-          className="border-2 border-dashed border-slate-700 hover:border-sky-500 rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-left cursor-pointer transition-all bg-slate-900/40 hover:bg-slate-900/80 group"
+          className="border-2 border-dashed border-border hover:border-brand rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-left cursor-pointer transition-all bg-muted/20 hover:bg-muted/50 group"
         >
           <div className="flex items-center gap-3.5">
-            <div className="h-11 w-11 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
+            <div className="h-11 w-11 rounded-lg bg-brand/10 border border-brand/20 flex items-center justify-center text-brand shrink-0">
               <ImageIcon className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs font-bold text-white group-hover:text-sky-400 transition-colors flex items-center gap-1.5">
+              <p className="text-xs font-bold text-foreground group-hover:text-brand transition-colors flex items-center gap-1.5">
                 <span>Select from Media Library</span>
-                <Sparkles className="h-3 w-3 text-sky-400" />
+                <Sparkles className="h-3 w-3 text-brand" />
               </p>
-              <p className="text-[11px] text-slate-400 mt-0.5">
+              <p className="text-[11px] text-muted-foreground mt-0.5">
                 {helperText}
               </p>
             </div>
