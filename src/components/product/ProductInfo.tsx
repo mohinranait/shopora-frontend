@@ -118,11 +118,19 @@ export function ProductInfo({
       return false;
     }
     const title = activeVariant ? `${product.name} (${activeVariant.title})` : product.name;
-    const mainImg =
-      (activeVariant?.image as any)?.media?.url || (typeof activeVariant?.image === "string" ? activeVariant.image : null) ||
-      (product.mainImage as any)?.media?.url || (typeof product.mainImage === "string" ? product.mainImage : null) ||
-      (product as any).mainImageUseMedia?.media?.url ||
-      (product.images && product.images.length > 0 ? (product.images[0].url || (product.images[0] as any).useMedia?.media?.url) : "");
+    const variantImg =
+      typeof activeVariant?.image === "string"
+        ? activeVariant.image
+        : (activeVariant?.image?.media?.url ?? activeVariant?.useMedia?.media?.url);
+    const prodMainImg =
+      typeof product.mainImage === "string"
+        ? product.mainImage
+        : product.mainImage?.media?.url;
+    const firstGalleryImg =
+      product.images && product.images.length > 0
+        ? product.images[0].url || product.images[0].image?.media?.url || product.images[0].useMedia?.media?.url || ""
+        : "";
+    const mainImg = variantImg || prodMainImg || firstGalleryImg || "";
 
     setIsAdding(true);
     const ok = await addItem(
@@ -148,7 +156,7 @@ export function ProductInfo({
               sku: activeVariant.sku,
               price: activeVariant.price,
               stock: activeVariant.stock,
-              image: (activeVariant.image as any)?.media?.url || (typeof activeVariant.image === "string" ? activeVariant.image : null),
+              image: variantImg || null,
               attributes: activeVariant.attributes || null,
             }
           : null,

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useState, useEffect } from "react";
+import React, { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -32,6 +32,15 @@ import { IProductItem } from "@/types";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
+type TabType = "all" | "platform" | "vendor" | "pending" | "low_stock";
+
+function getInitialTab(filter: string | null): TabType {
+  if (filter === "pending" || filter === "low_stock" || filter === "platform" || filter === "vendor") {
+    return filter;
+  }
+  return "all";
+}
+
 function AdminProductsInner() {
   const searchParams = useSearchParams();
   const filterParam = searchParams.get("filter");
@@ -41,16 +50,14 @@ function AdminProductsInner() {
   const [deleteProduct] = useDeleteProductMutation();
 
   const products = data?.products || [];
-  const [activeTab, setActiveTab] = useState<
-    "all" | "platform" | "vendor" | "pending" | "low_stock"
-  >(filterParam === "pending" ? "pending" : "all");
+  const [prevFilterParam, setPrevFilterParam] = useState(filterParam);
+  const [activeTab, setActiveTab] = useState<TabType>(() => getInitialTab(filterParam));
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    if (filterParam === "pending") {
-      setActiveTab("pending");
-    }
-  }, [filterParam]);
+  if (filterParam !== prevFilterParam) {
+    setPrevFilterParam(filterParam);
+    setActiveTab(getInitialTab(filterParam));
+  }
 
   const handleApprove = async (id: string | number) => {
     try {
@@ -281,10 +288,10 @@ function AdminProductsInner() {
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden shrink-0 flex items-center justify-center">
-                            {((prod.mainImage as any)?.media?.url || (typeof prod.mainImage === "string" ? prod.mainImage : null)) ? (
+                            {(typeof prod.mainImage === "string" ? prod.mainImage : prod.mainImage?.media?.url) ? (
                               // eslint-disable-next-line @next/next/no-img-element
                               <img
-                                src={((prod.mainImage as any)?.media?.url || (typeof prod.mainImage === "string" ? prod.mainImage : "")) as string}
+                                src={typeof prod.mainImage === "string" ? prod.mainImage : prod.mainImage?.media?.url}
                                 alt={prod.name}
                                 className="h-full w-full object-cover"
                               />

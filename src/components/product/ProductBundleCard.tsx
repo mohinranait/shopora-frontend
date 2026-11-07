@@ -120,9 +120,9 @@ export function ProductBundleCard({ productId }: ProductBundleCardProps) {
           {/* Main Product Thumbnail */}
           <div className="flex flex-col items-center">
             <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-2xl bg-white border-2 border-indigo-500/30 p-2 shadow-xs relative overflow-hidden flex items-center justify-center">
-              {((mainProduct.mainImage as any)?.media?.url || (typeof mainProduct.mainImage === "string" ? mainProduct.mainImage : null)) ? (
+              {(typeof mainProduct.mainImage === "string" ? mainProduct.mainImage : mainProduct.mainImage?.media?.url) ? (
                 <Image
-                  src={((mainProduct.mainImage as any)?.media?.url || (typeof mainProduct.mainImage === "string" ? mainProduct.mainImage : "")) as string}
+                  src={typeof mainProduct.mainImage === "string" ? mainProduct.mainImage : mainProduct.mainImage?.media?.url || ""}
                   alt={mainProduct.name}
                   fill
                   sizes="96px"
@@ -161,9 +161,9 @@ export function ProductBundleCard({ productId }: ProductBundleCardProps) {
                       isSelected ? "border-brand" : "border-slate-200"
                     }`}
                   >
-                    {Boolean((companion.mainImage as any)?.media?.url || (typeof companion.mainImage === "string" ? companion.mainImage : null)) && (
+                    {Boolean(typeof companion.mainImage === "string" ? companion.mainImage : companion.mainImage?.media?.url) && (
                       <Image
-                        src={((companion.mainImage as any)?.media?.url || (typeof companion.mainImage === "string" ? companion.mainImage : "")) as string}
+                        src={typeof companion.mainImage === "string" ? companion.mainImage : companion.mainImage?.media?.url || ""}
                         alt={companion.name}
                         fill
                         sizes="96px"

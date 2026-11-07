@@ -5,14 +5,36 @@ import Link from "next/link";
 import { Star, ShoppingBag, Heart, Check, Store } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import type { IProductItem, IMockProduct } from "@/types";
+import type { IProductItem } from "@/types";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/hooks/useWishlist";
 
-export type ProductCardData = IProductItem | IMockProduct;
+export type ProductCardData = IProductItem;
 
 interface ProductCardProps {
   product: ProductCardData;
+}
+
+/**
+ * Helper to safely resolve the primary product image URL from Prisma relational data or API payload
+ */
+function resolveProductImageUrl(product: IProductItem): string {
+  // 1. Check mainImage relation (UseMedia object with media.url) or direct URL string
+  if (product.mainImage) {
+    if (typeof product.mainImage === "object" && product.mainImage.media?.url) {
+      return product.mainImage.media.url;
+    }
+  }
+
+  // 2. Check product gallery images list
+  if (product.images && product.images.length > 0) {
+    const firstImg = product.images[0];
+    if (firstImg) {
+      if (firstImg.image?.media?.url) return firstImg.image.media.url;
+    }
+  }
+
+  return "/images/placeholder-product.png";
 }
 
 /**
@@ -47,8 +69,8 @@ export function ProductCardSkeleton() {
 }
 
 /**
- * Universal Storefront Product Card
- * Supports both real backend IProductItem and IMockProduct with complete null-safety
+ * Storefront Product Card
+ * Strictly typed with DB schema relations (Product, UseMedia, SellerProfile, Category)
  */
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { isWishlisted: checkWishlist, toggleWishlist, isToggling } = useWishlist();
@@ -58,8 +80,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addItem } = useCart();
   const router = useRouter();
 
-  // Variable products need an option (size, colour…) picked on the product page
-  const needsOptions = "productType" in product && product.productType === "VARIABLE";
+  // Variable products need an option (size, colour, etc.) chosen on the product page
+  const needsOptions = product.productType === "VARIABLE";
+  const imageUrl = resolveProductImageUrl(product);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -68,13 +91,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       return;
     }
     setIsAdding(true);
-    const mainImg =
-      ("mainImage" in product && product.mainImage) ||
-      ((product as any).mainImageUseMedia?.media?.url) ||
-      ("images" in product && Array.isArray((product as any).images) && (product as any).images[0]?.url) ||
-      ("images" in product && Array.isArray((product as any).images) && ((product as any).images[0] as any)?.useMedia?.media?.url) ||
-      ("image" in product && typeof product.image === "string" ? product.image : "") ||
-      "";
 
     const ok = await addItem({
       productId: String(product.id),
@@ -84,24 +100,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         id: String(product.id),
         name: product.name,
         slug: product.slug,
-        mainImage: mainImg,
+        mainImage: imageUrl,
         basePrice: product.basePrice,
         stock: product.stock,
-        isPlatformOwned: false,
-        isFreeShipping: "isFreeShipping" in product ? Boolean(product.isFreeShipping) : false,
+        isPlatformOwned: product.isPlatformOwned ?? false,
+        isFreeShipping: Boolean(product.isFreeShipping),
       },
-      seller:
-        "seller" in product && product.seller
-          ? {
-              id: String((product.seller as any).id),
-              storeName: (product.seller as any).storeName,
-              storeSlug: (product.seller as any).storeSlug,
-              storeLogo: null,
-              isVerified: true,
-            }
-          : null,
+      seller: product.seller
+        ? {
+            id: String(product.seller.id),
+            storeName: product.seller.storeName,
+            storeSlug: product.seller.storeSlug,
+            storeLogo:
+              typeof product.seller.logo === "string"
+                ? product.seller.logo
+                : product.seller.logo?.media?.url ?? product.seller.storeLogo ?? null,
+            isVerified: product.seller.isVerified ?? true,
+          }
+        : null,
       unitPrice: product.basePrice,
-      comparePrice: product.comparePrice,
+      comparePrice: product.comparePrice ?? null,
       maxAvailableStock: product.stock,
     });
     setIsAdding(false);
@@ -119,69 +137,25 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   // Safe discount percentage calculation
   const discountPercent =
-    "discountPercent" in product && product.discountPercent
-      ? product.discountPercent
-      : comparePrice && comparePrice > basePrice
+    product.discountPercent ??
+    (comparePrice && comparePrice > basePrice
       ? Math.round(((comparePrice - basePrice) / comparePrice) * 100)
-      : null;
+      : null);
 
-  // Safe trending / hot flag
-  const isHot = Boolean(
-    ("isTrending" in product && product.isTrending) ||
-      ("isHot" in product && product.isHot)
-  );
+  // Trending / Hot badge from DB model
+  const isHot = Boolean(product.isTrending || product.isHot);
 
-  // Safe image resolution
-  let imageUrl = "/images/placeholder-product.png";
-  if ((product as any).mainImage?.media?.url) {
-    imageUrl = (product as any).mainImage.media.url;
-  } else if ("mainImage" in product && typeof (product as any).mainImage === "string" && (product as any).mainImage) {
-    imageUrl = (product as any).mainImage;
-  } else if ("mainImageUseMedia" in product && (product as any).mainImageUseMedia?.media?.url) {
-    imageUrl = (product as any).mainImageUseMedia.media.url;
-  } else if ("image" in product && typeof (product as any).image === "string" && (product as any).image) {
-    imageUrl = (product as any).image;
-  } else if ("image" in product && (product as any).image?.media?.url) {
-    imageUrl = (product as any).image.media.url;
-  } else if (
-    "images" in product &&
-    Array.isArray(product.images) &&
-    product.images.length > 0
-  ) {
-    const firstImg = product.images[0] as any;
-    const resolvedUrl = firstImg?.url || firstImg?.useMedia?.media?.url || firstImg?.image?.media?.url;
-    if (resolvedUrl) imageUrl = resolvedUrl;
-  }
+  // Category display name
+  const categoryName = product.category?.name || "Collection";
 
-  // Safe category display name
-  let categoryName = "Collection";
-  if (typeof product.category === "object" && product.category?.name) {
-    categoryName = product.category.name;
-  } else if (typeof product.category === "string" && product.category) {
-    categoryName = product.category;
-  }
+  // Seller display name
+  const sellerName =
+    product.seller?.storeName ||
+    (product.isPlatformOwned ? "Shopora Direct" : "Shopora Store");
 
-  // Safe seller display name
-  let sellerName = "Shopora Direct";
-  if (product.seller) {
-    if ("storeName" in product.seller && product.seller.storeName) {
-      sellerName = product.seller.storeName;
-    } else if ("name" in product.seller && product.seller.name) {
-      sellerName = product.seller.name;
-    }
-  }
-
-  // Safe rating & review count
-  const rating =
-    "ratingAverage" in product
-      ? product.ratingAverage || 5.0
-      : product.rating ?? 5.0;
-
-  const reviewCount =
-    "ratingCount" in product
-      ? product.ratingCount ?? 0
-      : product.reviewCount ?? 0;
-
+  // Safe rating & review count from DB model
+  const rating = product.ratingAverage ? Number(product.ratingAverage.toFixed(1)) : 5.0;
+  const reviewCount = product.ratingCount ?? 0;
   const inStock = (product.stock ?? 0) > 0;
 
   return (
@@ -190,7 +164,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="relative aspect-square overflow-hidden bg-slate-50 p-3 flex items-center justify-center">
         {/* Discount / Hot Badge */}
         <div className="absolute left-2.5 top-2.5 z-10 flex flex-col gap-1">
-          {discountPercent && discountPercent > 0 && (
+          {discountPercent !== null && discountPercent > 0 && (
             <span className="rounded bg-rose-600 px-2 py-0.5 text-[11px] font-bold text-white shadow-2xs">
               -{discountPercent}%
             </span>

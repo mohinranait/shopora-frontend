@@ -1,6 +1,7 @@
 import { IUseMediaItem } from "./media.type";
 import { IPaginationMeta } from "./common.type";
 import { IReviewItem } from "./review.type";
+import { IProductQuestion } from "./question.type";
 
 export type ProductType = "SIMPLE" | "VARIABLE";
 export type ProductStatus = "PUBLISHED" | "UNPUBLISHED" | "ARCHIVED";
@@ -9,14 +10,13 @@ export type ProductApprovalStatus = "DRAFT" | "PENDING" | "APPROVED" | "REJECTED
 export interface IProductImageItem {
   id?: string;
   productId?: string;
-  url: string;
+  url?: string;
   altText?: string | null;
   displayOrder?: number;
   isPrimary?: boolean;
   imageId?: string | null;
-  useMediaId?: string | null;
   image?: IUseMediaItem | null;
-  useMedia?: IUseMediaItem | null;
+  createdAt?: string;
 }
 
 export interface IProductVariantItem {
@@ -31,10 +31,9 @@ export interface IProductVariantItem {
   lowStockThreshold?: number;
   image?: string | IUseMediaItem | null;
   imageId?: string | null;
-  useMediaId?: string | null;
-  useMedia?: IUseMediaItem | null;
   barcode?: string | null;
   weightKg?: number | null;
+  dimensions?: { length?: number; width?: number; height?: number } | null;
   attributes?: Record<string, string>;
   attributeValueIds?: string[];
   attributeValues?: Array<{
@@ -48,6 +47,8 @@ export interface IProductVariantItem {
   }>;
   isDefault?: boolean;
   isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface IProductSelectedAttributeValue {
@@ -75,13 +76,13 @@ export interface IProductItem {
   slug: string;
   sku: string;
   shortDescription?: string | null;
-  description: string;
+  description?: string;
   categoryId: string;
-  category?: { id: string; name: string; slug: string };
+  category?: { id: string; name: string; slug: string; description?: string | null; icon?: string | null } | null;
   brandId?: string | null;
   brand?: { id: string; name: string; slug: string; logo?: string | IUseMediaItem | null } | null;
   sellerId?: string | null;
-  seller?: { id: string; storeName: string; storeSlug: string; logo?: string | IUseMediaItem | null; storeLogo?: string | null } | null;
+  seller?: { id: string; storeName: string; storeSlug: string; logo?: string | IUseMediaItem | null; storeLogo?: string | null; isVerified?: boolean; name?: string } | null;
   isPlatformOwned: boolean;
   approvalStatus: ProductApprovalStatus;
   rejectionReason?: string | null;
@@ -92,9 +93,8 @@ export interface IProductItem {
   costPrice?: number | null;
   stock: number;
   lowStockThreshold: number;
-  mainImage: string | IUseMediaItem;
+  mainImage?: IUseMediaItem | null;
   mainImageId?: string | null;
-  mainImageUseMediaId?: string | null;
   ratingAverage: number;
   ratingCount: number;
   totalSold: number;
@@ -102,6 +102,7 @@ export interface IProductItem {
   variants?: IProductVariantItem[];
   selectedAttributes?: IProductSelectedAttributeItem[];
   reviews?: IReviewItem[];
+  questions?: IProductQuestion[];
   tags?: string[];
   bundleProductIds?: string[];
   warranty?: string | null;
@@ -115,7 +116,10 @@ export interface IProductItem {
   metaKeywords?: string | null;
   isFeatured?: boolean;
   isTrending?: boolean;
+  isHot?: boolean;
+  discountPercent?: number | null;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface IProductSelectedAttributeInput {
@@ -135,7 +139,6 @@ export interface IProductVariantInput {
   lowStockThreshold?: number;
   image?: string | IUseMediaItem | null;
   imageId?: string | null;
-  useMediaId?: string | null;
   barcode?: string | null;
   weightKg?: number | null;
   dimensions?: {
@@ -150,10 +153,9 @@ export interface IProductVariantInput {
 }
 
 export interface IProductImageInput {
-  url?: string;
-  imageId?: string;
-  useMediaId?: string;
-  altText?: string;
+  url?: string | null;
+  imageId?: string | null;
+  altText?: string | null;
   displayOrder?: number;
   isPrimary?: boolean;
 }
@@ -171,9 +173,8 @@ export interface ICreateProductPayload {
   costPrice?: number | null;
   stock?: number;
   lowStockThreshold?: number;
-  mainImage?: string;
+  mainImage?: string | IUseMediaItem | null;
   mainImageId?: string | null;
-  mainImageUseMediaId?: string | null;
   images?: IProductImageInput[];
   selectedAttributes?: IProductSelectedAttributeInput[];
   variants?: IProductVariantInput[];
@@ -203,6 +204,59 @@ export interface IUpdateProductPayload extends Partial<ICreateProductPayload> {
 export interface IProductListResponse {
   products: IProductItem[];
   meta?: IPaginationMeta;
+}
+
+export interface IAutocompleteProduct {
+  id: string;
+  name: string;
+  slug: string;
+  basePrice: number;
+  comparePrice?: number | null;
+  mainImage?: string | IUseMediaItem | null;
+  stock?: number;
+}
+
+export interface IAutocompleteCategory {
+  id: string;
+  name: string;
+  slug: string;
+  image?: string | null;
+}
+
+export interface IAutocompleteBrand {
+  id: string;
+  name: string;
+  slug: string;
+  logo?: string | null;
+}
+
+export interface IAutocompleteSuggestionsResponse {
+  products: IAutocompleteProduct[];
+  categories: IAutocompleteCategory[];
+  brands: IAutocompleteBrand[];
+}
+
+export interface IProductBundleItem {
+  id: string;
+  name: string;
+  slug: string;
+  basePrice: number;
+  comparePrice?: number | null;
+  mainImage?: string | IUseMediaItem | null;
+  stock: number;
+}
+
+export interface IProductBundleResponse {
+  mainProduct: IProductBundleItem;
+  companionProducts: IProductBundleItem[];
+  bundleItems?: IProductBundleItem[];
+  bundleDiscountPercent: number;
+  discountPercentage?: number;
+  originalTotal?: number;
+  bundleTotal: number;
+  discountedTotal?: number;
+  totalSavings?: number;
+  savings?: number;
 }
 
 export interface IMockProduct {

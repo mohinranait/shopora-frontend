@@ -33,7 +33,6 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import {
-  useGetCategoriesQuery,
   useGetBrandsQuery,
   useGetAttributesQuery,
   useGetProductsQuery,
@@ -44,6 +43,8 @@ import {
 import { getApiErrorMessage } from "@/services/api";
 import {
   IProductItem,
+  IProductImageItem,
+  IProductVariantItem,
   ICreateProductPayload,
   IProductVariantInput,
   IProductImageInput,
@@ -65,10 +66,62 @@ interface SelectedAttrGroup {
   selectedValues: string[];
 }
 
+interface FormGalleryImage {
+  url: string;
+  imageId?: string;
+  useMediaId?: string;
+  altText?: string;
+}
+
 interface ProductFormProps {
   initialData?: IProductItem;
   isEdit?: boolean;
   backUrl?: string;
+}
+
+/**
+ * Helpers to safely extract media info from DB relational models without any typecasting
+ */
+function getInitialMainImageUrl(product?: IProductItem): string {
+  if (!product?.mainImage) return "";
+  if (typeof product.mainImage === "string") return product.mainImage;
+  if (typeof product.mainImage === "object" && product.mainImage.media?.url) {
+    return product.mainImage.media.url;
+  }
+  return "";
+}
+
+function getInitialMainImageUseMediaId(product?: IProductItem): string | undefined {
+  if (product?.mainImageId) return product.mainImageId;
+  if (typeof product?.mainImage === "object" && product?.mainImage?.id) {
+    return product.mainImage.id;
+  }
+  return undefined;
+}
+
+function getInitialGalleryImages(images?: IProductImageItem[]): FormGalleryImage[] {
+  if (!images || images.length === 0) return [];
+  return images.map((img) => {
+    const resolvedUrl =
+      img.url ||
+      img.image?.media?.url ||
+      img.useMedia?.media?.url ||
+      "";
+    const mediaId = img.imageId ?? img.image?.id ?? undefined;
+    return {
+      url: resolvedUrl,
+      imageId: mediaId,
+      useMediaId: mediaId,
+      altText: img.altText ?? undefined,
+    };
+  });
+}
+
+function resolveVariantImageUrl(v: IProductVariantItem): string | null {
+  if (typeof v.image === "string") return v.image;
+  if (typeof v.image === "object" && v.image?.media?.url) return v.image.media.url;
+  if (v.useMedia?.media?.url) return v.useMedia.media.url;
+  return null;
 }
 
 export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/products" }: ProductFormProps) {
@@ -77,8 +130,8 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
   // ==========================================
   // Global Data Catalogs (RTK Query Cache)
   // ==========================================
-  const { data: categories = [], isLoading: isCategoriesLoading } = useGetCategoriesQuery();
-  const { data: brands = [], isLoading: isBrandsLoading } = useGetBrandsQuery(true);
+  // const { data: categories = [], isLoading: isCategoriesLoading } = useGetCategoriesQuery();
+  const { data: brands = [] } = useGetBrandsQuery(true);
   const { data: availableAttributes = [] } = useGetAttributesQuery(true);
   const [generateCombinations, { isLoading: isGenerating }] = useGenerateCombinationsMutation();
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
@@ -108,7 +161,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
   // Form State: 2. Product Type
   // ==========================================
   const [productType, setProductType] = useState<"SIMPLE" | "VARIABLE">(
-    (initialData?.productType as "SIMPLE" | "VARIABLE") || "SIMPLE"
+    initialData?.productType || "SIMPLE"
   );
 
   // ==========================================
@@ -127,19 +180,12 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
   // ==========================================
   // Form State: 4. Media
   // ==========================================
-  const [mainImageUrl, setMainImageUrl] = useState((initialData?.mainImage as any)?.media?.url || (typeof initialData?.mainImage === "string" ? initialData.mainImage : "") || "");
-  const [mainImageUseMediaId, setMainImageUseMediaId] = useState<string | undefined>(
-    (initialData?.mainImageId ?? initialData?.mainImageUseMediaId ?? undefined) as string | undefined
+  const [mainImageUrl, setMainImageUrl] = useState(() => getInitialMainImageUrl(initialData));
+  const [mainImageUseMediaId, setMainImageUseMediaId] = useState<string | undefined>(() =>
+    getInitialMainImageUseMediaId(initialData)
   );
-  const [galleryImages, setGalleryImages] = useState<
-    Array<{ url: string; useMediaId?: string; imageId?: string; altText?: string }>
-  >(
-    initialData?.images?.map((img) => ({
-      url: (img as any).image?.media?.url || (img as any).useMedia?.media?.url || img.url,
-      imageId: (img.imageId ?? img.useMediaId ?? undefined) as string | undefined,
-      useMediaId: (img.imageId ?? img.useMediaId ?? undefined) as string | undefined,
-      altText: img.altText ?? undefined,
-    })) || []
+  const [galleryImages, setGalleryImages] = useState<FormGalleryImage[]>(() =>
+    getInitialGalleryImages(initialData?.images)
   );
 
   // Media Modal Trigger Target
@@ -172,11 +218,12 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       costPrice: v.costPrice,
       stock: v.stock,
       lowStockThreshold: v.lowStockThreshold || 5,
-      image: (v.image as any)?.media?.url || (typeof v.image === "string" ? v.image : null),
-      imageId: v.imageId ?? v.useMediaId,
-      useMediaId: v.imageId ?? v.useMediaId,
+      image: resolveVariantImageUrl(v),
+      imageId: v.imageId ?? v.useMediaId ?? (typeof v.image === "object" ? v.image?.id : null) ?? null,
+      useMediaId: v.useMediaId ?? v.imageId ?? (typeof v.image === "object" ? v.image?.id : null) ?? null,
       barcode: v.barcode,
       weightKg: v.weightKg,
+      dimensions: v.dimensions ?? null,
       isDefault: v.isDefault,
       isActive: v.isActive,
       attributeValueIds: v.attributeValues?.map((av) => av.attributeValueId) || [],
@@ -211,7 +258,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
   // Form State: 8. Status & Flags
   // ==========================================
   const [status, setStatus] = useState<"PUBLISHED" | "UNPUBLISHED" | "ARCHIVED">(
-    (initialData?.status as "PUBLISHED" | "UNPUBLISHED" | "ARCHIVED") || "PUBLISHED"
+    initialData?.status || "PUBLISHED"
   );
   const [isFeatured, setIsFeatured] = useState(initialData?.isFeatured ?? false);
   const [isTrending, setIsTrending] = useState(initialData?.isTrending ?? false);
@@ -246,14 +293,14 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
     } else if (mediaTarget === "gallery") {
       setGalleryImages((prev) => [
         ...prev,
-        { url: payload.url, useMediaId: payload.useMediaId, altText: payload.alt },
+        { url: payload.url, imageId: payload.useMediaId, useMediaId: payload.useMediaId, altText: payload.alt },
       ]);
       toast.success("Image added to gallery.");
     } else if (typeof mediaTarget === "object" && "variantIndex" in mediaTarget) {
       const idx = mediaTarget.variantIndex;
       setVariantRows((prev) =>
         prev.map((r, i) =>
-          i === idx ? { ...r, image: payload.url, useMediaId: payload.useMediaId } : r
+          i === idx ? { ...r, image: payload.url, imageId: payload.useMediaId, useMediaId: payload.useMediaId } : r
         )
       );
       toast.success("Variant image assigned.");
@@ -361,9 +408,19 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
           stock: existingRow?.stock ?? (typeof stock === "number" ? stock : 0),
           lowStockThreshold: existingRow?.lowStockThreshold ?? (typeof lowStockThreshold === "number" ? lowStockThreshold : 5),
           image: existingRow?.image || null,
-          useMediaId: existingRow?.useMediaId || null,
+          imageId: existingRow?.imageId || existingRow?.useMediaId || null,
+          useMediaId: existingRow?.useMediaId || existingRow?.imageId || null,
           barcode: existingRow?.barcode || null,
           weightKg: existingRow?.weightKg ?? (typeof weightKg === "number" ? weightKg : null),
+          dimensions: existingRow?.dimensions ?? (
+            typeof lengthCm === "number" || typeof widthCm === "number" || typeof heightCm === "number"
+              ? {
+                  length: typeof lengthCm === "number" ? lengthCm : undefined,
+                  width: typeof widthCm === "number" ? widthCm : undefined,
+                  height: typeof heightCm === "number" ? heightCm : undefined,
+                }
+              : null
+          ),
           isDefault: i === 0,
           isActive: true,
           attributeValueIds: v.attributeValueIds,
@@ -536,7 +593,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
 
       // Build Gallery Images Payload
       const imagesPayload: IProductImageInput[] = galleryImages.map((img, idx) => ({
-        url: (img as any).image?.media?.url || (img as any).useMedia?.media?.url || img.url,
+        url: img.url,
         imageId: img.imageId ?? img.useMediaId,
         useMediaId: img.imageId ?? img.useMediaId,
         altText: img.altText || name,
@@ -560,7 +617,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
         lowStockThreshold: typeof lowStockThreshold === "number" ? lowStockThreshold : 5,
         mainImage: mainImageUrl,
         mainImageId: mainImageUseMediaId,
-        mainImageUseMediaId,
+        mainImageUseMediaId: mainImageUseMediaId,
         images: imagesPayload,
         selectedAttributes: selectedAttributesPayload,
         variants:
@@ -586,6 +643,9 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                   typeof v.weightKg === "number" && !isNaN(v.weightKg)
                     ? v.weightKg
                     : null,
+                dimensions: v.dimensions ?? null,
+                imageId: v.imageId ?? v.useMediaId ?? null,
+                useMediaId: v.useMediaId ?? v.imageId ?? null,
                 isActive: v.isActive !== false,
               }))
             : [],
@@ -1346,7 +1406,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                                   />
                                 )}
                                 <span>{val.value}</span>
-                                {isChecked && <Check className="h-3 w-3 stroke-[3]" />}
+                                {isChecked && <Check className="h-3 w-3 stroke-3" />}
                               </button>
                             );
                           })}
@@ -1360,7 +1420,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
 
             {/* Step 2: "Generate Variants" Action Button */}
             {selectedAttributeGroups.length > 0 && (
-              <div className="pt-2 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-purple-950/60 to-slate-900 border border-purple-800/40">
+              <div className="pt-2 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-linear-to-r from-purple-950/60 to-slate-900 border border-purple-800/40">
                 <div className="space-y-0.5">
                   <h4 className="text-xs font-bold text-purple-200 flex items-center gap-1.5">
                     <Sparkles className="h-4 w-4 text-purple-400" />
@@ -1492,7 +1552,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
 
                 {/* Table */}
                 <div className="rounded-xl border border-slate-800 overflow-x-auto shadow-inner">
-                  <table className="w-full text-left text-xs min-w-[950px]">
+                  <table className="w-full text-left text-xs min-w-237.5">
                     <thead className="bg-slate-950 text-[11px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">
                       <tr>
                         <th className="py-2.5 px-3">Image</th>
@@ -1524,7 +1584,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                               >
                                 {v.image ? (
                                   <img
-                                    src={((v.image as any)?.media?.url || (typeof v.image === "string" ? v.image : "")) as string}
+                                    src={typeof v.image === "string" ? v.image : v.image?.media?.url}
                                     alt={v.title}
                                     className="h-full w-full object-contain"
                                   />
@@ -1948,7 +2008,11 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                         <div className="h-9 w-9 rounded-lg bg-slate-800 overflow-hidden shrink-0 relative flex items-center justify-center">
                           {pItem?.mainImage ? (
                             <img
-                              src={((pItem.mainImage as any)?.media?.url || (typeof pItem.mainImage === "string" ? pItem.mainImage : "")) as string}
+                              src={
+                                typeof pItem.mainImage === "string"
+                                  ? pItem.mainImage
+                                  : pItem.mainImage.media?.url || ""
+                              }
                               alt={pItem.name}
                               className="h-full w-full object-cover"
                             />
@@ -1957,7 +2021,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-bold text-white truncate max-w-[200px]">
+                          <p className="font-bold text-white truncate max-w-50">
                             {pItem?.name || pId}
                           </p>
                           <p className="text-[11px] text-slate-400">
@@ -2018,7 +2082,11 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                           <div className="h-8 w-8 rounded-lg bg-slate-800 overflow-hidden shrink-0 relative flex items-center justify-center">
                             {item.mainImage ? (
                               <img
-                                src={((item.mainImage as any)?.media?.url || (typeof item.mainImage === "string" ? item.mainImage : "")) as string}
+                                src={
+                                  typeof item.mainImage === "string"
+                                    ? item.mainImage
+                                    : item.mainImage.media?.url || ""
+                                }
                                 alt={item.name}
                                 className="h-full w-full object-cover"
                               />
@@ -2027,7 +2095,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                             )}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-xs font-semibold text-white truncate max-w-[240px]">
+                            <p className="text-xs font-semibold text-white truncate max-w-60">
                               {item.name}
                             </p>
                             <p className="text-[10px] text-slate-400">

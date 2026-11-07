@@ -18,7 +18,10 @@ export interface IUseMediaItem {
   description?: string | null;
   media?: IMediaItem;
   createdAt: string;
+  sellerId: string | null;
+  userId: string | null;
 }
+
 
 export interface SelectedMediaPayload {
   useMediaId: string;

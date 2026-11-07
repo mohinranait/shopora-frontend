@@ -70,12 +70,12 @@ export default function AdminBrandsPage() {
     setFormDescription(brand.description || "");
     setFormIsActive(brand.isActive);
 
-    if (brand.logo || brand.useMedia) {
+    if (brand.logo ) {
       setFormLogo({
-        url: brand.logo?.media?.url || brand.useMedia?.media?.url || (typeof brand.logo === "string" ? brand.logo : "") || "",
-        useMediaId: brand.logoId ?? brand.useMediaId ?? undefined,
-        alt: brand.useMedia?.alt || `${brand.name} Logo`,
-        description: brand.useMedia?.description || "",
+        url: brand.logo?.media?.url  || "",
+        useMediaId: brand.logoId  ?? undefined,
+        alt: brand.logo?.alt || `${brand.name} Logo`,
+        description: brand.logo?.description || "",
       });
     } else {
       setFormLogo(null);
@@ -101,7 +101,6 @@ export default function AdminBrandsPage() {
         isActive: formIsActive,
         logo: formLogo?.url || undefined,
         logoId: formLogo?.useMediaId ?? null,
-        useMediaId: formLogo?.useMediaId ?? null,
       };
 
       if (modalMode === "create") {
@@ -278,7 +277,7 @@ export default function AdminBrandsPage() {
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
                                   src={displayLogo}
-                                  alt={brand.useMedia?.alt || brand.name}
+                                  alt={brand.logo?.alt || brand.name}
                                   className="w-full h-full object-contain"
                                 />
                               ) : (
@@ -298,9 +297,9 @@ export default function AdminBrandsPage() {
 
                         <td className="py-3 px-4 font-mono text-slate-400 text-xs">
                           Slug: {brand.slug}
-                           {brand.useMedia?.alt && (
+                           {brand.logo?.alt && (
                                 <p className="text-[10px] text-slate-400 truncate max-w-45">
-                                  Alt: &quot;{brand.useMedia.alt}&quot;
+                                  Alt: &quot;{brand.logo.alt}&quot;
                                 </p>
                               )}
                         </td>

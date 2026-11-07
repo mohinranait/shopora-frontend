@@ -5,6 +5,8 @@ import {
   IUpdateProductPayload,
   IProductListResponse,
   IApiResponse,
+  IAutocompleteSuggestionsResponse,
+  IProductBundleResponse,
 } from "@/types";
 
 export const productApiSlice = baseApi.injectEndpoints({
@@ -33,9 +35,9 @@ export const productApiSlice = baseApi.injectEndpoints({
         result
           ? [
               ...result.products.map(({ id }) => ({ type: "Products" as const, id })),
-              { type: "Products", id: "LIST" },
+              { type: "Products" as const, id: "LIST" },
             ]
-          : [{ type: "Products", id: "LIST" }],
+          : [{ type: "Products" as const, id: "LIST" }],
     }),
 
     // Get all products for admin (including PENDING review, platform-owned, vendor-owned)
@@ -62,9 +64,9 @@ export const productApiSlice = baseApi.injectEndpoints({
         result
           ? [
               ...result.products.map(({ id }) => ({ type: "Products" as const, id })),
-              { type: "Products", id: "LIST" },
+              { type: "Products" as const, id: "LIST" },
             ]
-          : [{ type: "Products", id: "LIST" }],
+          : [{ type: "Products" as const, id: "LIST" }],
     }),
 
     // Get seller's own products (authenticated seller only)
@@ -91,23 +93,23 @@ export const productApiSlice = baseApi.injectEndpoints({
         result
           ? [
               ...result.products.map(({ id }) => ({ type: "Products" as const, id })),
-              { type: "Products", id: "LIST" },
+              { type: "Products" as const, id: "LIST" },
             ]
-          : [{ type: "Products", id: "LIST" }],
+          : [{ type: "Products" as const, id: "LIST" }],
     }),
 
     // Get single product by ID
     getProductById: builder.query<IProductItem, string | number>({
       query: (id) => `/products/${id}`,
       transformResponse: (res: IApiResponse<IProductItem>) => res.data,
-      providesTags: (result, error, id) => [{ type: "Product", id }],
+      providesTags: (result, error, id) => [{ type: "Product" as const, id }],
     }),
 
     // Get single product by slug (storefront)
     getProductBySlug: builder.query<IProductItem, string>({
       query: (slug) => `/products/detail/${slug}`,
       transformResponse: (res: IApiResponse<IProductItem>) => res.data,
-      providesTags: (result, error, slug) => [{ type: "Product", id: slug }],
+      providesTags: (result, error, slug) => [{ type: "Product" as const, id: slug }],
     }),
 
     // Create a new product (Simple or Variable)
@@ -118,7 +120,7 @@ export const productApiSlice = baseApi.injectEndpoints({
         body,
       }),
       transformResponse: (res: IApiResponse<IProductItem>) => res.data,
-      invalidatesTags: [{ type: "Products", id: "LIST" }],
+      invalidatesTags: [{ type: "Products" as const, id: "LIST" }],
     }),
 
     // Update existing product
@@ -133,8 +135,8 @@ export const productApiSlice = baseApi.injectEndpoints({
       }),
       transformResponse: (res: IApiResponse<IProductItem>) => res.data,
       invalidatesTags: (result, error, { id }) => [
-        { type: "Products", id: "LIST" },
-        { type: "Product", id },
+        { type: "Products" as const, id: "LIST" },
+        { type: "Product" as const, id },
       ],
     }),
 
@@ -150,8 +152,8 @@ export const productApiSlice = baseApi.injectEndpoints({
       }),
       transformResponse: (res: IApiResponse<IProductItem>) => res.data,
       invalidatesTags: (result, error, { id }) => [
-        { type: "Products", id: "LIST" },
-        { type: "Product", id },
+        { type: "Products" as const, id: "LIST" },
+        { type: "Product" as const, id },
       ],
     }),
 
@@ -162,43 +164,25 @@ export const productApiSlice = baseApi.injectEndpoints({
         method: "DELETE",
       }),
       transformResponse: (res: IApiResponse<{ message: string }>) => res.data,
-      invalidatesTags: [{ type: "Products", id: "LIST" }],
+      invalidatesTags: [{ type: "Products" as const, id: "LIST" }],
     }),
 
     // Autocomplete live search
     getAutocompleteSuggestions: builder.query<
-      {
-        products: Array<{
-          id: string;
-          name: string;
-          slug: string;
-          basePrice: number;
-          comparePrice?: number | null;
-          mainImage?: string | null;
-        }>;
-        categories: Array<{ id: string; name: string; slug: string; image?: string | null }>;
-        brands: Array<{ id: string; name: string; slug: string; logo?: string | null }>;
-      },
+      IAutocompleteSuggestionsResponse,
       string
     >({
       query: (q) => `/products/search/autocomplete?q=${encodeURIComponent(q)}`,
-      transformResponse: (res: IApiResponse<any>) => res.data,
+      transformResponse: (res: IApiResponse<IAutocompleteSuggestionsResponse>) => res.data,
     }),
 
     // Product bundle / Frequently Bought Together
     getProductBundle: builder.query<
-      {
-        mainProduct: IProductItem;
-        companionProducts: IProductItem[];
-        bundleDiscountPercent: number;
-        originalTotal: number;
-        bundleTotal: number;
-        totalSavings: number;
-      },
+      IProductBundleResponse,
       string
     >({
       query: (id) => `/products/${id}/bundle`,
-      transformResponse: (res: IApiResponse<any>) => res.data,
+      transformResponse: (res: IApiResponse<IProductBundleResponse>) => res.data,
     }),
   }),
 });
@@ -216,4 +200,5 @@ export const {
   useGetAutocompleteSuggestionsQuery,
   useLazyGetAutocompleteSuggestionsQuery,
   useGetProductBundleQuery,
+  useLazyGetProductBundleQuery,
 } = productApiSlice;
