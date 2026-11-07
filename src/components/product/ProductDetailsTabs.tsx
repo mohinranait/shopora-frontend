@@ -239,7 +239,7 @@ export function ProductDetailsTabs({
             {/* Main Rich Description */}
             <div
               className="prose prose-slate max-w-none text-slate-700 text-sm sm:text-base leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: product.description }}
+              dangerouslySetInnerHTML={{ __html: product.description || "" }}
             />
 
             {/* Embedded Video Showcase (if present) */}

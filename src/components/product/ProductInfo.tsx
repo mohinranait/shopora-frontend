@@ -121,14 +121,14 @@ export function ProductInfo({
     const variantImg =
       typeof activeVariant?.image === "string"
         ? activeVariant.image
-        : (activeVariant?.image?.media?.url ?? activeVariant?.useMedia?.media?.url);
+        : activeVariant?.image?.media?.url;
     const prodMainImg =
       typeof product.mainImage === "string"
         ? product.mainImage
         : product.mainImage?.media?.url;
     const firstGalleryImg =
       product.images && product.images.length > 0
-        ? product.images[0].url || product.images[0].image?.media?.url || product.images[0].useMedia?.media?.url || ""
+        ? product.images[0].url || product.images[0].image?.media?.url || ""
         : "";
     const mainImg = variantImg || prodMainImg || firstGalleryImg || "";
 

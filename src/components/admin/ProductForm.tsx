@@ -69,7 +69,6 @@ interface SelectedAttrGroup {
 interface FormGalleryImage {
   url: string;
   imageId?: string;
-  useMediaId?: string;
   altText?: string;
 }
 
@@ -105,13 +104,11 @@ function getInitialGalleryImages(images?: IProductImageItem[]): FormGalleryImage
     const resolvedUrl =
       img.url ||
       img.image?.media?.url ||
-      img.useMedia?.media?.url ||
       "";
     const mediaId = img.imageId ?? img.image?.id ?? undefined;
     return {
       url: resolvedUrl,
       imageId: mediaId,
-      useMediaId: mediaId,
       altText: img.altText ?? undefined,
     };
   });
@@ -120,7 +117,6 @@ function getInitialGalleryImages(images?: IProductImageItem[]): FormGalleryImage
 function resolveVariantImageUrl(v: IProductVariantItem): string | null {
   if (typeof v.image === "string") return v.image;
   if (typeof v.image === "object" && v.image?.media?.url) return v.image.media.url;
-  if (v.useMedia?.media?.url) return v.useMedia.media.url;
   return null;
 }
 
@@ -220,8 +216,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       stock: v.stock,
       lowStockThreshold: v.lowStockThreshold || 5,
       image: resolveVariantImageUrl(v),
-      imageId: v.imageId ?? v.useMediaId ?? (typeof v.image === "object" ? v.image?.id : null) ?? null,
-      useMediaId: v.useMediaId ?? v.imageId ?? (typeof v.image === "object" ? v.image?.id : null) ?? null,
+      imageId: v.imageId ?? (typeof v.image === "object" ? v.image?.id : null) ?? null,
       barcode: v.barcode,
       weightKg: v.weightKg,
       dimensions: v.dimensions ?? null,
@@ -294,14 +289,14 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
     } else if (mediaTarget === "gallery") {
       setGalleryImages((prev) => [
         ...prev,
-        { url: payload.url, imageId: payload.useMediaId, useMediaId: payload.useMediaId, altText: payload.alt },
+        { url: payload.url, imageId: payload.useMediaId, altText: payload.alt },
       ]);
       toast.success("Image added to gallery.");
     } else if (typeof mediaTarget === "object" && "variantIndex" in mediaTarget) {
       const idx = mediaTarget.variantIndex;
       setVariantRows((prev) =>
         prev.map((r, i) =>
-          i === idx ? { ...r, image: payload.url, imageId: payload.useMediaId, useMediaId: payload.useMediaId } : r
+          i === idx ? { ...r, image: payload.url, imageId: payload.useMediaId } : r
         )
       );
       toast.success("Variant image assigned.");
@@ -409,8 +404,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
           stock: existingRow?.stock ?? (typeof stock === "number" ? stock : 0),
           lowStockThreshold: existingRow?.lowStockThreshold ?? (typeof lowStockThreshold === "number" ? lowStockThreshold : 5),
           image: existingRow?.image || null,
-          imageId: existingRow?.imageId || existingRow?.useMediaId || null,
-          useMediaId: existingRow?.useMediaId || existingRow?.imageId || null,
+          imageId: existingRow?.imageId || null,
           barcode: existingRow?.barcode || null,
           weightKg: existingRow?.weightKg ?? (typeof weightKg === "number" ? weightKg : null),
           dimensions: existingRow?.dimensions ?? (
@@ -595,8 +589,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       // Build Gallery Images Payload
       const imagesPayload: IProductImageInput[] = galleryImages.map((img, idx) => ({
         url: img.url,
-        imageId: img.imageId ?? img.useMediaId,
-        useMediaId: img.imageId ?? img.useMediaId,
+        imageId: img.imageId,
         altText: img.altText || name,
         displayOrder: idx,
         isPrimary: idx === 0,
@@ -618,7 +611,6 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
         lowStockThreshold: typeof lowStockThreshold === "number" ? lowStockThreshold : 5,
         mainImage: mainImageUrl,
         mainImageId: mainImageUseMediaId,
-        mainImageUseMediaId: mainImageUseMediaId,
         images: imagesPayload,
         selectedAttributes: selectedAttributesPayload,
         variants:
@@ -645,8 +637,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                     ? v.weightKg
                     : null,
                 dimensions: v.dimensions ?? null,
-                imageId: v.imageId ?? v.useMediaId ?? null,
-                useMediaId: v.useMediaId ?? v.imageId ?? null,
+                imageId: v.imageId ?? null,
                 isActive: v.isActive !== false,
               }))
             : [],
