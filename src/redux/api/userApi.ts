@@ -3,6 +3,7 @@ import type {
   IApiResponse,
   IAuthUser,
   ICustomerAddress,
+  IUseMediaItem,
 } from "@/types";
 
 export interface IWishlistItem {
@@ -14,7 +15,7 @@ export interface IWishlistItem {
     name: string;
     slug: string;
     productType?: string;
-    mainImage: string | null;
+    mainImage: IUseMediaItem | null;
     basePrice: number;
     comparePrice?: number | null;
     stock: number;

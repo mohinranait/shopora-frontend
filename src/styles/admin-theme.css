@@ -400,8 +400,8 @@
 
 /* 11. Modals, Dialogs, Dropdowns & Drawers */
 .admin-theme-light [role="menu"],
-.admin-theme-light [role="dialog"] > div,
-.admin-theme-light [role="dialog"] [class*="bg-slate-900"],
+.admin-theme-light [role="dialog"],
+.admin-theme-light [role="alertdialog"],
 .admin-theme-light [class*="bg-slate-900"][class*="rounded-2xl"],
 .admin-theme-light [class*="bg-slate-950"][class*="rounded-2xl"],
 .admin-theme-light [class*="bg-slate-900"][class*="rounded-xl"],
@@ -412,8 +412,36 @@
 }
 
 .admin-theme-light [role="dialog"] [class*="border-slate-800"],
-.admin-theme-light [role="dialog"] [class*="border-slate-700"] {
+.admin-theme-light [role="dialog"] [class*="border-slate-700"],
+.admin-theme-light [role="alertdialog"] [class*="border-slate-800"],
+.admin-theme-light [role="alertdialog"] [class*="border-slate-700"] {
   border-color: #e2e8f0 !important;
+}
+
+/* Prevent inner dialog children from getting unwanted extra borders */
+.admin-theme-light [role="dialog"] > div:not([class*="rounded-2xl"]):not([class*="rounded-xl"]):not([class*="border-"]),
+.admin-theme-light [role="alertdialog"] > div:not([class*="rounded-2xl"]):not([class*="rounded-xl"]):not([class*="border-"]) {
+  border: none !important;
+}
+
+.admin-theme-light [role="dialog"] [class*="border-b"],
+.admin-theme-light [role="alertdialog"] [class*="border-b"] {
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.admin-theme-light [role="dialog"] [class*="border-t"],
+.admin-theme-light [role="alertdialog"] [class*="border-t"] {
+  border-top: 1px solid #e2e8f0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
+}
+
+.admin-theme-light [role="dialog"] form > div:not([class*="border"]) {
+  border: none !important;
 }
 
 .admin-theme-light [role="menu"] button:hover,

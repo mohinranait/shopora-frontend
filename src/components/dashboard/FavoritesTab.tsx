@@ -19,6 +19,11 @@ import { useAppDispatch } from "@/redux/hooks";
 import { addToCart, openCartDrawer } from "@/redux/slices/cartSlice";
 import { cartApi } from "@/lib/cart/api";
 import { formatTaka } from "@/components/cart/CartParts";
+import type { IUseMediaItem } from "@/types";
+
+function getProductMainImageUrl(mainImage: IUseMediaItem | null | undefined): string {
+  return mainImage?.media?.url || "";
+}
 
 export function FavoritesTab() {
   const router = useRouter();
@@ -77,7 +82,7 @@ export function FavoritesTab() {
             id: product.id,
             name: product.name,
             slug: product.slug,
-            mainImage: (product.mainImage as any)?.media?.url || (typeof product.mainImage === "string" ? product.mainImage : "") || "",
+            mainImage: getProductMainImageUrl(product.mainImage),
             basePrice: product.basePrice,
             stock: product.stock,
           },
@@ -180,6 +185,8 @@ export function FavoritesTab() {
                     )
                   : 0;
 
+              const mainImageUrl = getProductMainImageUrl(product.mainImage);
+
               return (
                 <div
                   key={item.id}
@@ -187,10 +194,10 @@ export function FavoritesTab() {
                 >
                   {/* Top: Image, Badges & Remove Button */}
                   <div className="relative aspect-square w-full overflow-hidden rounded-md bg-slate-50 border border-slate-100 flex items-center justify-center">
-                    {Boolean((product.mainImage as any)?.media?.url || (typeof product.mainImage === "string" ? product.mainImage : null)) ? (
+                    {mainImageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={((product.mainImage as any)?.media?.url || (typeof product.mainImage === "string" ? product.mainImage : "")) as string}
+                        src={mainImageUrl}
                         alt={product.name}
                         className="h-full w-full object-contain p-2 transition-transform duration-200 group-hover:scale-105"
                       />

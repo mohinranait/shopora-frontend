@@ -130,8 +130,8 @@ export function Pagination({
   return (
     <div
       className={cn(
-        "flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 text-xs select-none",
-        isDark ? "text-slate-400 border-t border-slate-800/80 bg-slate-900/40" : "text-slate-600 border-t border-slate-200 bg-slate-50/50",
+        "flex flex-col  sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 text-xs select-none",
+        isDark ? "text-slate-400 border-t  bg-slate-900/40" : "text-slate-600 border-t  border-slate-200 bg-slate-50/50",
         className
       )}
     >

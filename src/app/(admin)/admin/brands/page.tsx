@@ -9,24 +9,20 @@ import {
   Edit,
   Trash2,
   ExternalLink,
-  X,
-  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { DataTable, type ColumnDef } from "@/components/ui/DataTable";
 import {
   useGetBrandsQuery,
-  useCreateBrandMutation,
-  useUpdateBrandMutation,
   useDeleteBrandMutation,
 } from "@/redux";
 import { getApiErrorMessage } from "@/services/api";
-import { IBrand, ImageValue } from "@/types";
+import { IBrand } from "@/types";
 import { toast } from "sonner";
-import { ImageUploadField } from "@/components/media/ImageUploadField";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { Pagination } from "@/components/ui/Pagination";
+import { Modal } from "@/components/ui/Modal";
+import { BrandForm } from "@/components/admin/BrandForm";
 
 export default function AdminBrandsPage() {
   const [search, setSearch] = useState("");
@@ -70,8 +66,6 @@ export default function AdminBrandsPage() {
   const totalPages = meta?.totalPages ?? (totalItems > 0 ? Math.ceil(totalItems / pageSize) : 1);
   const counts = meta?.counts;
 
-  const [createBrand] = useCreateBrandMutation();
-  const [updateBrand] = useUpdateBrandMutation();
   const [deleteBrand] = useDeleteBrandMutation();
 
   // Modal State for Add / Edit Brand
@@ -79,23 +73,10 @@ export default function AdminBrandsPage() {
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
   const [editingBrand, setEditingBrand] = useState<IBrand | null>(null);
 
-  // Form State
-  const [formName, setFormName] = useState("");
-  const [formWebsite, setFormWebsite] = useState("");
-  const [formDescription, setFormDescription] = useState("");
-  const [formIsActive, setFormIsActive] = useState(true);
-  const [formLogo, setFormLogo] = useState<ImageValue | null>(null);
-  const [formSubmitting, setFormSubmitting] = useState(false);
-
   // Open Create Modal
   const handleOpenCreate = () => {
     setModalMode("create");
     setEditingBrand(null);
-    setFormName("");
-    setFormWebsite("");
-    setFormDescription("");
-    setFormIsActive(true);
-    setFormLogo(null);
     setIsModalOpen(true);
   };
 
@@ -103,58 +84,7 @@ export default function AdminBrandsPage() {
   const handleOpenEdit = (brand: IBrand) => {
     setModalMode("edit");
     setEditingBrand(brand);
-    setFormName(brand.name);
-    setFormWebsite(brand.website || "");
-    setFormDescription(brand.description || "");
-    setFormIsActive(brand.isActive);
-
-    if (brand.logo ) {
-      setFormLogo({
-        url: brand.logo?.media?.url  || "",
-        useMediaId: brand.logoId  ?? undefined,
-        alt: brand.logo?.alt || `${brand.name} Logo`,
-        description: brand.logo?.description || "",
-      });
-    } else {
-      setFormLogo(null);
-    }
-
     setIsModalOpen(true);
-  };
-
-  // Handle Form Submit
-  const handleSaveBrand = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formName.trim()) {
-      toast.error("Brand name is required");
-      return;
-    }
-
-    try {
-      setFormSubmitting(true);
-      const payload = {
-        name: formName.trim(),
-        website: formWebsite.trim() || undefined,
-        description: formDescription.trim() || undefined,
-        isActive: formIsActive,
-        logo: formLogo?.url || undefined,
-        logoId: formLogo?.useMediaId ?? null,
-      };
-
-      if (modalMode === "create") {
-        await createBrand(payload).unwrap();
-        toast.success("Brand created successfully!");
-      } else if (editingBrand) {
-        await updateBrand({ id: editingBrand.id, body: payload }).unwrap();
-        toast.success("Brand updated successfully!");
-      }
-
-      setIsModalOpen(false);
-    } catch (err: unknown) {
-      toast.error(getApiErrorMessage(err));
-    } finally {
-      setFormSubmitting(false);
-    }
   };
 
   // Delete Confirmation State
@@ -174,6 +104,119 @@ export default function AdminBrandsPage() {
       setIsDeletingBrand(false);
     }
   };
+
+  // TanStack Table Column Definitions
+  const columns: ColumnDef<IBrand>[] = useMemo(
+    () => [
+      {
+        id: "details",
+        header: "Brand Logo & Details",
+        cell: ({ row }) => {
+          const brand = row.original;
+          const displayLogo = brand.logo?.media?.url;
+          return (
+            <div className="flex items-center gap-3">
+              <div className="h-11 w-11 rounded-lg overflow-hidden border border-slate-700 bg-slate-900 shrink-0 flex items-center justify-center p-1">
+                {displayLogo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={displayLogo}
+                    alt={brand.logo?.alt || brand.name}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <Tag className="h-5 w-5 text-slate-600" />
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="font-bold text-white text-sm">{brand.name}</p>
+                {brand.description && (
+                  <p className="text-[11px] text-slate-400 truncate max-w-xs">
+                    {brand.description}
+                  </p>
+                )}
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "slug",
+        header: "Slug",
+        cell: ({ row }) => {
+          const brand = row.original;
+          return (
+            <div className="font-mono text-slate-400 text-xs">
+              <span>Slug: {brand.slug}</span>
+              {brand.logo?.alt && (
+                <p className="text-[10px] text-slate-400 truncate max-w-45">
+                  Alt: &quot;{brand.logo.alt}&quot;
+                </p>
+              )}
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "website",
+        header: "Official Website",
+        cell: ({ row }) => {
+          const brand = row.original;
+          return brand.website ? (
+            <a
+              href={brand.website}
+              target="_blank"
+              rel="noreferrer"
+              className="text-sky-400 hover:underline flex items-center gap-1 font-mono text-[11px]"
+            >
+              <span>{brand.website.replace(/^https?:\/\//, "")}</span>
+              <ExternalLink className="h-3 w-3 shrink-0" />
+            </a>
+          ) : (
+            <span className="text-slate-500 text-[11px]">—</span>
+          );
+        },
+      },
+      {
+        accessorKey: "isActive",
+        header: "Status",
+        cell: ({ row }) => {
+          return row.original.isActive ? (
+            <Badge variant="success">Active</Badge>
+          ) : (
+            <Badge variant="secondary">Inactive</Badge>
+          );
+        },
+      },
+      {
+        id: "actions",
+        header: () => <div className="text-right">Actions</div>,
+        meta: { className: "text-right" },
+        cell: ({ row }) => {
+          const brand = row.original;
+          return (
+            <div className="flex items-center justify-end gap-1.5">
+              <button
+                onClick={() => handleOpenEdit(brand)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-sky-400 hover:bg-slate-800 transition cursor-pointer"
+                title="Edit Brand"
+              >
+                <Edit className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setBrandToDelete(brand)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition cursor-pointer"
+                title="Delete Brand"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          );
+        },
+      },
+    ],
+    []
+  );
 
   return (
     <div className="space-y-6">
@@ -264,267 +307,48 @@ export default function AdminBrandsPage() {
         </div>
       </div>
 
-      {/* Brands Table */}
-      <Card>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-900/80 text-slate-400 font-semibold border-b border-slate-800">
-                <tr>
-                  <th className="py-3 px-4">Brand Logo & Details</th>
-                  <th className="py-3 px-4">Slug</th>
-                  <th className="py-3 px-4">Official Website</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/80 text-slate-300">
-                {loading ? (
-                  <tr>
-                    <td colSpan={5} className="py-12 text-center text-slate-400">
-                      <Loader2 className="h-6 w-6 text-sky-400 animate-spin mx-auto mb-2" />
-                      Loading brands from database...
-                    </td>
-                  </tr>
-                ) : brands.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="py-12 text-center text-slate-500">
-                      No brands found matching your criteria.
-                    </td>
-                  </tr>
-                ) : (
-                  brands.map((brand) => {
-                    const displayLogo = brand.logo?.media?.url;
-                    return (
-                      <tr key={brand.id} className="hover:bg-slate-900/50 transition-colors">
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-3">
-                            <div className="h-11 w-11 rounded-lg overflow-hidden border border-slate-700 bg-slate-900 shrink-0 flex items-center justify-center p-1">
-                              {displayLogo ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                  src={displayLogo}
-                                  alt={brand.logo?.alt || brand.name}
-                                  className="w-full h-full object-contain"
-                                />
-                              ) : (
-                                <Tag className="h-5 w-5 text-slate-600" />
-                              )}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="font-bold text-white text-sm">{brand.name}</p>
-                              {brand.description && (
-                                <p className="text-[11px] text-slate-400 truncate max-w-xs">
-                                  {brand.description}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </td>
+      {/* Brands Table (Reusable TanStack DataTable) */}
+      <DataTable
+        columns={columns}
+        data={brands}
+        isLoading={loading || isFetching}
+        loadingMessage="Loading brands from database..."
+        emptyMessage="No brands found matching your criteria."
+        pagination={{
+          currentPage: page,
+          totalPages,
+          totalItems,
+          pageSize,
+          onPageChange: setPage,
+          onPageSizeChange: (newSize) => {
+            setPageSize(newSize);
+            setPage(1);
+          },
+          pageSizeOptions: [10, 20, 50, 100],
+          itemLabel: "brands",
+        }}
+      />
 
-                        <td className="py-3 px-4 font-mono text-slate-400 text-xs">
-                          Slug: {brand.slug}
-                           {brand.logo?.alt && (
-                                <p className="text-[10px] text-slate-400 truncate max-w-45">
-                                  Alt: &quot;{brand.logo.alt}&quot;
-                                </p>
-                              )}
-                        </td>
-
-
-                        <td className="py-3 px-4">
-                          {brand.website ? (
-                            <a
-                              href={brand.website}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-sky-400 hover:underline flex items-center gap-1 font-mono text-[11px]"
-                            >
-                              <span>{brand.website.replace(/^https?:\/\//, "")}</span>
-                              <ExternalLink className="h-3 w-3 shrink-0" />
-                            </a>
-                          ) : (
-                            <span className="text-slate-500 text-[11px]">—</span>
-                          )}
-                        </td>
-
-                        <td className="py-3 px-4">
-                          {brand.isActive ? (
-                            <Badge variant="success">Active</Badge>
-                          ) : (
-                            <Badge variant="secondary">Inactive</Badge>
-                          )}
-                        </td>
-
-                        <td className="py-3 px-4 text-right">
-                          <div className="flex items-center justify-end gap-1.5">
-                            <button
-                              onClick={() => handleOpenEdit(brand)}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-sky-400 hover:bg-slate-800 transition"
-                              title="Edit Brand"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </button>
-                            <button
-                              onClick={() => setBrandToDelete(brand)}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
-                              title="Delete Brand"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Table Pagination */}
-          {totalItems > 0 && (
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              pageSize={pageSize}
-              onPageChange={setPage}
-              onPageSizeChange={(newSize) => {
-                setPageSize(newSize);
-                setPage(1);
-              }}
-              pageSizeOptions={[10, 20, 50, 100]}
-              isLoading={isFetching}
-              itemLabel="brands"
-              variant="dark"
-            />
-          )}
-        </CardContent>
-      </Card>
-
-      {/* CREATE / EDIT BRAND MODAL */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl p-6 text-slate-100 space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Tag className="h-4 w-4 text-sky-400" />
-                {modalMode === "create" ? "Add New Brand" : `Edit Brand: ${editingBrand?.name}`}
-              </h3>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveBrand} className="space-y-4">
-              {/* Brand Name */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-200">
-                  Brand Name <span className="text-rose-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Sony, Anker, Apple"
-                  value={formName}
-                  onChange={(e) => setFormName(e.target.value)}
-                  className="mt-1 w-full h-9 rounded-lg border border-slate-700 bg-slate-950 px-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand"
-                />
-              </div>
-
-              {/* WordPress-Style Media Library Image Upload Field */}
-              <div>
-                <ImageUploadField
-                  label="Brand Official Logo"
-                  value={formLogo}
-                  onChange={setFormLogo}
-                  helperText="Select logo from WordPress-style Media Library or upload new image to Cloudinary."
-                  modalTitle="Select Brand Logo Asset"
-                />
-              </div>
-
-              {/* Website */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-200">
-                  Official Website
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://example.com"
-                  value={formWebsite}
-                  onChange={(e) => setFormWebsite(e.target.value)}
-                  className="mt-1 w-full h-9 rounded-lg border border-slate-700 bg-slate-950 px-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand font-mono"
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-200">
-                  Description
-                </label>
-                <textarea
-                  rows={3}
-                  placeholder="Short overview about the brand and product portfolio..."
-                  value={formDescription}
-                  onChange={(e) => setFormDescription(e.target.value)}
-                  className="mt-1 w-full p-2.5 rounded-lg border border-slate-700 bg-slate-950 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand resize-none"
-                />
-              </div>
-
-              {/* Active Toggle */}
-              <div className="flex items-center justify-between p-3 rounded-lg border border-slate-800 bg-slate-950/60">
-                <div>
-                  <p className="text-xs font-bold text-white">Active Status</p>
-                  <p className="text-[11px] text-slate-400">
-                    Visible in catalog filters and storefront navigation
-                  </p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={formIsActive}
-                  onChange={(e) => setFormIsActive(e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-700 text-sky-500 focus:ring-brand"
-                />
-              </div>
-
-              {/* Form Buttons */}
-              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsModalOpen(false)}
-                  className="text-xs"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="brand"
-                  size="sm"
-                  disabled={formSubmitting}
-                  className="text-xs font-bold"
-                >
-                  {formSubmitting ? (
-                    <>
-                      <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
-                      Saving...
-                    </>
-                  ) : modalMode === "create" ? (
-                    "Create Brand"
-                  ) : (
-                    "Save Changes"
-                  )}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Reusable Global Modal with BrandForm as children */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={modalMode === "create" ? "Add New Brand" : `Edit Brand: ${editingBrand?.name}`}
+        icon={<Tag className="h-4 w-4 text-sky-400" />}
+        description={
+          modalMode === "create"
+            ? "Create a new manufacturer brand with official logo and metadata."
+            : `Update details for "${editingBrand?.name}".`
+        }
+      >
+        <BrandForm
+          key={editingBrand?.id ?? "create"}
+          mode={modalMode}
+          brand={editingBrand}
+          onCancel={() => setIsModalOpen(false)}
+          onSuccess={() => setIsModalOpen(false)}
+        />
+      </Modal>
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog
