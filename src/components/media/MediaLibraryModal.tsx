@@ -17,6 +17,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   useGetMediaLibraryQuery,
   useUploadFileMutation,
@@ -159,33 +167,25 @@ export function MediaLibraryModal({
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      {/* Modal Dialog Window */}
-      <div className="relative w-full max-w-5xl h-[88vh] bg-slate-900 border border-slate-800 rounded-2xl flex flex-col overflow-hidden text-slate-100">
-        {/* Modal Top Header (WordPress Style) */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/70">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
-              <ImageIcon className="h-4 w-4" />
+    <>
+      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <DialogContent className="max-w-5xl h-[88vh] p-0 flex flex-col overflow-hidden bg-card text-foreground">
+          {/* Modal Top Header (WordPress Style) */}
+          <DialogHeader className="px-6 py-4 border-b border-border bg-muted/40 shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-brand">
+                <ImageIcon className="h-4 w-4" />
+              </div>
+              <div>
+                <DialogTitle className="text-base font-bold text-foreground flex items-center gap-2">
+                  <span>{title}</span>
+                  <Badge variant="brand" className="text-[10px] py-0 font-mono">
+                    Media Library
+                  </Badge>
+                </DialogTitle>
+              </div>
             </div>
-            <div>
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <span>{title}</span>
-                <Badge variant="brand" className="text-[10px] py-0 font-mono">
-                  Media Library
-                </Badge>
-              </h2>
-            </div>
-          </div>
-
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+          </DialogHeader>
 
         {/* Tab Navigation Ribbon */}
         <div className="flex items-center justify-between px-6 border-b border-slate-800 bg-slate-950/40">
@@ -509,19 +509,20 @@ export function MediaLibraryModal({
             </Button>
           </div>
         </div>
-      </div>
+      </DialogContent>
+    </Dialog>
 
-      {/* Delete Media Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={Boolean(mediaToDelete)}
-        onClose={() => setMediaToDelete(null)}
-        onConfirm={confirmDeleteMedia}
-        isLoading={isDeletingMedia}
-        title="Delete Media Asset"
-        description="Are you sure you want to permanently delete this media asset? Any product, category, or slider using this image may be affected."
-        confirmText="Delete Media"
-        variant="danger"
-      />
-    </div>
-  );
+    {/* Delete Media Confirmation Dialog */}
+    <ConfirmDialog
+      isOpen={Boolean(mediaToDelete)}
+      onClose={() => setMediaToDelete(null)}
+      onConfirm={confirmDeleteMedia}
+      isLoading={isDeletingMedia}
+      title="Delete Media Asset"
+      description="Are you sure you want to permanently delete this media asset? Any product, category, or slider using this image may be affected."
+      confirmText="Delete Media"
+      variant="danger"
+    />
+  </>
+);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import  { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   DollarSign,
@@ -19,6 +19,9 @@ import {
   CreditCard,
   ShieldCheck,
   Boxes,
+  BarChart3,
+  LineChart as LineChartIcon,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,15 +33,65 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  AreaChart,
+  Area,
+} from "recharts";
+import {
   useGetAdminProductsQuery,
   useReviewProductApprovalMutation,
   useGetAdminAnalyticsQuery,
 } from "@/redux";
 import { toast } from "sonner";
 
+const chartConfig: ChartConfig = {
+  gmv: {
+    label: "Sales (৳)",
+    color: "#3890d0",
+  },
+  orders: {
+    label: "Orders",
+    color: "#8b5cf6",
+  },
+};
+
 export default function AdminDashboardPage() {
   const [timeRange, setTimeRange] = useState<"today" | "7d" | "30d" | "year">("7d");
+  const [chartType, setChartType] = useState<"bar" | "area">("bar");
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Rejection Dialog State
+  const [rejectingProductId, setRejectingProductId] = useState<string | number | null>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [isRejecting, setIsRejecting] = useState(false);
 
   // Real backend products & analytics query for admin
   const { data: adminProductsData, refetch: refetchAdminProducts } = useGetAdminProductsQuery({ limit: 100 });
@@ -65,16 +118,33 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleReject = async (id: string | number) => {
-    const reason = prompt("Enter rejection reason:");
-    if (!reason) return;
+  const handleOpenReject = (id: string | number) => {
+    setRejectingProductId(id);
+    setRejectionReason("");
+  };
+
+  const handleConfirmReject = async () => {
+    if (!rejectingProductId) return;
+    if (!rejectionReason.trim()) {
+      toast.error("Please provide a rejection reason for the seller.");
+      return;
+    }
     try {
-      await reviewProductApproval({ id, status: "REJECTED", rejectionReason: reason }).unwrap();
+      setIsRejecting(true);
+      await reviewProductApproval({
+        id: rejectingProductId,
+        status: "REJECTED",
+        rejectionReason: rejectionReason.trim(),
+      }).unwrap();
       toast.info("Product marked as rejected.");
+      setRejectingProductId(null);
+      setRejectionReason("");
       refetchAdminProducts();
       refetchAnalytics();
     } catch {
       toast.error("Failed to reject product");
+    } finally {
+      setIsRejecting(false);
     }
   };
 
@@ -154,31 +224,31 @@ export default function AdminDashboardPage() {
     },
   ];
 
-  // Weekly Revenue Chart Bars
+  // Weekly Revenue Chart Data
   const weeklyRevenue = [
-    { day: "Sat", gmv: 52000, orders: 135, height: "65%" },
-    { day: "Sun", gmv: 68000, orders: 172, height: "82%" },
-    { day: "Mon", gmv: 49000, orders: 120, height: "58%" },
-    { day: "Tue", gmv: 84000, orders: 210, height: "100%" },
-    { day: "Wed", gmv: 71000, orders: 185, height: "85%" },
-    { day: "Thu", gmv: 63000, orders: 154, height: "75%" },
-    { day: "Fri", gmv: 98000, orders: 245, height: "115%" },
+    { day: "Sat", gmv: 52000, orders: 135 },
+    { day: "Sun", gmv: 68000, orders: 172 },
+    { day: "Mon", gmv: 49000, orders: 120 },
+    { day: "Tue", gmv: 84000, orders: 210 },
+    { day: "Wed", gmv: 71000, orders: 185 },
+    { day: "Thu", gmv: 63000, orders: 154 },
+    { day: "Fri", gmv: 98000, orders: 245 },
   ];
 
   return (
     <div className="space-y-6">
       {/* Page Title & Top Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-white tracking-tight">
+            <h1 className="text-2xl font-black text-foreground tracking-tight">
               Marketplace Command Center
             </h1>
             <Badge variant="brand" className="text-[10px] uppercase font-bold">
               Live Production
             </Badge>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Real-time hybrid sales telemetry, multi-vendor splits, inventory, and fulfillment operations.
           </p>
         </div>
@@ -186,15 +256,15 @@ export default function AdminDashboardPage() {
         {/* Toolbar Controls */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Time range pills */}
-          <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5 text-xs font-semibold">
+          <div className="flex items-center bg-muted/60 border border-border rounded-lg p-0.5 text-xs font-semibold">
             {(["today", "7d", "30d", "year"] as const).map((range) => (
               <button
                 key={range}
                 onClick={() => setTimeRange(range)}
-                className={`px-3 py-1.5 rounded-md transition-all ${
+                className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
                   timeRange === range
-                    ? "bg-brand text-white"
-                    : "text-slate-400 hover:text-white"
+                    ? "bg-brand text-white shadow-xs"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {range === "today"
@@ -213,17 +283,17 @@ export default function AdminDashboardPage() {
             size="sm"
             variant="outline"
             onClick={handleRefresh}
-            className="text-xs gap-1.5"
+            className="text-xs gap-1.5 cursor-pointer shadow-xs"
             disabled={isRefreshing}
           >
             <RefreshCw
-              className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin text-sky-400" : ""}`}
+              className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin text-brand" : "text-muted-foreground"}`}
             />
             <span className="hidden sm:inline">Refresh</span>
           </Button>
 
-          <Button size="sm" variant="outline" className="text-xs gap-1.5">
-            <Download className="h-3.5 w-3.5 text-slate-400" />
+          <Button size="sm" variant="outline" className="text-xs gap-1.5 cursor-pointer shadow-xs">
+            <Download className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="hidden sm:inline">Export Report</span>
           </Button>
         </div>
@@ -232,29 +302,29 @@ export default function AdminDashboardPage() {
       {/* 4 Primary KPI Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1: Total GMV */}
-        <Card className="hover:border-slate-700 transition">
+        <Card className="hover:border-brand/40 transition">
           <CardContent className="p-5">
-            <div className="flex items-center justify-between text-slate-400">
+            <div className="flex items-center justify-between text-muted-foreground">
               <span className="text-xs font-semibold uppercase tracking-wider">
                 Gross Merchandise Value
               </span>
-              <div className="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <div className="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500">
                 <DollarSign className="h-4 w-4" />
               </div>
             </div>
             <div className="mt-2">
-              <p className="text-2xl font-black text-white tracking-tight">
+              <p className="text-2xl font-black text-foreground tracking-tight">
                 ৳ {(analytics?.revenue?.grossSales ?? 0).toLocaleString()}
               </p>
               <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-xs font-bold text-emerald-400 flex items-center">
+                <span className="text-xs font-bold text-emerald-500 flex items-center">
                   Direct: ৳ {(analytics?.revenue?.directSalesRevenue ?? 0).toLocaleString()}
                 </span>
               </div>
             </div>
-            <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-              <span className="text-slate-400">Platform Commission:</span>
-              <span className="font-bold text-sky-400">
+            <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground">Platform Commission:</span>
+              <span className="font-bold text-brand">
                 ৳ {(analytics?.revenue?.platformCommission ?? 0).toLocaleString()}
               </span>
             </div>
@@ -262,9 +332,9 @@ export default function AdminDashboardPage() {
         </Card>
 
         {/* Metric 2: Net Platform Profit */}
-        <Card className="hover:border-slate-700 transition">
+        <Card className="hover:border-brand/40 transition">
           <CardContent className="p-5">
-            <div className="flex items-center justify-between text-slate-400">
+            <div className="flex items-center justify-between text-muted-foreground">
               <span className="text-xs font-semibold uppercase tracking-wider">
                 Platform Net Profit
               </span>
@@ -273,20 +343,20 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             <div className="mt-2">
-              <p className="text-2xl font-black text-white tracking-tight">
+              <p className="text-2xl font-black text-foreground tracking-tight">
                 ৳ {(analytics?.revenue?.netPlatformProfit ?? 0).toLocaleString()}
               </p>
               <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-xs font-bold text-emerald-400 flex items-center">
+                <span className="text-xs font-bold text-emerald-500 flex items-center">
                   <ArrowUpRight className="h-3.5 w-3.5" />
                   {analytics?.revenue?.profitMarginPercent ?? 0}% Margin
                 </span>
-                <span className="text-[11px] text-slate-400">Realized Profit</span>
+                <span className="text-[11px] text-muted-foreground">Realized Profit</span>
               </div>
             </div>
-            <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-              <span className="text-slate-400">Direct Retail Profit:</span>
-              <span className="font-bold text-emerald-400">
+            <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground">Direct Retail Profit:</span>
+              <span className="font-bold text-emerald-500">
                 ৳ {(analytics?.revenue?.directSalesProfit ?? 0).toLocaleString()}
               </span>
             </div>
@@ -294,29 +364,29 @@ export default function AdminDashboardPage() {
         </Card>
 
         {/* Metric 3: Active Stock Investment */}
-        <Card className="hover:border-slate-700 transition">
+        <Card className="hover:border-brand/40 transition">
           <CardContent className="p-5">
-            <div className="flex items-center justify-between text-slate-400">
+            <div className="flex items-center justify-between text-muted-foreground">
               <span className="text-xs font-semibold uppercase tracking-wider">
                 Active Stock Investment
               </span>
-              <div className="h-8 w-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+              <div className="h-8 w-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
                 <Boxes className="h-4 w-4" />
               </div>
             </div>
             <div className="mt-2">
-              <p className="text-2xl font-black text-white tracking-tight">
+              <p className="text-2xl font-black text-foreground tracking-tight">
                 ৳ {(analytics?.revenue?.activeStockInvestment ?? 0).toLocaleString()}
               </p>
               <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-xs font-bold text-amber-400">
+                <span className="text-xs font-bold text-amber-500">
                   Shopora Direct Inventory
                 </span>
               </div>
             </div>
-            <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-              <span className="text-slate-400">Total Ecosystem Capital:</span>
-              <span className="font-bold text-sky-400">
+            <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground">Total Ecosystem Capital:</span>
+              <span className="font-bold text-brand">
                 ৳ {(analytics?.revenue?.totalCatalogInvestment ?? 0).toLocaleString()}
               </span>
             </div>
@@ -324,30 +394,30 @@ export default function AdminDashboardPage() {
         </Card>
 
         {/* Metric 4: Total Orders */}
-        <Card className="hover:border-slate-700 transition">
+        <Card className="hover:border-brand/40 transition">
           <CardContent className="p-5">
-            <div className="flex items-center justify-between text-slate-400">
+            <div className="flex items-center justify-between text-muted-foreground">
               <span className="text-xs font-semibold uppercase tracking-wider">
                 Total Orders
               </span>
-              <div className="h-8 w-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+              <div className="h-8 w-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500">
                 <ShoppingCart className="h-4 w-4" />
               </div>
             </div>
             <div className="mt-2">
-              <p className="text-2xl font-black text-white tracking-tight">
+              <p className="text-2xl font-black text-foreground tracking-tight">
                 {(analytics?.orders?.total ?? 0).toLocaleString()}
               </p>
               <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-xs font-bold text-emerald-400 flex items-center">
+                <span className="text-xs font-bold text-emerald-500 flex items-center">
                   <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
                   {analytics?.orders?.delivered ?? 0} Delivered
                 </span>
               </div>
             </div>
-            <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-              <span className="text-slate-400">Pending Fulfillment:</span>
-              <span className="font-bold text-amber-400">
+            <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground">Pending Fulfillment:</span>
+              <span className="font-bold text-amber-500">
                 {analytics?.orders?.pending ?? 0} Orders
               </span>
             </div>
@@ -359,9 +429,9 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Weekly Revenue Visual Chart (2 Cols) */}
         <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between pb-4">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
-              <CardTitle className="text-base font-bold text-white flex items-center gap-2">
+              <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
                 <span>Weekly Revenue & Sales Volume</span>
                 <Badge variant="brand" className="text-[10px] font-mono">
                   BDT (৳)
@@ -371,57 +441,111 @@ export default function AdminDashboardPage() {
                 Gross sales progression across direct and vendor channels over the last 7 days.
               </CardDescription>
             </div>
-            <div className="text-right">
-              <p className="text-lg font-black text-white">৳ 4,85,000</p>
-              <p className="text-[10px] text-emerald-400 font-semibold">
-                Avg ৳ 69,285 / day
-              </p>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center bg-muted/60 border border-border rounded-lg p-0.5">
+                <button
+                  onClick={() => setChartType("bar")}
+                  className={`p-1.5 rounded cursor-pointer transition ${
+                    chartType === "bar" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  title="Bar View"
+                >
+                  <BarChart3 className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={() => setChartType("area")}
+                  className={`p-1.5 rounded cursor-pointer transition ${
+                    chartType === "area" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  title="Area View"
+                >
+                  <LineChartIcon className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              <div className="text-right pl-2 hidden sm:block">
+                <p className="text-base font-black text-foreground">৳ 4,85,000</p>
+                <p className="text-[10px] text-emerald-500 font-semibold">
+                  Avg ৳ 69,285 / day
+                </p>
+              </div>
             </div>
           </CardHeader>
-          <CardContent>
-            {/* Visual Bar Chart */}
-            <div className="h-56 pt-6 flex items-end justify-between gap-3 sm:gap-6 border-b border-slate-800">
-              {weeklyRevenue.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="flex-1 flex flex-col items-center gap-2 h-full justify-end group"
-                >
-                  {/* Tooltip on hover */}
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 text-[10px] bg-slate-900 border border-slate-700 px-2 py-1 rounded text-center pointer-events-none whitespace-nowrap">
-                    <p className="font-bold text-white">৳{item.gmv.toLocaleString()}</p>
-                    <p className="text-slate-400">{item.orders} orders</p>
-                  </div>
-
-                  {/* Bar */}
-                  <div className="w-full max-w-10.5 bg-slate-800/80 rounded-t-lg overflow-hidden flex flex-col justify-end group-hover:bg-slate-700 transition">
-                    <div
-                      style={{ height: item.height }}
-                      className="w-full bg-linear-to-t from-brand-deep to-brand rounded-t-lg transition-all duration-500 group-hover:from-sky-500 group-hover:to-cyan-400"
-                    />
-                  </div>
-
-                  {/* Day Label */}
-                  <span className="text-xs font-semibold text-slate-400 group-hover:text-white transition">
-                    {item.day}
-                  </span>
-                </div>
-              ))}
-            </div>
+          <CardContent className="pt-2">
+            {/* shadcn Recharts Chart Container */}
+            <ChartContainer config={chartConfig} className="h-64 w-full">
+              {chartType === "bar" ? (
+                <BarChart data={weeklyRevenue} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis
+                    dataKey="day"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    className="text-xs"
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(val) => `৳${(val / 1000).toFixed(0)}k`}
+                    className="text-xs"
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar
+                    dataKey="gmv"
+                    fill="var(--color-brand, #3890d0)"
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={45}
+                  />
+                </BarChart>
+              ) : (
+                <AreaChart data={weeklyRevenue} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="gmvArea" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3890d0" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#3890d0" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis
+                    dataKey="day"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    className="text-xs"
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(val) => `৳${(val / 1000).toFixed(0)}k`}
+                    className="text-xs"
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Area
+                    type="monotone"
+                    dataKey="gmv"
+                    stroke="#3890d0"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#gmvArea)"
+                  />
+                </AreaChart>
+              )}
+            </ChartContainer>
 
             {/* Chart Legend & Insights */}
-            <div className="mt-4 flex flex-wrap items-center justify-between text-xs text-slate-400 gap-4">
+            <div className="mt-3 pt-3 border-t border-border flex flex-wrap items-center justify-between text-xs text-muted-foreground gap-4">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded-sm bg-brand" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-brand" />
                   <span>Platform Revenue (42%)</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded-sm bg-brand-deep" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-purple-500" />
                   <span>Vendor Marketplace (58%)</span>
                 </div>
               </div>
-              <span className="text-[11px] text-slate-400">
-                Peak Sales Day: <strong className="text-white">Friday (৳ 98,000)</strong>
+              <span className="text-[11px] text-muted-foreground">
+                Peak Sales Day: <strong className="text-foreground">Friday (৳ 98,000)</strong>
               </span>
             </div>
           </CardContent>
@@ -430,7 +554,7 @@ export default function AdminDashboardPage() {
         {/* Multi-Vendor vs Direct Platform Split Breakdown (1 Col) */}
         <Card className="flex flex-col justify-between">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-bold text-white">
+            <CardTitle className="text-base font-bold text-foreground">
               Marketplace Model Split
             </CardTitle>
             <CardDescription>
@@ -441,14 +565,14 @@ export default function AdminDashboardPage() {
             {/* Split 1: Channel Revenue */}
             <div>
               <div className="flex justify-between text-xs font-semibold mb-1.5">
-                <span className="text-sky-400">Shopora Direct (Self)</span>
-                <span className="text-purple-400">Vendor Network (3rd Party)</span>
+                <span className="text-brand">Shopora Direct (Self)</span>
+                <span className="text-purple-500">Vendor Network (3rd Party)</span>
               </div>
-              <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden flex">
+              <div className="h-3 w-full bg-muted rounded-full overflow-hidden flex">
                 <div className="h-full bg-brand" style={{ width: `${directPercent}%` }} />
                 <div className="h-full bg-purple-500" style={{ width: `${vendorPercent}%` }} />
               </div>
-              <div className="flex justify-between text-[11px] text-slate-400 mt-1 font-mono">
+              <div className="flex justify-between text-[11px] text-muted-foreground mt-1 font-mono">
                 <span>৳ {directSales.toLocaleString()} ({directPercent}%)</span>
                 <span>৳ {vendorSales.toLocaleString()} ({vendorPercent}%)</span>
               </div>
@@ -457,56 +581,56 @@ export default function AdminDashboardPage() {
             {/* Split 2: Order Fulfillment */}
             <div>
               <div className="flex justify-between text-xs font-semibold mb-1.5">
-                <span className="text-slate-300">Central Warehouse</span>
-                <span className="text-slate-300">Seller Drop-ship</span>
+                <span className="text-foreground">Central Warehouse</span>
+                <span className="text-foreground">Seller Drop-ship</span>
               </div>
-              <div className="h-2.5 w-full bg-slate-800 rounded-full overflow-hidden flex">
+              <div className="h-2.5 w-full bg-muted rounded-full overflow-hidden flex">
                 <div className="h-full bg-emerald-500" style={{ width: "65%" }} />
                 <div className="h-full bg-amber-500" style={{ width: "35%" }} />
               </div>
-              <div className="flex justify-between text-[11px] text-slate-400 mt-1 font-mono">
+              <div className="flex justify-between text-[11px] text-muted-foreground mt-1 font-mono">
                 <span>811 orders (65%)</span>
                 <span>437 orders (35%)</span>
               </div>
             </div>
 
             {/* Payment Gateway Distribution */}
-            <div className="rounded-lg bg-slate-900 border border-slate-800 p-3 space-y-2">
-              <p className="text-xs font-bold text-white flex items-center gap-1.5">
+            <div className="rounded-lg bg-muted/40 border border-border p-3 space-y-2">
+              <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <CreditCard className="h-3.5 w-3.5 text-brand" />
                 Payment Gateways Breakdown
               </p>
               <div className="grid grid-cols-3 gap-2 text-center pt-1">
-                <div className="bg-slate-950 p-2 rounded border border-slate-850">
-                  <p className="text-[10px] text-slate-400">bKash</p>
-                  <p className="text-xs font-bold text-pink-400 mt-0.5">54%</p>
+                <div className="bg-card p-2 rounded border border-border">
+                  <p className="text-[10px] text-muted-foreground">bKash</p>
+                  <p className="text-xs font-bold text-pink-500 mt-0.5">54%</p>
                 </div>
-                <div className="bg-slate-950 p-2 rounded border border-slate-850">
-                  <p className="text-[10px] text-slate-400">Cash on Del</p>
-                  <p className="text-xs font-bold text-emerald-400 mt-0.5">36%</p>
+                <div className="bg-card p-2 rounded border border-border">
+                  <p className="text-[10px] text-muted-foreground">Cash on Del</p>
+                  <p className="text-xs font-bold text-emerald-500 mt-0.5">36%</p>
                 </div>
-                <div className="bg-slate-950 p-2 rounded border border-slate-850">
-                  <p className="text-[10px] text-slate-400">Cards/SSL</p>
-                  <p className="text-xs font-bold text-sky-400 mt-0.5">10%</p>
+                <div className="bg-card p-2 rounded border border-border">
+                  <p className="text-[10px] text-muted-foreground">Cards/SSL</p>
+                  <p className="text-xs font-bold text-brand mt-0.5">10%</p>
                 </div>
               </div>
             </div>
           </CardContent>
-          <div className="p-4 border-t border-slate-800/80 bg-slate-950/60 rounded-b-xl flex items-center justify-between text-xs">
-            <span className="text-slate-400">Net Profit Margin:</span>
-            <span className="font-bold text-emerald-400">
+          <div className="p-4 border-t border-border bg-muted/20 rounded-b-xl flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">Net Profit Margin:</span>
+            <span className="font-bold text-emerald-500">
               {analytics?.revenue?.profitMarginPercent ?? 0}% (Healthy)
             </span>
           </div>
         </Card>
       </div>
 
-      {/* Product Moderation & Verification Queue (Crucial Multi-Vendor Feature) */}
-      <Card className="border-amber-500/20 bg-slate-950/90">
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-4">
+      {/* Product Moderation & Verification Queue (Converted to shadcn Table) */}
+      <Card className="border-amber-500/20 bg-card">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <CardTitle className="text-base font-bold text-white">
+              <CardTitle className="text-base font-bold text-foreground">
                 Seller Product Moderation Queue
               </CardTitle>
               <Badge variant="warning" className="text-[10px] font-bold">
@@ -519,115 +643,110 @@ export default function AdminDashboardPage() {
           </div>
           <Link
             href="/admin/products?filter=pending"
-            className="text-xs font-semibold text-sky-400 hover:underline flex items-center gap-1"
+            className="text-xs font-semibold text-brand hover:underline flex items-center gap-1"
           >
             <span>View All Pending ({realPendingProducts.length})</span>
             <ChevronRight className="h-3.5 w-3.5" />
           </Link>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-900/80 text-slate-400 font-semibold border-b border-slate-800">
-                <tr>
-                  <th className="py-3 px-4">Product Details</th>
-                  <th className="py-3 px-4">Vendor Store</th>
-                  <th className="py-3 px-4">Category</th>
-                  <th className="py-3 px-4">Price / MSRP</th>
-                  <th className="py-3 px-4">Submitted</th>
-                  <th className="py-3 px-4 text-right">Moderation Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/80 text-slate-300">
-                {realPendingProducts.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="py-8 text-center text-slate-400">
-                      <CheckCircle2 className="h-6 w-6 text-emerald-400 mx-auto mb-1.5" />
-                      <p className="font-semibold text-white">No products awaiting approval</p>
-                      <p className="text-[11px] text-slate-500 mt-0.5">All vendor submitted products have been reviewed.</p>
-                    </td>
-                  </tr>
-                ) : (
-                  realPendingProducts.slice(0, 5).map((prod) => (
-                    <tr
-                      key={prod.id}
-                      className="hover:bg-slate-900/50 transition-colors"
-                    >
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden shrink-0 flex items-center justify-center">
-                            {prod.mainImage?.media?.url ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img
-                                src={prod.mainImage?.media?.url}
-                                alt={prod.name}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <Package className="h-5 w-5 text-slate-500" />
-                            )}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="font-bold text-white truncate max-w-xs sm:max-w-md">
-                              {prod.name}
-                            </p>
-                            <p className="text-[11px] text-slate-400 font-mono">
-                              SKU: {prod.sku || "N/A"}
-                            </p>
-                          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Product Details</TableHead>
+                <TableHead>Vendor Store</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Price / MSRP</TableHead>
+                <TableHead>Submitted</TableHead>
+                <TableHead className="text-right">Moderation Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {realPendingProducts.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
+                    <CheckCircle2 className="h-6 w-6 text-emerald-500 mx-auto mb-1.5" />
+                    <p className="font-semibold text-foreground">No products awaiting approval</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">All vendor submitted products have been reviewed.</p>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                realPendingProducts.slice(0, 5).map((prod) => (
+                  <TableRow key={prod.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-muted border border-border overflow-hidden shrink-0 flex items-center justify-center">
+                          {prod.mainImage?.media?.url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={prod.mainImage?.media?.url}
+                              alt={prod.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <Package className="h-5 w-5 text-muted-foreground" />
+                          )}
                         </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="inline-flex items-center gap-1 font-semibold text-slate-200">
-                          <Store className="h-3 w-3 text-purple-400" />
-                          {prod.seller?.storeName || "Vendor"}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-slate-400">{prod.category?.name || "General"}</td>
-                      <td className="py-3 px-4">
-                        <p className="font-bold text-white">
-                          ৳ {prod.basePrice.toLocaleString()}
-                        </p>
-                      </td>
-                      <td className="py-3 px-4 text-slate-400 font-mono">
-                        {new Date(prod.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            size="xs"
-                            variant="brand"
-                            onClick={() => handleApprove(prod.id)}
-                            className="bg-emerald-600 hover:bg-emerald-500 text-white gap-1 cursor-pointer"
-                          >
-                            <CheckCircle2 className="h-3 w-3" />
-                            Approve
-                          </Button>
-                          <Button
-                            size="xs"
-                            variant="destructive"
-                            onClick={() => handleReject(prod.id)}
-                            className="gap-1 cursor-pointer"
-                          >
-                            <XCircle className="h-3 w-3" />
-                            Reject
-                          </Button>
+                        <div className="min-w-0">
+                          <p className="font-bold text-foreground truncate max-w-xs sm:max-w-md">
+                            {prod.name}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground font-mono">
+                            SKU: {prod.sku || "N/A"}
+                          </p>
                         </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center gap-1 font-semibold text-foreground">
+                        <Store className="h-3 w-3 text-purple-500" />
+                        {prod.seller?.storeName || "Vendor"}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{prod.category?.name || "General"}</TableCell>
+                    <TableCell>
+                      <p className="font-bold text-foreground">
+                        ৳ {prod.basePrice.toLocaleString()}
+                      </p>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground font-mono text-[11px]">
+                      {new Date(prod.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          size="xs"
+                          variant="brand"
+                          onClick={() => handleApprove(prod.id)}
+                          className="bg-emerald-600 hover:bg-emerald-500 text-white gap-1 cursor-pointer"
+                        >
+                          <CheckCircle2 className="h-3 w-3" />
+                          Approve
+                        </Button>
+                        <Button
+                          size="xs"
+                          variant="destructive"
+                          onClick={() => handleOpenReject(prod.id)}
+                          className="gap-1 cursor-pointer"
+                        >
+                          <XCircle className="h-3 w-3" />
+                          Reject
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
 
-      {/* Recent Orders Live Table */}
+      {/* Recent Orders Live Table (Converted to shadcn Table) */}
       <Card>
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-4">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border pb-4">
           <div>
-            <CardTitle className="text-base font-bold text-white">
+            <CardTitle className="text-base font-bold text-foreground">
               Recent Marketplace Orders
             </CardTitle>
             <CardDescription>
@@ -636,98 +755,93 @@ export default function AdminDashboardPage() {
           </div>
           <Link
             href="/admin/orders"
-            className="text-xs font-semibold text-sky-400 hover:underline flex items-center gap-1"
+            className="text-xs font-semibold text-brand hover:underline flex items-center gap-1"
           >
             <span>View All 1,248 Orders</span>
             <ChevronRight className="h-3.5 w-3.5" />
           </Link>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-900/80 text-slate-400 font-semibold border-b border-slate-800">
-                <tr>
-                  <th className="py-3 px-4">Order ID</th>
-                  <th className="py-3 px-4">Customer</th>
-                  <th className="py-3 px-4">Fulfillment Source</th>
-                  <th className="py-3 px-4">Total Amount</th>
-                  <th className="py-3 px-4">Payment</th>
-                  <th className="py-3 px-4">Fulfillment</th>
-                  <th className="py-3 px-4">Placed</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/80 text-slate-300">
-                {recentOrders.map((ord) => (
-                  <tr
-                    key={ord.id}
-                    className="hover:bg-slate-900/50 transition-colors"
-                  >
-                    <td className="py-3 px-4 font-mono font-bold text-sky-400">
-                      {ord.id}
-                    </td>
-                    <td className="py-3 px-4">
-                      <p className="font-bold text-white">{ord.customer}</p>
-                      <p className="text-[11px] text-slate-400">{ord.email}</p>
-                    </td>
-                    <td className="py-3 px-4">
-                      {ord.isPlatform ? (
-                        <Badge variant="brand" className="text-[10px]">
-                          Shopora Direct
-                        </Badge>
-                      ) : (
-                        <Badge variant="purple" className="text-[10px]">
-                          {ord.store}
-                        </Badge>
-                      )}
-                    </td>
-                    <td className="py-3 px-4 font-bold text-white font-mono">
-                      ৳ {ord.total.toLocaleString()}
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="space-y-0.5">
-                        <Badge
-                          variant={
-                            ord.paymentStatus === "paid" ? "success" : "warning"
-                          }
-                          className="text-[10px]"
-                        >
-                          {ord.paymentStatus.toUpperCase()}
-                        </Badge>
-                        <p className="text-[10px] text-slate-400">{ord.paymentMethod}</p>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Order ID</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Fulfillment Source</TableHead>
+                <TableHead>Total Amount</TableHead>
+                <TableHead>Payment</TableHead>
+                <TableHead>Fulfillment</TableHead>
+                <TableHead>Placed</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {recentOrders.map((ord) => (
+                <TableRow key={ord.id}>
+                  <TableCell className="font-mono font-bold text-brand">
+                    {ord.id}
+                  </TableCell>
+                  <TableCell>
+                    <p className="font-bold text-foreground">{ord.customer}</p>
+                    <p className="text-[11px] text-muted-foreground">{ord.email}</p>
+                  </TableCell>
+                  <TableCell>
+                    {ord.isPlatform ? (
+                      <Badge variant="brand" className="text-[10px]">
+                        Shopora Direct
+                      </Badge>
+                    ) : (
+                      <Badge variant="purple" className="text-[10px]">
+                        {ord.store}
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="font-bold text-foreground font-mono">
+                    ৳ {ord.total.toLocaleString()}
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-0.5">
                       <Badge
                         variant={
-                          ord.orderStatus === "delivered"
-                            ? "success"
-                            : ord.orderStatus === "shipped"
-                            ? "brand"
-                            : "warning"
+                          ord.paymentStatus === "paid" ? "success" : "warning"
                         }
-                        className="text-[10px] capitalize"
+                        className="text-[10px]"
                       >
-                        {ord.orderStatus}
+                        {ord.paymentStatus.toUpperCase()}
                       </Badge>
-                    </td>
-                    <td className="py-3 px-4 text-slate-400 font-mono text-[11px]">
-                      {ord.date}
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <Link
-                        href={`/admin/orders/${ord.id}`}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 inline-flex transition"
-                        title="View Order Details"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      <p className="text-[10px] text-muted-foreground">{ord.paymentMethod}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        ord.orderStatus === "delivered"
+                          ? "success"
+                          : ord.orderStatus === "shipped"
+                          ? "brand"
+                          : "warning"
+                      }
+                      className="text-[10px] capitalize"
+                    >
+                      {ord.orderStatus}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground font-mono text-[11px]">
+                    {ord.date}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Link
+                      href={`/admin/orders/${ord.id}`}
+                      className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted inline-flex transition"
+                      title="View Order Details"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
 
@@ -735,56 +849,110 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Link
           href="/admin/products/new"
-          className="p-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-850 hover:border-slate-700 transition flex items-center gap-3.5 group"
+          className="p-4 rounded-xl border border-border bg-card hover:border-brand/40 hover:shadow-xs transition flex items-center gap-3.5 group"
         >
-          <div className="h-10 w-10 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
+          <div className="h-10 w-10 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-brand">
             <Package className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-xs font-bold text-white">Add New Product</p>
-            <p className="text-[11px] text-slate-400">Direct or vendor upload</p>
+            <p className="text-xs font-bold text-foreground group-hover:text-brand transition">Add New Product</p>
+            <p className="text-[11px] text-muted-foreground">Direct or vendor upload</p>
           </div>
         </Link>
 
         <Link
           href="/admin/attributes"
-          className="p-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-850 hover:border-slate-700 transition flex items-center gap-3.5 group"
+          className="p-4 rounded-xl border border-border bg-card hover:border-brand/40 hover:shadow-xs transition flex items-center gap-3.5 group"
         >
-          <div className="h-10 w-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+          <div className="h-10 w-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500">
             <SlidersHorizontal className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-xs font-bold text-white">Attribute Combinations</p>
-            <p className="text-[11px] text-slate-400">Cartesian variant generator</p>
+            <p className="text-xs font-bold text-foreground group-hover:text-brand transition">Attribute Combinations</p>
+            <p className="text-[11px] text-muted-foreground">Cartesian variant generator</p>
           </div>
         </Link>
 
         <Link
-          href="/admin/sellers/kyc"
-          className="p-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-850 hover:border-slate-700 transition flex items-center gap-3.5 group"
+          href="/admin/sellers"
+          className="p-4 rounded-xl border border-border bg-card hover:border-brand/40 hover:shadow-xs transition flex items-center gap-3.5 group"
         >
-          <div className="h-10 w-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+          <div className="h-10 w-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
             <ShieldCheck className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-xs font-bold text-white">KYC Verification</p>
-            <p className="text-[11px] text-slate-400">3 vendors awaiting review</p>
+            <p className="text-xs font-bold text-foreground group-hover:text-brand transition">KYC Verification</p>
+            <p className="text-[11px] text-muted-foreground">Vendor account approvals</p>
           </div>
         </Link>
 
         <Link
           href="/admin/payouts"
-          className="p-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-850 hover:border-slate-700 transition flex items-center gap-3.5 group"
+          className="p-4 rounded-xl border border-border bg-card hover:border-brand/40 hover:shadow-xs transition flex items-center gap-3.5 group"
         >
-          <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+          <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500">
             <CreditCard className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-xs font-bold text-white">Vendor Payouts</p>
-            <p className="text-[11px] text-slate-400">Process wallet withdrawals</p>
+            <p className="text-xs font-bold text-foreground group-hover:text-brand transition">Vendor Payouts</p>
+            <p className="text-[11px] text-muted-foreground">Process wallet withdrawals</p>
           </div>
         </Link>
       </div>
+
+      {/* shadcn Rejection Dialog Modal */}
+      <Dialog
+        open={Boolean(rejectingProductId)}
+        onOpenChange={(open) => !open && setRejectingProductId(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-rose-500">
+              <AlertTriangle className="h-5 w-5" />
+              <span>Reject Submitted Product</span>
+            </DialogTitle>
+            <DialogDescription>
+              Please provide clear feedback explaining why this product is rejected so the seller can revise and resubmit.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2 py-2">
+            <Label htmlFor="rejection-reason" className="text-xs">
+              Rejection Reason & Compliance Notes <span className="text-rose-500">*</span>
+            </Label>
+            <Textarea
+              id="rejection-reason"
+              placeholder="e.g. Incomplete specifications, low image resolution, or trademark violation..."
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              rows={4}
+            />
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setRejectingProductId(null)}
+              disabled={isRejecting}
+              className="text-xs cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={handleConfirmReject}
+              disabled={isRejecting}
+              className="text-xs font-bold cursor-pointer"
+            >
+              {isRejecting ? "Rejecting..." : "Confirm Rejection"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

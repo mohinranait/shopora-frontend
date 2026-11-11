@@ -26,6 +26,35 @@ import {
   useReviewSellerApplicationMutation,
 } from "@/redux";
 import type { ISeller, SellerStatus } from "@/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface ReviewModalState {
   isOpen: boolean;
@@ -73,125 +102,119 @@ function ReviewSellerModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in">
-      <div className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 text-left space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+    <Dialog open={true} onOpenChange={(open) => !open && !isLoading && onClose()}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
           <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/20 text-brand">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
               <Store className="h-4 w-4" />
             </span>
             <div>
-              <h3 className="text-base font-bold text-white">Review &amp; Edit Seller</h3>
-              <p className="text-xs text-slate-400">{seller.storeName}</p>
+              <DialogTitle className="text-base font-bold">Review &amp; Edit Seller</DialogTitle>
+              <DialogDescription className="text-xs">{seller.storeName}</DialogDescription>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
+        </DialogHeader>
 
-        <form onSubmit={handleSave} className="space-y-4">
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold text-slate-300">
-              Account Status
-            </label>
-            <select
+        <form onSubmit={handleSave} className="space-y-4 py-1">
+          <div className="space-y-1.5">
+            <Label htmlFor="seller-status">Account Status</Label>
+            <Select
               value={status}
-              onChange={(e) => setStatus(e.target.value as SellerStatus)}
-              className="w-full rounded-xl border border-slate-800 bg-slate-800/80 px-3.5 py-2.5 text-xs text-white outline-none focus:border-brand"
+              onValueChange={(val) => setStatus(val as SellerStatus)}
             >
-              <option value="APPROVED">APPROVED (Active &amp; Selling)</option>
-              <option value="PENDING">PENDING (Under Review)</option>
-              <option value="SUSPENDED">SUSPENDED (Temporarily Disabled)</option>
-              <option value="REJECTED">REJECTED (Declined Application)</option>
-            </select>
+              <SelectTrigger id="seller-status">
+                <SelectValue placeholder="Select Status">
+                  {status === "APPROVED"
+                    ? "APPROVED (Active & Selling)"
+                    : status === "PENDING"
+                    ? "PENDING (Under Review)"
+                    : status === "SUSPENDED"
+                    ? "SUSPENDED (Temporarily Disabled)"
+                    : "REJECTED (Declined Application)"}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="APPROVED">APPROVED (Active &amp; Selling)</SelectItem>
+                <SelectItem value="PENDING">PENDING (Under Review)</SelectItem>
+                <SelectItem value="SUSPENDED">SUSPENDED (Temporarily Disabled)</SelectItem>
+                <SelectItem value="REJECTED">REJECTED (Declined Application)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold text-slate-300">
-              Platform Commission Rate (%)
-            </label>
+          <div className="space-y-1.5">
+            <Label htmlFor="seller-comm">Platform Commission Rate (%)</Label>
             <div className="relative">
-              <input
+              <Input
+                id="seller-comm"
                 type="number"
                 min="0"
                 max="100"
                 step="0.5"
                 value={commissionRate}
                 onChange={(e) => setCommissionRate(Number(e.target.value))}
-                className="w-full rounded-xl border border-slate-800 bg-slate-800/80 px-3.5 py-2.5 text-xs text-white outline-none focus:border-brand"
               />
-              <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">
+              <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
                 %
               </span>
             </div>
-            <p className="mt-1 text-[11px] text-slate-500">
+            <p className="text-[11px] text-muted-foreground">
               Percentage retained by platform on this vendor&apos;s delivered sales.
             </p>
           </div>
 
-          <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-800/40 p-3.5">
+          <div className="flex items-center justify-between rounded-xl border border-border bg-muted/30 p-3.5">
             <div>
-              <p className="text-xs font-bold text-white">Verified Merchant Badge</p>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-xs font-bold text-foreground">Verified Merchant Badge</p>
+              <p className="text-[11px] text-muted-foreground">
                 Displays trusted checkmark icon on the public store and products.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => setIsVerified(!isVerified)}
-              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
-                isVerified ? "bg-brand" : "bg-slate-700"
-              }`}
-            >
-              <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white ring-0 transition duration-200 ${
-                  isVerified ? "translate-x-5" : "translate-x-0"
-                }`}
-              />
-            </button>
+            <Switch checked={isVerified} onCheckedChange={setIsVerified} />
           </div>
 
           {status === "REJECTED" && (
-            <div>
-              <label className="mb-1.5 block text-xs font-semibold text-rose-400">
+            <div className="space-y-1.5">
+              <Label htmlFor="seller-reject-reason" className="text-rose-500">
                 Rejection Reason (Sent to Vendor)
-              </label>
-              <textarea
+              </Label>
+              <Textarea
+                id="seller-reject-reason"
                 rows={2}
                 required
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 placeholder="Explain what documents or information need correction..."
-                className="w-full rounded-xl border border-rose-500/30 bg-slate-800/80 p-3 text-xs text-white outline-none focus:border-rose-400"
               />
             </div>
           )}
 
-          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
-            <button
+          <DialogFooter className="pt-3 border-t border-border gap-2">
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={onClose}
               disabled={isLoading}
-              className="rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700 transition"
+              className="text-xs"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
+              variant="brand"
+              size="sm"
               disabled={isLoading}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-brand-deep px-5 py-2 text-xs font-bold text-white transition hover:bg-brand disabled:opacity-50"
+              className="text-xs font-bold"
             >
-              {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />}
               <span>Save Changes</span>
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -207,7 +230,6 @@ export default function AdminSellersPage() {
 
   const [reviewSeller] = useReviewSellerApplicationMutation();
 
-  // Quick action: quick approve
   const handleQuickApprove = async (seller: ISeller) => {
     try {
       await reviewSeller({
@@ -217,140 +239,118 @@ export default function AdminSellersPage() {
           isVerified: true,
         },
       }).unwrap();
-      toast.success(`"${seller.storeName}" approved and verified!`);
+      toast.success(`Merchant "${seller.storeName}" has been approved!`);
       void refetch();
-    } catch {
-      toast.error("Failed to approve seller");
+    } catch (err: unknown) {
+      toast.error(
+        (err as { data?: { message?: string } })?.data?.message || "Failed to approve seller"
+      );
     }
   };
 
-  // Quick action: quick suspend
-  const handleQuickSuspend = async (seller: ISeller) => {
-    try {
-      await reviewSeller({
-        id: seller.id,
-        data: {
-          status: "SUSPENDED",
-        },
-      }).unwrap();
-      toast.info(`"${seller.storeName}" has been suspended.`);
-      void refetch();
-    } catch {
-      toast.error("Failed to suspend seller");
-    }
-  };
-
-  // Client search filter
   const filteredSellers = useMemo(() => {
     if (!search.trim()) return sellers;
     const q = search.toLowerCase();
-    return sellers.filter(
-      (s) =>
-        s.storeName.toLowerCase().includes(q) ||
-        s.storeSlug.toLowerCase().includes(q) ||
-        (s.userName && s.userName.toLowerCase().includes(q)) ||
-        (s.userEmail && s.userEmail.toLowerCase().includes(q)) ||
-        (s.phone && s.phone.includes(q))
-    );
+    return sellers.filter((s) => {
+      const name = s.storeName.toLowerCase();
+      const owner = s.userName?.toLowerCase() || "";
+      const phone = s.phone?.toLowerCase() || "";
+      const email = s.userEmail?.toLowerCase() || "";
+      return name.includes(q) || owner.includes(q) || phone.includes(q) || email.includes(q);
+    });
   }, [sellers, search]);
 
-  // Dynamic Statistics
   const metrics = useMemo(() => {
-    const total = sellers.length;
-    const approved = sellers.filter((s) => s.status === "APPROVED").length;
-    const pending = sellers.filter((s) => s.status === "PENDING").length;
-    const totalProducts = sellers.reduce((sum, s) => sum + (s.productCount || 0), 0);
-    const totalWalletBalance = sellers.reduce(
-      (sum, s) => sum + (s.wallet?.balance || 0),
-      0
-    );
-    return { total, approved, pending, totalProducts, totalWalletBalance };
+    let pendingCount = 0;
+    let approvedCount = 0;
+    let totalProducts = 0;
+    let totalBalances = 0;
+
+    sellers.forEach((s) => {
+      if (s.status === "PENDING") pendingCount += 1;
+      if (s.status === "APPROVED") approvedCount += 1;
+      totalProducts += s.productCount || 0;
+      totalBalances += s.wallet?.balance || 0;
+    });
+
+    return { pendingCount, approvedCount, totalProducts, totalBalances };
   }, [sellers]);
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col justify-between gap-4 border-b border-slate-800/80 pb-4 sm:flex-row sm:items-center">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
-            Marketplace Vendors
+          <h1 className="text-2xl font-black text-foreground tracking-tight">
+            Marketplace Vendor Directory
           </h1>
-          <p className="mt-1 text-xs text-slate-400 sm:text-sm">
-            Manage registered sellers, configure commission agreements, audit store KYC, and manage active store status.
+          <p className="text-xs text-muted-foreground mt-1">
+            Review vendor onboarding requests, commission rates, store verification, and escrow balances.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          <Link
-            href="/admin/sellers/kyc"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-brand/40 bg-brand/10 px-3.5 py-2 text-xs font-bold text-brand transition hover:bg-brand/20"
-          >
-            <ShieldCheck className="h-4 w-4" />
-            <span>KYC Verification Portal</span>
-          </Link>
-
-          <button
-            type="button"
-            onClick={() => refetch()}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-300 transition hover:bg-slate-800 hover:text-white"
-          >
-            <RefreshCw className="h-3.5 w-3.5" />
-            <span>Refresh</span>
-          </button>
-        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => refetch()}
+          className="text-xs gap-1.5 self-start sm:self-auto cursor-pointer"
+        >
+          <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" />
+          <span>Refresh</span>
+        </Button>
       </div>
 
-      {/* Metrics Cards */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
+      {/* KPI Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400">Total Vendors</span>
-            <span className="rounded-lg bg-slate-800 p-2 text-slate-300">
-              <Store className="h-4 w-4" />
-            </span>
-          </div>
-          <p className="mt-2 text-2xl font-black text-white">{metrics.total}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">Across all onboarding stages</p>
-        </div>
-
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-emerald-400">Approved Stores</span>
-            <span className="rounded-lg bg-emerald-500/10 p-2 text-emerald-400">
-              <CheckCircle2 className="h-4 w-4" />
-            </span>
-          </div>
-          <p className="mt-2 text-2xl font-black text-emerald-400">{metrics.approved}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">Active &amp; selling publicly</p>
-        </div>
-
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-amber-400">Pending Review</span>
-            <span className="rounded-lg bg-amber-500/10 p-2 text-amber-400">
+            <span className="text-xs font-semibold text-muted-foreground">Pending Review</span>
+            <span className="rounded-lg bg-amber-500/10 p-2 text-amber-500">
               <ShieldAlert className="h-4 w-4" />
             </span>
           </div>
-          <p className="mt-2 text-2xl font-black text-amber-400">{metrics.pending}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">Awaiting audit &amp; approval</p>
-        </div>
+          <p className="mt-2 text-2xl font-black text-foreground">{metrics.pendingCount}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Vendors awaiting KYC moderation</p>
+        </Card>
 
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
+        <Card className="p-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-sky-400">Vendor Balance</span>
+            <span className="text-xs font-semibold text-muted-foreground">Active Merchants</span>
+            <span className="rounded-lg bg-emerald-500/10 p-2 text-emerald-500">
+              <CheckCircle2 className="h-4 w-4" />
+            </span>
+          </div>
+          <p className="mt-2 text-2xl font-black text-foreground">{metrics.approvedCount}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Verified &amp; active storefronts</p>
+        </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-muted-foreground">Total Vendor Catalog</span>
             <span className="rounded-lg bg-sky-500/10 p-2 text-brand">
+              <Package className="h-4 w-4" />
+            </span>
+          </div>
+          <p className="mt-2 text-2xl font-black text-foreground">{metrics.totalProducts}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Active seller SKU variants</p>
+        </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-muted-foreground">Total Vendor Balance</span>
+            <span className="rounded-lg bg-purple-500/10 p-2 text-purple-500">
               <CreditCard className="h-4 w-4" />
             </span>
           </div>
-          <p className="mt-2 text-2xl font-black text-white">
-            ৳{Math.round(metrics.totalWalletBalance).toLocaleString("en-US")}
+          <p className="mt-2 text-2xl font-black text-foreground font-mono">
+            ৳{Math.round(metrics.totalBalances).toLocaleString("en-US")}
           </p>
-          <p className="text-[11px] text-slate-500 mt-0.5">Total seller wallet reserves</p>
-        </div>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Combined seller wallet reserves</p>
+        </Card>
       </div>
 
       {/* Control Bar: Tabs & Search */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-3 sm:flex-row sm:items-center sm:justify-between">
         {/* Status Tabs */}
         <div className="flex flex-wrap items-center gap-1.5">
           {(["ALL", "APPROVED", "PENDING", "SUSPENDED"] as const).map((tab) => (
@@ -358,10 +358,10 @@ export default function AdminSellersPage() {
               key={tab}
               type="button"
               onClick={() => setActiveTab(tab)}
-              className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+              className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition cursor-pointer ${
                 activeTab === tab
-                  ? "bg-brand text-white"
-                  : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                  ? "bg-brand text-white shadow-xs"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
               {tab === "ALL" && "All Sellers"}
@@ -374,241 +374,223 @@ export default function AdminSellersPage() {
 
         {/* Search */}
         <div className="relative w-full sm:w-72">
-          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
-          <input
+          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground z-10" />
+          <Input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search stores, owner, phone…"
-            className="w-full rounded-xl border border-slate-800 bg-slate-800/80 py-2 pl-8 pr-3 text-xs text-white placeholder-slate-500 outline-none transition focus:border-brand"
+            className="pl-8 text-xs h-9"
           />
         </div>
       </div>
 
       {/* Sellers List Table */}
       {isLoading ? (
-        <div className="flex h-72 flex-col items-center justify-center gap-3 text-slate-400">
+        <div className="flex h-72 flex-col items-center justify-center gap-3 text-muted-foreground">
           <Loader2 className="h-8 w-8 animate-spin text-brand" />
           <p className="text-xs">Loading marketplace sellers…</p>
         </div>
       ) : isError ? (
-        <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-8 text-center text-rose-400">
+        <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-8 text-center text-rose-500">
           <AlertCircle className="mx-auto mb-2 h-8 w-8" />
-          <p className="text-sm font-bold text-white">Failed to load sellers</p>
-          <button
+          <p className="text-sm font-bold text-foreground">Failed to load sellers</p>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => refetch()}
-            className="mt-3 rounded-xl bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700"
+            className="mt-3 text-xs"
           >
             Retry
-          </button>
+          </Button>
         </div>
       ) : filteredSellers.length === 0 ? (
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-12 text-center text-slate-400">
-          <Store className="mx-auto mb-2 h-8 w-8 text-slate-600" />
-          <p className="text-sm font-bold text-white">No sellers found</p>
-          <p className="text-xs text-slate-500 mt-1">
+        <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground">
+          <Store className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
+          <p className="text-sm font-bold text-foreground">No sellers found</p>
+          <p className="text-xs text-muted-foreground mt-1">
             {search ? "Try adjusting your search keywords" : "No vendors in this status category"}
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="border-b border-slate-800 bg-slate-800/50 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                <tr>
-                  <th className="px-4 py-3.5">Store Details</th>
-                  <th className="px-4 py-3.5">Owner / Contact</th>
-                  <th className="px-4 py-3.5">Commission</th>
-                  <th className="px-4 py-3.5">Products</th>
-                  <th className="px-4 py-3.5">Wallet Balance</th>
-                  <th className="px-4 py-3.5">Status</th>
-                  <th className="px-4 py-3.5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/70 text-slate-300">
-                {filteredSellers.map((seller) => {
-                  const isApproved = seller.status === "APPROVED";
-                  const isPending = seller.status === "PENDING";
-                  const isSuspended = seller.status === "SUSPENDED";
+        <Card className="overflow-hidden p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Store Details</TableHead>
+                <TableHead>Owner / Contact</TableHead>
+                <TableHead>Commission</TableHead>
+                <TableHead>Products</TableHead>
+                <TableHead>Wallet Balance</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredSellers.map((seller) => {
+                const isApproved = seller.status === "APPROVED";
+                const isPending = seller.status === "PENDING";
+                const isSuspended = seller.status === "SUSPENDED";
+                const logoUrl =
+                  typeof seller.logo === "object" && seller.logo?.media?.url
+                    ? seller.logo.media.url
+                    : typeof seller.storeLogo === "string"
+                    ? seller.storeLogo
+                    : null;
 
-                  return (
-                    <tr key={seller.id} className="hover:bg-slate-800/40 transition">
-                      {/* Store */}
-                      <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-700 bg-slate-800 font-bold text-brand overflow-hidden">
-                            {((seller.logo as any)?.media?.url || (seller.storeLogo as any)?.media?.url || seller.storeLogo) ? (
-                              <img
-                                src={((seller.logo as any)?.media?.url || (seller.storeLogo as any)?.media?.url || seller.storeLogo) as string}
-                                alt={seller.storeName}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              seller.storeName.charAt(0)
-                            )}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-1.5">
-                              <Link
-                                href={`/admin/sellers/${seller.id}`}
-                                className="font-bold text-white hover:text-brand transition flex items-center gap-1.5"
-                              >
-                                <span>{seller.storeName}</span>
-                                {seller.isVerified && (
-                                  <span title="Verified Merchant">
-                                    <ShieldCheck className="h-3.5 w-3.5 text-brand" />
-                                  </span>
-                                )}
-                              </Link>
-                            </div>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <Link
-                                href={`/vendors/${seller.storeSlug}`}
-                                target="_blank"
-                                className="inline-flex items-center gap-1 text-[11px] font-mono text-slate-400 hover:text-brand transition"
-                              >
-                                <span>/{seller.storeSlug}</span>
-                                <ExternalLink className="h-2.5 w-2.5" />
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Owner */}
-                      <td className="px-4 py-3.5">
-                        <p className="font-semibold text-slate-200">
-                          {seller.userName || "Merchant"}
-                        </p>
-                        <div className="mt-0.5 space-y-0.5 text-[11px] text-slate-400">
-                          {seller.phone && (
-                            <p className="flex items-center gap-1 font-mono">
-                              <Phone className="h-3 w-3 text-slate-500" />
-                              {seller.phone}
-                            </p>
-                          )}
-                          {seller.userEmail && (
-                            <p className="flex items-center gap-1">
-                              <Mail className="h-3 w-3 text-slate-500" />
-                              <span className="truncate max-w-[150px]">{seller.userEmail}</span>
-                            </p>
+                return (
+                  <TableRow key={seller.id}>
+                    {/* Store */}
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-muted font-bold text-brand overflow-hidden">
+                          {logoUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={logoUrl}
+                              alt={seller.storeName}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            seller.storeName.charAt(0)
                           )}
                         </div>
-                      </td>
-
-                      {/* Commission */}
-                      <td className="px-4 py-3.5">
-                        <button
-                          type="button"
-                          onClick={() => setReviewModal({ isOpen: true, seller })}
-                          className="group inline-flex items-center gap-1 rounded-lg bg-slate-800 px-2.5 py-1 text-xs font-bold text-brand ring-1 ring-slate-700 hover:bg-slate-700 transition"
-                          title="Click to change commission"
-                        >
-                          <span>{seller.commissionRate ?? 10}%</span>
-                          <Edit2 className="h-3 w-3 text-slate-400 group-hover:text-white" />
-                        </button>
-                      </td>
-
-                      {/* Products */}
-                      <td className="px-4 py-3.5 font-bold text-slate-200">
-                        <div className="flex items-center gap-1.5">
-                          <Package className="h-3.5 w-3.5 text-slate-500" />
-                          <span>{seller.productCount || 0}</span>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <Link
+                              href={`/admin/sellers/${seller.id}`}
+                              className="font-bold text-foreground hover:text-brand transition flex items-center gap-1.5"
+                            >
+                              <span>{seller.storeName}</span>
+                              {seller.isVerified && (
+                                <span title="Verified Merchant">
+                                  <ShieldCheck className="h-3.5 w-3.5 text-brand" />
+                                </span>
+                              )}
+                            </Link>
+                          </div>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <Link
+                              href={`/vendors/${seller.storeSlug}`}
+                              target="_blank"
+                              className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-brand transition"
+                            >
+                              <span>/{seller.storeSlug}</span>
+                              <ExternalLink className="h-2.5 w-2.5" />
+                            </Link>
+                          </div>
                         </div>
-                      </td>
+                      </div>
+                    </TableCell>
 
-                      {/* Wallet Balance */}
-                      <td className="px-4 py-3.5">
-                        <p className="font-bold text-white">
-                          ৳{Math.round(seller.wallet?.balance || 0).toLocaleString("en-US")}
-                        </p>
-                        <p className="text-[11px] text-slate-500">
-                          Earned: ৳{Math.round(seller.wallet?.totalEarnings || 0).toLocaleString("en-US")}
-                        </p>
-                      </td>
-
-                      {/* Status */}
-                      <td className="px-4 py-3.5">
-                        {isApproved ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-400 ring-1 ring-emerald-500/20">
-                            <CheckCircle2 className="h-3 w-3" />
-                            Approved
-                          </span>
-                        ) : isPending ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-bold text-amber-400 ring-1 ring-amber-500/20">
-                            <ShieldAlert className="h-3 w-3" />
-                            Pending KYC
-                          </span>
-                        ) : isSuspended ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-bold text-rose-400 ring-1 ring-rose-500/20">
-                            <Ban className="h-3 w-3" />
-                            Suspended
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-500/10 px-2.5 py-0.5 text-[11px] font-bold text-slate-400 ring-1 ring-slate-500/20">
-                            {seller.status}
-                          </span>
+                    {/* Owner */}
+                    <TableCell>
+                      <p className="font-semibold text-foreground">
+                        {seller.userName || "Merchant"}
+                      </p>
+                      <div className="mt-0.5 space-y-0.5 text-[11px] text-muted-foreground">
+                        {seller.phone && (
+                          <p className="flex items-center gap-1 font-mono">
+                            <Phone className="h-3 w-3 text-muted-foreground" />
+                            {seller.phone}
+                          </p>
                         )}
-                      </td>
+                        {seller.userEmail && (
+                          <p className="flex items-center gap-1">
+                            <Mail className="h-3 w-3 text-muted-foreground" />
+                            <span className="truncate max-w-[150px]">{seller.userEmail}</span>
+                          </p>
+                        )}
+                      </div>
+                    </TableCell>
 
-                      {/* Actions */}
-                      <td className="px-4 py-3.5 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          {isPending && (
-                            <button
-                              type="button"
-                              onClick={() => handleQuickApprove(seller)}
-                              className="rounded-lg bg-emerald-600/20 px-2.5 py-1 text-xs font-bold text-emerald-400 hover:bg-emerald-600 hover:text-white transition"
-                            >
-                              Approve
-                            </button>
-                          )}
+                    {/* Commission */}
+                    <TableCell>
+                      <button
+                        type="button"
+                        onClick={() => setReviewModal({ isOpen: true, seller })}
+                        className="group inline-flex items-center gap-1 rounded-lg bg-muted px-2.5 py-1 text-xs font-bold text-brand border border-border hover:bg-muted/80 transition cursor-pointer"
+                        title="Click to change commission"
+                      >
+                        <span>{seller.commissionRate ?? 10}%</span>
+                        <Edit2 className="h-3 w-3 text-muted-foreground group-hover:text-foreground" />
+                      </button>
+                    </TableCell>
 
-                          {isApproved && (
-                            <button
-                              type="button"
-                              onClick={() => handleQuickSuspend(seller)}
-                              className="rounded-lg bg-rose-500/10 px-2.5 py-1 text-xs font-semibold text-rose-400 hover:bg-rose-600 hover:text-white transition"
-                            >
-                              Suspend
-                            </button>
-                          )}
+                    {/* Products */}
+                    <TableCell className="font-bold text-foreground">
+                      <div className="flex items-center gap-1.5">
+                        <Package className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span>{seller.productCount || 0}</span>
+                      </div>
+                    </TableCell>
 
-                          <Link
-                            href={`/admin/sellers/${seller.id}`}
-                            className="rounded-lg bg-brand/10 border border-brand/20 px-2.5 py-1 text-xs font-bold text-brand hover:bg-brand hover:text-white transition"
-                            title="View comprehensive vendor performance & analytics"
+                    {/* Wallet Balance */}
+                    <TableCell>
+                      <p className="font-bold text-foreground font-mono">
+                        ৳{Math.round(seller.wallet?.balance || 0).toLocaleString("en-US")}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">
+                        Earned: ৳{Math.round(seller.wallet?.totalEarnings || 0).toLocaleString("en-US")}
+                      </p>
+                    </TableCell>
+
+                    {/* Status */}
+                    <TableCell>
+                      {isApproved ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-500 border border-emerald-500/20">
+                          <CheckCircle2 className="h-3 w-3" />
+                          Approved
+                        </span>
+                      ) : isPending ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-bold text-amber-500 border border-amber-500/20">
+                          <ShieldAlert className="h-3 w-3" />
+                          Pending KYC
+                        </span>
+                      ) : isSuspended ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-bold text-rose-500 border border-rose-500/20">
+                          <Ban className="h-3 w-3" />
+                          Suspended
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-[11px] font-bold text-muted-foreground border border-border">
+                          {seller.status}
+                        </span>
+                      )}
+                    </TableCell>
+
+                    {/* Actions */}
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        {isPending && (
+                          <Button
+                            size="xs"
+                            variant="brand"
+                            onClick={() => handleQuickApprove(seller)}
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
                           >
-                            Details
-                          </Link>
-
-                          <button
-                            type="button"
-                            onClick={() => setReviewModal({ isOpen: true, seller })}
-                            className="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white transition"
-                          >
-                            Review
-                          </button>
-
-                          <Link
-                            href="/admin/sellers/kyc"
-                            className="rounded-lg border border-slate-700 bg-slate-800 p-1 text-slate-400 hover:bg-slate-700 hover:text-brand transition"
-                            title="Audit KYC documents"
-                          >
-                            <ShieldCheck className="h-3.5 w-3.5" />
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                            Approve
+                          </Button>
+                        )}
+                        <Button
+                          size="xs"
+                          variant="outline"
+                          onClick={() => setReviewModal({ isOpen: true, seller })}
+                          className="font-semibold"
+                        >
+                          Review
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Card>
       )}
 
-      {/* Review & Commission Dialog */}
+      {/* Review & Edit Modal (shadcn Dialog) */}
       {reviewModal.isOpen && reviewModal.seller && (
         <ReviewSellerModal
           seller={reviewModal.seller}

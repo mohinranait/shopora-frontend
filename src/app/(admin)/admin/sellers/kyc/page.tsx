@@ -23,6 +23,28 @@ import {
   useReviewSellerApplicationMutation,
 } from "@/redux";
 import type { ISeller } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface RejectModalState {
   isOpen: boolean;
@@ -72,61 +94,57 @@ function RejectKycModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in">
-      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 text-left space-y-5">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div className="flex items-center gap-2 text-rose-400">
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-md border-border bg-card text-card-foreground sm:rounded-2xl">
+        <DialogHeader>
+          <div className="flex items-center gap-2 text-rose-500">
             <BadgeAlert className="h-5 w-5" />
-            <h3 className="text-base font-bold text-white">Reject KYC Verification</h3>
+            <DialogTitle className="text-base font-bold text-foreground">Reject KYC Verification</DialogTitle>
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-
-        <p className="text-xs text-slate-400 leading-relaxed">
-          Specify why the KYC application for <strong className="text-white">{seller.storeName}</strong> is deficient. This notification will be displayed in the vendor&apos;s portal.
-        </p>
+          <DialogDescription className="text-xs text-muted-foreground leading-relaxed pt-1">
+            Specify why the KYC application for <strong className="text-foreground">{seller.storeName}</strong> is deficient. This notification will be displayed in the vendor&apos;s portal.
+          </DialogDescription>
+        </DialogHeader>
 
         <form onSubmit={handleReject} className="space-y-4">
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold text-rose-400">
+          <div className="space-y-1.5">
+            <Label htmlFor="rejection-reason" className="text-xs font-semibold text-rose-500">
               Deficiency / Rejection Reason <span className="text-rose-500">*</span>
-            </label>
-            <textarea
+            </Label>
+            <Textarea
+              id="rejection-reason"
               rows={3}
               required
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="e.g. Trade license expired or NID name does not match the bank account holder name..."
-              className="w-full rounded-xl border border-rose-500/30 bg-slate-800/80 p-3 text-xs text-white outline-none focus:border-rose-400"
+              className="border-rose-500/30 bg-muted/40 text-foreground placeholder:text-muted-foreground focus-visible:ring-rose-400"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-2.5 pt-2">
-            <button
+          <DialogFooter className="pt-2">
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={onClose}
               disabled={isLoading}
-              className="rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700 transition"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
+              size="sm"
               disabled={isLoading}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-5 py-2 text-xs font-bold text-white transition hover:bg-rose-500 disabled:opacity-50"
+              className="gap-1.5 bg-rose-600 font-bold text-white hover:bg-rose-500"
             >
               {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               <span>Reject Application</span>
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -142,144 +160,143 @@ function InspectKycModal({
   onReject: (seller: ISeller) => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in">
-      <div className="w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900 p-6 text-left space-y-6 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border-border bg-card text-card-foreground sm:rounded-2xl">
+        <DialogHeader>
           <div className="flex items-center gap-2.5">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/20 text-brand">
               <FileCheck2 className="h-5 w-5" />
             </span>
             <div>
-              <h3 className="text-base font-bold text-white">KYC Document Dossier</h3>
-              <p className="text-xs text-slate-400">{seller.storeName}</p>
+              <DialogTitle className="text-base font-bold text-foreground">KYC Document Dossier</DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">{seller.storeName}</DialogDescription>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
+        </DialogHeader>
 
-        {/* 1. Identity & Business Details */}
-        <div className="rounded-xl border border-slate-800 bg-slate-800/40 p-4 space-y-3">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <Building2 className="h-3.5 w-3.5 text-brand" />
-            <span>Business Entity &amp; Operating Address</span>
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div>
-              <p className="text-slate-500">Store Name:</p>
-              <p className="font-bold text-white">{seller.storeName}</p>
-            </div>
-            <div>
-              <p className="text-slate-500">Registered Owner:</p>
-              <p className="font-bold text-white">{seller.userName || "Merchant"}</p>
-            </div>
-            <div>
-              <p className="text-slate-500">Hotline / Mobile Phone:</p>
-              <p className="font-mono text-slate-200">{seller.phone || "None"}</p>
-            </div>
-            <div>
-              <p className="text-slate-500">Official Email:</p>
-              <p className="text-slate-200">{seller.userEmail || "None"}</p>
-            </div>
-            <div className="sm:col-span-2">
-              <p className="text-slate-500">Physical Business Address:</p>
-              <p className="text-slate-200">{seller.businessAddress || "None provided"}</p>
+        <div className="space-y-4">
+          {/* 1. Identity & Business Details */}
+          <div className="rounded-xl border border-border bg-muted/40 p-4 space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <Building2 className="h-3.5 w-3.5 text-brand" />
+              <span>Business Entity &amp; Operating Address</span>
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div>
+                <p className="text-muted-foreground">Store Name:</p>
+                <p className="font-bold text-foreground">{seller.storeName}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Registered Owner:</p>
+                <p className="font-bold text-foreground">{seller.userName || "Merchant"}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Hotline / Mobile Phone:</p>
+                <p className="font-mono text-foreground">{seller.phone || "None"}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Official Email:</p>
+                <p className="text-foreground">{seller.userEmail || "None"}</p>
+              </div>
+              <div className="sm:col-span-2">
+                <p className="text-muted-foreground">Physical Business Address:</p>
+                <p className="text-foreground">{seller.businessAddress || "None provided"}</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* 2. KYC Identifiers */}
-        <div className="rounded-xl border border-slate-800 bg-slate-800/40 p-4 space-y-3">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <FileText className="h-3.5 w-3.5 text-emerald-400" />
-            <span>Statutory Compliance Numbers</span>
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div>
-              <p className="text-slate-500">National ID (NID) or Trade License:</p>
-              <p className="font-mono font-bold text-emerald-400 text-sm">
-                {seller.nidOrTradeLicense || "Not submitted"}
-              </p>
-            </div>
-            <div>
-              <p className="text-slate-500">Tax Identification Number (TIN):</p>
-              <p className="font-mono font-bold text-slate-200">
-                {seller.taxNumber || "Not submitted"}
-              </p>
+          {/* 2. KYC Identifiers */}
+          <div className="rounded-xl border border-border bg-muted/40 p-4 space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <FileText className="h-3.5 w-3.5 text-emerald-500" />
+              <span>Statutory Compliance Numbers</span>
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div>
+                <p className="text-muted-foreground">National ID (NID) or Trade License:</p>
+                <p className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">
+                  {seller.nidOrTradeLicense || "Not submitted"}
+                </p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Tax Identification Number (TIN):</p>
+                <p className="font-mono font-bold text-foreground">
+                  {seller.taxNumber || "Not submitted"}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* 3. Bank & Payout Destination */}
-        <div className="rounded-xl border border-slate-800 bg-slate-800/40 p-4 space-y-3">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <CreditCard className="h-3.5 w-3.5 text-purple-400" />
-            <span>Disbursement Bank &amp; MFS Details</span>
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div>
-              <p className="text-slate-500">Designated Bank:</p>
-              <p className="font-bold text-white">{seller.bankName || "None"}</p>
-            </div>
-            <div>
-              <p className="text-slate-500">Bank Account Number:</p>
-              <p className="font-mono font-bold text-slate-200">{seller.bankAccountNumber || "None"}</p>
-            </div>
-            <div>
-              <p className="text-slate-500">Branch Name / Routing No:</p>
-              <p className="font-mono text-slate-300">{seller.bankRouting || "None"}</p>
-            </div>
-            <div>
-              <p className="text-slate-500">bKash / Nagad Number:</p>
-              <p className="font-mono font-bold text-pink-400">{seller.bkashOrNagad || "None"}</p>
+          {/* 3. Bank & Payout Destination */}
+          <div className="rounded-xl border border-border bg-muted/40 p-4 space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <CreditCard className="h-3.5 w-3.5 text-purple-500" />
+              <span>Disbursement Bank &amp; MFS Details</span>
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div>
+                <p className="text-muted-foreground">Designated Bank:</p>
+                <p className="font-bold text-foreground">{seller.bankName || "None"}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Bank Account Number:</p>
+                <p className="font-mono font-bold text-foreground">{seller.bankAccountNumber || "None"}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Branch Name / Routing No:</p>
+                <p className="font-mono text-muted-foreground">{seller.bankRouting || "None"}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">bKash / Nagad Number:</p>
+                <p className="font-mono font-bold text-pink-600 dark:text-pink-400">{seller.bkashOrNagad || "None"}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center justify-between pt-3 border-t border-slate-800">
+        <DialogFooter className="flex flex-row items-center justify-between pt-3 border-t border-border sm:justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400">Current Status:</span>
-            <span
-              className={`font-bold px-2 py-0.5 rounded-full text-[11px] ${
+            <span className="text-xs text-muted-foreground">Current Status:</span>
+            <Badge
+              variant="outline"
+              className={
                 seller.isVerified
-                  ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20"
-                  : "bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20"
-              }`}
+                  ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  : "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+              }
             >
               {seller.isVerified ? "Verified Merchant" : "Unverified"}
-            </span>
+            </Badge>
           </div>
 
           <div className="flex items-center gap-2">
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={() => {
                 onClose();
                 onReject(seller);
               }}
-              className="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-2 text-xs font-bold text-rose-400 hover:bg-rose-500 hover:text-white transition"
+              className="border-rose-500/40 bg-rose-500/10 font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-500 hover:text-white"
             >
               Reject KYC
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              size="sm"
               onClick={() => {
                 onClose();
                 onApprove(seller);
               }}
-              className="rounded-xl bg-emerald-600 px-5 py-2 text-xs font-bold text-white hover:bg-emerald-500 transition"
+              className="bg-emerald-600 font-bold text-white hover:bg-emerald-500"
             >
               Approve &amp; Verify
-            </button>
+            </Button>
           </div>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -343,269 +360,281 @@ export default function AdminSellersKycPage() {
   return (
     <div className="space-y-6">
       {/* Page Title */}
-      <div className="flex flex-col justify-between gap-4 border-b border-slate-800/80 pb-4 sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-between gap-4 border-b border-border pb-4 sm:flex-row sm:items-center">
         <div>
           <div className="flex items-center gap-2">
             <Link
               href="/admin/sellers"
-              className="text-xs font-semibold text-slate-400 hover:text-white transition"
+              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition"
             >
               ← All Sellers
             </Link>
-            <span className="text-slate-600">/</span>
+            <span className="text-muted-foreground/60">/</span>
             <span className="text-xs font-bold text-brand">KYC Portal</span>
           </div>
-          <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">
+          <h1 className="mt-1 text-2xl font-black tracking-tight text-foreground sm:text-3xl">
             Merchant KYC Verification &amp; Compliance
           </h1>
-          <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+          <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
             Audit Trade Licenses, National IDs, TINs, and disbursement bank accounts before authorizing public selling.
           </p>
         </div>
 
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={() => refetch()}
-          className="inline-flex items-center gap-1.5 self-start rounded-xl border border-slate-800 bg-slate-900 px-3.5 py-2 text-xs font-semibold text-slate-300 transition hover:bg-slate-800 hover:text-white"
+          className="gap-1.5"
         >
           <RefreshCw className="h-3.5 w-3.5" />
           <span>Refresh Queue</span>
-        </button>
+        </Button>
       </div>
 
       {/* Metrics Banner */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
+        <Card className="border-border bg-card p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-amber-400">Pending Verification</span>
-            <span className="rounded-lg bg-amber-500/10 p-2 text-amber-400">
+            <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">Pending Verification</span>
+            <span className="rounded-lg bg-amber-500/10 p-2 text-amber-600 dark:text-amber-400">
               <ShieldAlert className="h-4 w-4" />
             </span>
           </div>
-          <p className="mt-2 text-2xl font-black text-amber-400">{metrics.pending}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">Awaiting compliance review</p>
-        </div>
+          <p className="mt-2 text-2xl font-black text-amber-600 dark:text-amber-400">{metrics.pending}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Awaiting compliance review</p>
+        </Card>
 
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
+        <Card className="border-border bg-card p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-emerald-400">Verified Merchants</span>
-            <span className="rounded-lg bg-emerald-500/10 p-2 text-emerald-400">
+            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Verified Merchants</span>
+            <span className="rounded-lg bg-emerald-500/10 p-2 text-emerald-600 dark:text-emerald-400">
               <ShieldCheck className="h-4 w-4" />
             </span>
           </div>
-          <p className="mt-2 text-2xl font-black text-emerald-400">{metrics.verified}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">Full compliance verified</p>
-        </div>
+          <p className="mt-2 text-2xl font-black text-emerald-600 dark:text-emerald-400">{metrics.verified}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Full compliance verified</p>
+        </Card>
 
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
+        <Card className="border-border bg-card p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-rose-400">Rejected / Deficient</span>
-            <span className="rounded-lg bg-rose-500/10 p-2 text-rose-400">
+            <span className="text-xs font-semibold text-rose-600 dark:text-rose-400">Rejected / Deficient</span>
+            <span className="rounded-lg bg-rose-500/10 p-2 text-rose-600 dark:text-rose-400">
               <XCircle className="h-4 w-4" />
             </span>
           </div>
-          <p className="mt-2 text-2xl font-black text-rose-400">{metrics.rejected}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">Notice issued to vendor</p>
-        </div>
+          <p className="mt-2 text-2xl font-black text-rose-600 dark:text-rose-400">{metrics.rejected}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Notice issued to vendor</p>
+        </Card>
       </div>
 
       {/* Controls: Tabs & Search */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-3 sm:flex-row sm:items-center sm:justify-between shadow-xs">
         <div className="flex items-center gap-1.5">
-          <button
+          <Button
             type="button"
+            size="sm"
+            variant={filterTab === "PENDING" ? "default" : "ghost"}
             onClick={() => setFilterTab("PENDING")}
-            className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+            className={
               filterTab === "PENDING"
-                ? "bg-amber-500 text-slate-950"
-                : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
-            }`}
+                ? "bg-amber-500 font-bold text-slate-950 hover:bg-amber-400"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            }
           >
             Pending Audit ({metrics.pending})
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            size="sm"
+            variant={filterTab === "VERIFIED" ? "default" : "ghost"}
             onClick={() => setFilterTab("VERIFIED")}
-            className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+            className={
               filterTab === "VERIFIED"
-                ? "bg-emerald-600 text-white"
-                : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
-            }`}
+                ? "bg-emerald-600 font-bold text-white hover:bg-emerald-500"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            }
           >
             Verified ({metrics.verified})
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            size="sm"
+            variant={filterTab === "ALL" ? "default" : "ghost"}
             onClick={() => setFilterTab("ALL")}
-            className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+            className={
               filterTab === "ALL"
-                ? "bg-brand text-white"
-                : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
-            }`}
+                ? "bg-brand font-bold text-white hover:bg-brand-deep"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            }
           >
             All Submissions
-          </button>
+          </Button>
         </div>
 
         <div className="relative w-full sm:w-72">
-          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
-          <input
+          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search Trade License, NID, Bank…"
-            className="w-full rounded-xl border border-slate-800 bg-slate-800/80 py-2 pl-8 pr-3 text-xs text-white placeholder-slate-500 outline-none transition focus:border-brand"
+            className="pl-8"
           />
         </div>
       </div>
 
       {/* KYC Applications Table */}
       {isLoading ? (
-        <div className="flex h-72 flex-col items-center justify-center gap-3 text-slate-400">
+        <div className="flex h-72 flex-col items-center justify-center gap-3 text-muted-foreground">
           <Loader2 className="h-8 w-8 animate-spin text-brand" />
           <p className="text-xs">Loading KYC applications…</p>
         </div>
       ) : isError ? (
-        <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-8 text-center text-rose-400">
-          <AlertCircle className="mx-auto mb-2 h-8 w-8" />
-          <p className="text-sm font-bold text-white">Failed to load KYC applications</p>
-          <button
+        <Card className="border-rose-500/20 bg-rose-500/10 p-8 text-center text-rose-500">
+          <AlertCircle className="mx-auto mb-2 h-8 w-8 text-rose-500" />
+          <p className="text-sm font-bold text-foreground">Failed to load KYC applications</p>
+          <Button
             onClick={() => refetch()}
-            className="mt-3 rounded-xl bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700"
+            size="sm"
+            className="mt-3"
           >
             Retry
-          </button>
-        </div>
+          </Button>
+        </Card>
       ) : filteredSellers.length === 0 ? (
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-12 text-center text-slate-400">
-          <ShieldCheck className="mx-auto mb-2 h-8 w-8 text-slate-600" />
-          <p className="text-sm font-bold text-white">No KYC applications in this queue</p>
-          <p className="text-xs text-slate-500 mt-1">All merchant documents are up-to-date.</p>
-        </div>
+        <Card className="border-border bg-card p-12 text-center text-muted-foreground shadow-xs">
+          <ShieldCheck className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
+          <p className="text-sm font-bold text-foreground">No KYC applications in this queue</p>
+          <p className="text-xs text-muted-foreground mt-1">All merchant documents are up-to-date.</p>
+        </Card>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="border-b border-slate-800 bg-slate-800/50 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                <tr>
-                  <th className="px-4 py-3.5">Store / Owner</th>
-                  <th className="px-4 py-3.5">Trade License / NID</th>
-                  <th className="px-4 py-3.5">Tax No (TIN)</th>
-                  <th className="px-4 py-3.5">Bank &amp; Payout Account</th>
-                  <th className="px-4 py-3.5">Status</th>
-                  <th className="px-4 py-3.5 text-right">Audit Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/70 text-slate-300">
-                {filteredSellers.map((seller) => (
-                  <tr key={seller.id} className="hover:bg-slate-800/40 transition">
-                    {/* Store & Owner */}
-                    <td className="px-4 py-3.5">
-                      <p className="font-bold text-white">{seller.storeName}</p>
-                      <p className="text-[11px] text-slate-400">{seller.userName || "Merchant"}</p>
-                      <p className="font-mono text-[10px] text-slate-500 mt-0.5">{seller.phone}</p>
-                    </td>
+        <Card className="overflow-hidden border-border bg-card shadow-xs">
+          <Table>
+            <TableHeader className="border-b border-border bg-muted/50">
+              <TableRow className="border-border hover:bg-transparent">
+                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Store / Owner</TableHead>
+                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Trade License / NID</TableHead>
+                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Tax No (TIN)</TableHead>
+                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Bank &amp; Payout Account</TableHead>
+                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Status</TableHead>
+                <TableHead className="text-right text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Audit Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="divide-y divide-border">
+              {filteredSellers.map((seller) => (
+                <TableRow key={seller.id} className="border-border hover:bg-muted/40">
+                  {/* Store & Owner */}
+                  <TableCell>
+                    <p className="font-bold text-foreground">{seller.storeName}</p>
+                    <p className="text-[11px] text-muted-foreground">{seller.userName || "Merchant"}</p>
+                    <p className="font-mono text-[10px] text-muted-foreground/80 mt-0.5">{seller.phone}</p>
+                  </TableCell>
 
-                    {/* Trade License / NID */}
-                    <td className="px-4 py-3.5">
-                      {seller.nidOrTradeLicense ? (
-                        <div className="flex items-center gap-1.5 font-mono text-emerald-400 font-bold">
-                          <FileCheck2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                          <span>{seller.nidOrTradeLicense}</span>
-                        </div>
-                      ) : (
-                        <span className="text-slate-500 italic">Not provided</span>
-                      )}
-                    </td>
-
-                    {/* TIN */}
-                    <td className="px-4 py-3.5">
-                      {seller.taxNumber ? (
-                        <span className="font-mono text-slate-300 font-semibold">
-                          {seller.taxNumber}
-                        </span>
-                      ) : (
-                        <span className="text-slate-500 italic">None</span>
-                      )}
-                    </td>
-
-                    {/* Bank & Payout */}
-                    <td className="px-4 py-3.5">
-                      {seller.bankName ? (
-                        <div>
-                          <p className="font-semibold text-slate-200">{seller.bankName}</p>
-                          <p className="font-mono text-[11px] text-slate-400">
-                            A/C: {seller.bankAccountNumber || "N/A"}
-                          </p>
-                        </div>
-                      ) : seller.bkashOrNagad ? (
-                        <div>
-                          <p className="text-[11px] font-semibold text-pink-400">MFS Direct</p>
-                          <p className="font-mono text-[11px] text-slate-300">{seller.bkashOrNagad}</p>
-                        </div>
-                      ) : (
-                        <span className="text-slate-500 italic">No payout details</span>
-                      )}
-                    </td>
-
-                    {/* Status */}
-                    <td className="px-4 py-3.5">
-                      {seller.isVerified ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-400 ring-1 ring-emerald-500/20">
-                          <ShieldCheck className="h-3 w-3" />
-                          Verified
-                        </span>
-                      ) : seller.status === "REJECTED" ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-bold text-rose-400 ring-1 ring-rose-500/20">
-                          <XCircle className="h-3 w-3" />
-                          Deficient
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-bold text-amber-400 ring-1 ring-amber-500/20">
-                          <ShieldAlert className="h-3 w-3" />
-                          Pending Review
-                        </span>
-                      )}
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-4 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => setInspectModal({ isOpen: true, seller })}
-                          className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white transition"
-                        >
-                          View Dossier
-                        </button>
-
-                        {!seller.isVerified && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => handleApproveKyc(seller)}
-                              className="rounded-lg bg-emerald-600/20 px-3 py-1.5 text-xs font-bold text-emerald-400 hover:bg-emerald-600 hover:text-white transition"
-                            >
-                              Approve
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setRejectModal({ isOpen: true, seller })}
-                              className="rounded-lg bg-rose-500/10 px-2.5 py-1.5 text-xs font-semibold text-rose-400 hover:bg-rose-600 hover:text-white transition"
-                              title="Reject KYC"
-                            >
-                              <X className="h-3.5 w-3.5" />
-                            </button>
-                          </>
-                        )}
+                  {/* Trade License / NID */}
+                  <TableCell>
+                    {seller.nidOrTradeLicense ? (
+                      <div className="flex items-center gap-1.5 font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+                        <FileCheck2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                        <span>{seller.nidOrTradeLicense}</span>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                    ) : (
+                      <span className="text-muted-foreground italic">Not provided</span>
+                    )}
+                  </TableCell>
+
+                  {/* TIN */}
+                  <TableCell>
+                    {seller.taxNumber ? (
+                      <span className="font-mono text-foreground font-semibold">
+                        {seller.taxNumber}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground italic">None</span>
+                    )}
+                  </TableCell>
+
+                  {/* Bank & Payout */}
+                  <TableCell>
+                    {seller.bankName ? (
+                      <div>
+                        <p className="font-semibold text-foreground">{seller.bankName}</p>
+                        <p className="font-mono text-[11px] text-muted-foreground">
+                          A/C: {seller.bankAccountNumber || "N/A"}
+                        </p>
+                      </div>
+                    ) : seller.bkashOrNagad ? (
+                      <div>
+                        <p className="text-[11px] font-semibold text-pink-600 dark:text-pink-400">MFS Direct</p>
+                        <p className="font-mono text-[11px] text-foreground">{seller.bkashOrNagad}</p>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground italic">No payout details</span>
+                    )}
+                  </TableCell>
+
+                  {/* Status */}
+                  <TableCell>
+                    {seller.isVerified ? (
+                      <Badge variant="outline" className="gap-1 border-emerald-500/20 bg-emerald-500/10 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                        <ShieldCheck className="h-3 w-3" />
+                        Verified
+                      </Badge>
+                    ) : seller.status === "REJECTED" ? (
+                      <Badge variant="outline" className="gap-1 border-rose-500/20 bg-rose-500/10 text-[11px] font-bold text-rose-600 dark:text-rose-400">
+                        <XCircle className="h-3 w-3" />
+                        Deficient
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="gap-1 border-amber-500/20 bg-amber-500/10 text-[11px] font-bold text-amber-600 dark:text-amber-400">
+                        <ShieldAlert className="h-3 w-3" />
+                        Pending Review
+                      </Badge>
+                    )}
+                  </TableCell>
+
+                  {/* Actions */}
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setInspectModal({ isOpen: true, seller })}
+                        className="text-xs font-semibold"
+                      >
+                        View Dossier
+                      </Button>
+
+                      {!seller.isVerified && (
+                        <>
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={() => handleApproveKyc(seller)}
+                            className="bg-emerald-600/15 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white"
+                          >
+                            Approve
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setRejectModal({ isOpen: true, seller })}
+                            className="h-8 w-8 border-rose-500/20 bg-rose-500/10 p-0 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white"
+                            title="Reject KYC"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
       )}
 
       {/* Reject Reason Modal */}

@@ -219,20 +219,20 @@ export function CategoryTreeSelector({
   const getLevelBadge = (level: number, hasChildren: boolean) => {
     if (level === 0) {
       return (
-        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
+        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/30">
           Main Category
         </span>
       );
     }
     if (hasChildren) {
       return (
-        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/30">
           Subcategory
         </span>
       );
     }
     return (
-      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
         Leaf Category
       </span>
     );
@@ -251,8 +251,8 @@ export function CategoryTreeSelector({
           onClick={() => setStagedId(cat.id)}
           className={`group flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-all border ${
             isStaged
-              ? "bg-brand-600/20 border-brand-500 text-white font-bold shadow-xs"
-              : "border-transparent text-slate-300 hover:bg-slate-800/60 hover:text-white"
+              ? "bg-brand-500/15 border-brand-500 text-foreground font-bold shadow-xs"
+              : "border-transparent text-foreground/80 hover:bg-muted hover:text-foreground"
           }`}
           style={{ paddingLeft: `${Math.max(12, level * 24 + 12)}px` }}
         >
@@ -264,16 +264,16 @@ export function CategoryTreeSelector({
                   e.stopPropagation();
                   toggleFolder(cat.id);
                 }}
-                className="p-1 -ml-1 text-slate-400 hover:text-white rounded-md hover:bg-slate-700/60 transition"
+                className="p-1 -ml-1 text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition"
               >
                 {isExpanded ? (
-                  <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                 ) : (
-                  <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
+                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
                 )}
               </button>
             ) : (
-              <span className="w-3.5 h-3.5 inline-block -ml-1 text-slate-600 text-center font-mono text-[10px]">
+              <span className="w-3.5 h-3.5 inline-block -ml-1 text-muted-foreground/60 text-center font-mono text-[10px]">
                 •
               </span>
             )}
@@ -312,7 +312,7 @@ export function CategoryTreeSelector({
         </div>
 
         {hasChildren && isExpanded && (
-          <div className="border-l border-slate-800/80 ml-6 pl-1 my-0.5 space-y-0.5">
+          <div className="border-l border-border ml-6 pl-1 my-0.5 space-y-0.5">
             {children.map((child) => renderTreeNode(child, level + 1))}
           </div>
         )}
@@ -331,49 +331,49 @@ export function CategoryTreeSelector({
           className={`w-full p-3.5 rounded-2xl border-2 border-dashed transition-all flex items-center justify-between gap-3 text-left group ${
             required && !value
               ? "border-brand-500/50 bg-brand-500/5 hover:border-brand-500 hover:bg-brand-500/10"
-              : "border-slate-800 bg-slate-950/60 hover:border-slate-700 hover:bg-slate-900"
+              : "border-border bg-card/60 hover:border-border/80 hover:bg-muted/40"
           } ${disabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="h-10 w-10 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+            <div className="h-10 w-10 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <FolderTree className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-xs font-bold text-white flex items-center gap-2">
+              <div className="text-xs font-bold text-foreground flex items-center gap-2">
                 <span>Select Product Category</span>
-                <span className="text-[10px] text-brand-400 bg-brand-500/10 px-1.5 py-0.5 rounded font-semibold">
+                <span className="text-[10px] text-brand-600 dark:text-brand-400 bg-brand-500/10 px-1.5 py-0.5 rounded font-semibold">
                   Required
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 truncate mt-0.5">
+              <p className="text-[11px] text-muted-foreground truncate mt-0.5">
                 Browse hierarchical categories (Main Category → Subcategory → Leaf)
               </p>
             </div>
           </div>
 
-          <div className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-slate-200 group-hover:text-white group-hover:border-slate-600 transition shrink-0 flex items-center gap-1.5">
+          <div className="px-3 py-1.5 rounded-xl bg-muted border border-border text-xs font-bold text-foreground group-hover:bg-muted/80 transition shrink-0 flex items-center gap-1.5">
             <span>Browse Categories</span>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
           </div>
         </button>
       ) : (
-        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/20 border border-slate-800 space-y-2.5 shadow-sm">
+        <div className="p-3.5 rounded-2xl bg-card border border-border space-y-2.5 shadow-xs">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="h-9 w-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0">
+              <div className="h-9 w-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                 <Check className="h-5 w-5" />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-xs font-bold text-white truncate">{selectedCategory.name}</h4>
+                  <h4 className="text-xs font-bold text-foreground truncate">{selectedCategory.name}</h4>
                   {getLevelBadge(
                     Math.max(0, selectedPath.length - 1),
                     (childrenMap.get(selectedCategory.id) || []).length > 0
                   )}
                 </div>
-                <div className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
-                  <span className="text-slate-500">ID:</span>
-                  <span className="font-mono text-slate-400 text-[10px]">{selectedCategory.id}</span>
+                <div className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                  <span className="text-muted-foreground/70">ID:</span>
+                  <span className="font-mono text-muted-foreground text-[10px]">{selectedCategory.id}</span>
                 </div>
               </div>
             </div>
@@ -385,7 +385,7 @@ export function CategoryTreeSelector({
                 variant="outline"
                 disabled={disabled}
                 onClick={() => setIsOpen(true)}
-                className="h-8 text-xs border-slate-700 hover:bg-slate-800 text-slate-200"
+                className="h-8 text-xs border-border hover:bg-muted text-foreground"
               >
                 Change Category
               </Button>
@@ -394,7 +394,7 @@ export function CategoryTreeSelector({
                 disabled={disabled}
                 onClick={handleClear}
                 title="Clear category"
-                className="h-8 w-8 rounded-lg border border-slate-800 text-slate-400 hover:text-rose-400 hover:border-rose-500/30 hover:bg-rose-500/10 flex items-center justify-center transition"
+                className="h-8 w-8 rounded-lg border border-border text-muted-foreground hover:text-rose-500 hover:border-rose-500/30 hover:bg-rose-500/10 flex items-center justify-center transition"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -402,18 +402,18 @@ export function CategoryTreeSelector({
           </div>
 
           {/* Full Breadcrumb Path Banner */}
-          <div className="p-2 px-3 rounded-xl bg-slate-950/70 border border-slate-800/80 flex flex-wrap items-center gap-1.5 text-xs">
-            <span className="text-[11px] font-semibold text-slate-500 flex items-center gap-1 mr-1">
-              <FolderTree className="h-3 w-3 text-brand-400" /> Category Path:
+          <div className="p-2 px-3 rounded-xl bg-muted/40 border border-border flex flex-wrap items-center gap-1.5 text-xs">
+            <span className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1 mr-1">
+              <FolderTree className="h-3 w-3 text-brand-600 dark:text-brand-400" /> Category Path:
             </span>
             {selectedPath.map((item, idx) => (
               <React.Fragment key={item.id}>
-                {idx > 0 && <ChevronRight className="h-3 w-3 text-slate-600 shrink-0" />}
+                {idx > 0 && <ChevronRight className="h-3 w-3 text-muted-foreground/60 shrink-0" />}
                 <span
                   className={`px-2 py-0.5 rounded-lg text-xs font-semibold ${
                     idx === selectedPath.length - 1
-                      ? "bg-brand-600/20 text-brand-300 font-bold border border-brand-500/30"
-                      : "bg-slate-900 text-slate-300 border border-slate-800"
+                      ? "bg-brand-500/15 text-brand-700 dark:text-brand-300 font-bold border border-brand-500/30"
+                      : "bg-background text-foreground border border-border"
                   }`}
                 >
                   {item.name}
@@ -426,25 +426,25 @@ export function CategoryTreeSelector({
 
       {/* Category Tree Selector Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 dark:bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
           <div
-            className="bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden"
+            className="bg-card border border-border text-card-foreground rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between gap-4 bg-slate-950/50">
+            <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between gap-4 bg-muted/40">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-2xl bg-brand-500/10 border border-brand-500/30 text-brand-400 flex items-center justify-center shrink-0">
+                <div className="h-10 w-10 rounded-2xl bg-brand-500/10 border border-brand-500/30 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0">
                   <FolderTree className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <h3 className="text-base font-bold text-foreground flex items-center gap-2">
                     Select Product Category
-                    <Badge variant="outline" className="border-brand-500/30 text-brand-400 text-[10px]">
+                    <Badge variant="outline" className="border-brand-500/30 text-brand-600 dark:text-brand-400 text-[10px]">
                       Hierarchical Tree
                     </Badge>
                   </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     Navigate from Main Category down to specific Subcategories for optimal search discovery.
                   </p>
                 </div>
@@ -458,7 +458,7 @@ export function CategoryTreeSelector({
                     refetchCategories();
                     refetchTree();
                   }}
-                  className="h-8 w-8 p-0 text-slate-400 hover:text-white"
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
                   title="Refresh categories"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
@@ -467,7 +467,7 @@ export function CategoryTreeSelector({
                   size="sm"
                   variant="ghost"
                   onClick={() => setIsOpen(false)}
-                  className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full"
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -475,23 +475,23 @@ export function CategoryTreeSelector({
             </div>
 
             {/* Search Bar & View Mode Switcher */}
-            <div className="p-4 border-b border-slate-800/80 bg-slate-950/30 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="p-4 border-b border-border bg-muted/20 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               {/* Search input with live clear */}
               <div className="relative flex-1">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Search category by name (e.g. phones, laptop, t-shirt, accessories)..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-9 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition"
+                  className="w-full pl-10 pr-9 py-2 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition"
                   autoFocus
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-white rounded-md"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-muted-foreground hover:text-foreground rounded-md"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -500,14 +500,14 @@ export function CategoryTreeSelector({
 
               {/* View Switcher: Cascading vs Tree (disabled during search) */}
               {!searchQuery && (
-                <div className="flex items-center p-1 bg-slate-900 rounded-xl border border-slate-800 shrink-0">
+                <div className="flex items-center p-1 bg-muted rounded-xl border border-border shrink-0">
                   <button
                     type="button"
                     onClick={() => setViewMode("cascading")}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
                       viewMode === "cascading"
                         ? "bg-brand-600 text-white shadow-xs font-bold"
-                        : "text-slate-400 hover:text-white"
+                        : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     <Columns3 className="h-3.5 w-3.5" />
@@ -519,7 +519,7 @@ export function CategoryTreeSelector({
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
                       viewMode === "tree"
                         ? "bg-brand-600 text-white shadow-xs font-bold"
-                        : "text-slate-400 hover:text-white"
+                        : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     <FolderTree className="h-3.5 w-3.5" />
@@ -532,30 +532,30 @@ export function CategoryTreeSelector({
             {/* Modal Body Area */}
             <div className="flex-1 overflow-y-auto p-4 min-h-[340px] max-h-[50vh]">
               {isCategoriesLoading || isTreeLoading ? (
-                <div className="h-64 flex flex-col items-center justify-center gap-3 text-slate-400 text-xs">
+                <div className="h-64 flex flex-col items-center justify-center gap-3 text-muted-foreground text-xs">
                   <RefreshCw className="h-6 w-6 animate-spin text-brand-500" />
                   <span>Loading category taxonomy...</span>
                 </div>
               ) : searchQuery ? (
                 /* Search Results View */
                 <div className="space-y-2">
-                  <div className="text-xs font-semibold text-slate-400 px-1 flex items-center justify-between">
+                  <div className="text-xs font-semibold text-muted-foreground px-1 flex items-center justify-between">
                     <span>Search Results ({searchResults.length})</span>
-                    <span className="text-[11px] text-slate-500">
+                    <span className="text-[11px] text-muted-foreground">
                       Showing matches for &quot;{searchQuery}&quot;
                     </span>
                   </div>
 
                   {searchResults.length === 0 ? (
-                    <div className="p-12 text-center text-slate-500 text-xs space-y-2">
-                      <AlertCircle className="h-8 w-8 mx-auto text-slate-600" />
-                      <p className="font-semibold text-slate-300">No categories found</p>
+                    <div className="p-12 text-center text-muted-foreground text-xs space-y-2">
+                      <AlertCircle className="h-8 w-8 mx-auto text-muted-foreground/60" />
+                      <p className="font-semibold text-foreground">No categories found</p>
                       <p className="text-[11px]">
                         Try searching with different keywords or browse via columns.
                       </p>
                     </div>
                   ) : (
-                    <div className="divide-y divide-slate-800/80 rounded-2xl bg-slate-950/40 border border-slate-800 overflow-hidden">
+                    <div className="divide-y divide-border rounded-2xl bg-card border border-border overflow-hidden">
                       {searchResults.map(({ category, path, level, pathString }) => {
                         const isStaged = stagedId === category.id;
                         const hasChildren = (childrenMap.get(category.id) || []).length > 0;
@@ -567,13 +567,13 @@ export function CategoryTreeSelector({
                             onDoubleClick={() => handleSelectImmediate(category.id)}
                             className={`p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 cursor-pointer transition ${
                               isStaged
-                                ? "bg-brand-600/20 text-white"
-                                : "hover:bg-slate-800/50 text-slate-300"
+                                ? "bg-brand-500/15 text-foreground"
+                                : "hover:bg-muted/50 text-foreground"
                             }`}
                           >
                             <div className="space-y-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-bold text-sm text-white">
+                                <span className="font-bold text-sm text-foreground">
                                   {category.name}
                                 </span>
                                 {getLevelBadge(level, hasChildren)}
@@ -583,8 +583,8 @@ export function CategoryTreeSelector({
                                   </span>
                                 )}
                               </div>
-                              <div className="text-xs text-slate-400 flex items-center gap-1.5 font-mono">
-                                <FolderTree className="h-3 w-3 text-slate-500 shrink-0" />
+                              <div className="text-xs text-muted-foreground flex items-center gap-1.5 font-mono">
+                                <FolderTree className="h-3 w-3 text-muted-foreground shrink-0" />
                                 <span className="truncate">{pathString}</span>
                               </div>
                             </div>
@@ -609,13 +609,13 @@ export function CategoryTreeSelector({
                 /* Cascading Column Drilldown View (Daraz / Amazon style) */
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 h-full min-h-[300px]">
                   {/* Column 1: Main / Root Categories */}
-                  <div className="rounded-2xl bg-slate-950/60 border border-slate-800 flex flex-col overflow-hidden">
-                    <div className="p-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                  <div className="rounded-2xl bg-muted/20 border border-border flex flex-col overflow-hidden">
+                    <div className="p-3 bg-muted/50 border-b border-border flex items-center justify-between">
+                      <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
                         <Folder className="h-3.5 w-3.5 text-sky-400" />
                         1. Main Categories
                       </span>
-                      <span className="text-[10px] text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded-full">
+                      <span className="text-[10px] text-muted-foreground bg-muted border border-border px-1.5 py-0.5 rounded-full">
                         {rootCategories.length}
                       </span>
                     </div>
@@ -638,8 +638,8 @@ export function CategoryTreeSelector({
                               isSelected
                                 ? "bg-brand-600 text-white font-bold shadow-xs"
                                 : isStaged
-                                ? "bg-brand-600/30 text-white border border-brand-500/40"
-                                : "text-slate-300 hover:bg-slate-800/70 hover:text-white"
+                                ? "bg-brand-500/20 text-foreground font-semibold border border-brand-500/40"
+                                : "text-foreground/80 hover:bg-muted hover:text-foreground"
                             }`}
                           >
                             <span className="truncate pr-1">{cat.name}</span>
@@ -649,7 +649,7 @@ export function CategoryTreeSelector({
                                   className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
                                     isSelected
                                       ? "bg-brand-700/60 text-white"
-                                      : "bg-slate-800 text-slate-400"
+                                      : "bg-muted text-muted-foreground border border-border"
                                   }`}
                                 >
                                   {children.length}
@@ -657,7 +657,7 @@ export function CategoryTreeSelector({
                               )}
                               <ChevronRight
                                 className={`h-3.5 w-3.5 ${
-                                  isSelected ? "text-white" : "text-slate-500"
+                                  isSelected ? "text-white" : "text-muted-foreground"
                                 }`}
                               />
                             </div>
@@ -668,14 +668,14 @@ export function CategoryTreeSelector({
                   </div>
 
                   {/* Column 2: Subcategories (Level 2) */}
-                  <div className="rounded-2xl bg-slate-950/60 border border-slate-800 flex flex-col overflow-hidden">
-                    <div className="p-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                  <div className="rounded-2xl bg-muted/20 border border-border flex flex-col overflow-hidden">
+                    <div className="p-3 bg-muted/50 border-b border-border flex items-center justify-between">
+                      <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
                         <FolderOpen className="h-3.5 w-3.5 text-purple-400" />
                         2. Subcategories
                       </span>
                       {selectedL1 && (
-                        <span className="text-[10px] text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded-full">
+                        <span className="text-[10px] text-muted-foreground bg-muted border border-border px-1.5 py-0.5 rounded-full">
                           {level2Categories.length}
                         </span>
                       )}
@@ -683,13 +683,13 @@ export function CategoryTreeSelector({
 
                     <div className="p-1.5 space-y-1 overflow-y-auto flex-1 max-h-[380px]">
                       {!selectedL1 ? (
-                        <div className="h-full flex items-center justify-center p-6 text-center text-slate-500 text-xs">
+                        <div className="h-full flex items-center justify-center p-6 text-center text-muted-foreground text-xs">
                           Select a Main Category from Column 1
                         </div>
                       ) : level2Categories.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center p-6 text-center text-slate-500 text-xs space-y-2">
-                          <Tag className="h-6 w-6 text-slate-600" />
-                          <p className="text-slate-400 font-semibold">No subcategories</p>
+                        <div className="h-full flex flex-col items-center justify-center p-6 text-center text-muted-foreground text-xs space-y-2">
+                          <Tag className="h-6 w-6 text-muted-foreground/60" />
+                          <p className="text-foreground font-semibold">No subcategories</p>
                           <p className="text-[11px]">
                             &quot;{categoryMap.get(selectedL1)?.name}&quot; can be selected directly as the primary category.
                           </p>
@@ -711,8 +711,8 @@ export function CategoryTreeSelector({
                                 isSelected
                                   ? "bg-purple-600 text-white font-bold shadow-xs"
                                   : isStaged
-                                  ? "bg-purple-600/30 text-white border border-purple-500/40"
-                                  : "text-slate-300 hover:bg-slate-800/70 hover:text-white"
+                                  ? "bg-purple-500/20 text-foreground font-semibold border border-purple-500/40"
+                                  : "text-foreground/80 hover:bg-muted hover:text-foreground"
                               }`}
                             >
                               <span className="truncate pr-1">{cat.name}</span>
@@ -722,7 +722,7 @@ export function CategoryTreeSelector({
                                     className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
                                       isSelected
                                         ? "bg-purple-700/60 text-white"
-                                        : "bg-slate-800 text-slate-400"
+                                        : "bg-muted text-muted-foreground border border-border"
                                     }`}
                                   >
                                     {children.length}
@@ -730,7 +730,7 @@ export function CategoryTreeSelector({
                                 )}
                                 <ChevronRight
                                   className={`h-3.5 w-3.5 ${
-                                    isSelected ? "text-white" : "text-slate-500"
+                                    isSelected ? "text-white" : "text-muted-foreground"
                                   }`}
                                 />
                               </div>
@@ -742,14 +742,14 @@ export function CategoryTreeSelector({
                   </div>
 
                   {/* Column 3: Leaf Categories (Level 3) */}
-                  <div className="rounded-2xl bg-slate-950/60 border border-slate-800 flex flex-col overflow-hidden">
-                    <div className="p-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                  <div className="rounded-2xl bg-muted/20 border border-border flex flex-col overflow-hidden">
+                    <div className="p-3 bg-muted/50 border-b border-border flex items-center justify-between">
+                      <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
                         <Tag className="h-3.5 w-3.5 text-emerald-400" />
                         3. Leaf / Specific
                       </span>
                       {selectedL2 && (
-                        <span className="text-[10px] text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded-full">
+                        <span className="text-[10px] text-muted-foreground bg-muted border border-border px-1.5 py-0.5 rounded-full">
                           {level3Categories.length}
                         </span>
                       )}
@@ -757,16 +757,16 @@ export function CategoryTreeSelector({
 
                     <div className="p-1.5 space-y-1 overflow-y-auto flex-1 max-h-[380px]">
                       {!selectedL2 ? (
-                        <div className="h-full flex items-center justify-center p-6 text-center text-slate-500 text-xs">
+                        <div className="h-full flex items-center justify-center p-6 text-center text-muted-foreground text-xs">
                           {selectedL1
                             ? "Select a Subcategory from Column 2"
                             : "Select Main & Subcategories first"}
                         </div>
                       ) : level3Categories.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center p-6 text-center text-slate-500 text-xs space-y-2">
+                        <div className="h-full flex flex-col items-center justify-center p-6 text-center text-muted-foreground text-xs space-y-2">
                           <Check className="h-6 w-6 text-emerald-400" />
                           <p className="text-emerald-300 font-semibold">Ready to Select</p>
-                          <p className="text-[11px] text-slate-400">
+                          <p className="text-[11px] text-muted-foreground">
                             Subcategory &quot;{categoryMap.get(selectedL2)?.name}&quot; has no deeper children. Click &quot;Confirm Selection&quot; below.
                           </p>
                         </div>
@@ -782,7 +782,7 @@ export function CategoryTreeSelector({
                               className={`group w-full p-2.5 rounded-xl text-xs font-semibold flex items-center justify-between cursor-pointer transition ${
                                 isStaged
                                   ? "bg-emerald-600 text-white font-bold shadow-xs"
-                                  : "text-slate-300 hover:bg-slate-800/70 hover:text-white"
+                                  : "text-foreground/80 hover:bg-muted hover:text-foreground"
                               }`}
                             >
                               <span className="truncate pr-1">{cat.name}</span>
@@ -796,28 +796,28 @@ export function CategoryTreeSelector({
                 </div>
               ) : (
                 /* Nested Tree View (WooCommerce / Folder Explorer style) */
-                <div className="p-2 space-y-1 bg-slate-950/40 rounded-2xl border border-slate-800">
+                <div className="p-2 space-y-1 bg-muted/20 rounded-2xl border border-border">
                   {rootCategories.map((root) => renderTreeNode(root, 0))}
                 </div>
               )}
             </div>
 
             {/* Modal Bottom Action & Breadcrumb Preview */}
-            <div className="p-4 border-t border-slate-800 bg-slate-950/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="p-4 border-t border-border bg-muted/40 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <div className="min-w-0">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 block">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground block">
                   Chosen Category Preview:
                 </span>
                 {stagedCategory ? (
                   <div className="flex flex-wrap items-center gap-1.5 text-xs mt-0.5">
                     {stagedPath.map((item, idx) => (
                       <React.Fragment key={item.id}>
-                        {idx > 0 && <ChevronRight className="h-3 w-3 text-slate-600 shrink-0" />}
+                        {idx > 0 && <ChevronRight className="h-3 w-3 text-muted-foreground/60 shrink-0" />}
                         <span
                           className={`font-semibold ${
                             idx === stagedPath.length - 1
-                              ? "text-brand-400 font-bold"
-                              : "text-slate-300"
+                              ? "text-brand-600 dark:text-brand-400 font-bold"
+                              : "text-foreground"
                           }`}
                         >
                           {item.name}
@@ -830,7 +830,7 @@ export function CategoryTreeSelector({
                     )}
                   </div>
                 ) : (
-                  <span className="text-xs text-slate-500 italic">No category selected yet</span>
+                  <span className="text-xs text-muted-foreground italic">No category selected yet</span>
                 )}
               </div>
 
@@ -839,7 +839,7 @@ export function CategoryTreeSelector({
                   type="button"
                   variant="outline"
                   onClick={() => setIsOpen(false)}
-                  className="text-xs border-slate-700 hover:bg-slate-800"
+                  className="text-xs border-border hover:bg-muted text-foreground"
                 >
                   Cancel
                 </Button>

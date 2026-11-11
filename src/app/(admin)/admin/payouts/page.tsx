@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
-  Download,
   AlertCircle,
   RefreshCw,
   Loader2,
@@ -19,6 +18,27 @@ import {
   useProcessPayoutMutation,
 } from "@/redux";
 import type { IPayoutRequest } from "@/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface ProcessModalState {
   isOpen: boolean;
@@ -82,55 +102,49 @@ function ProcessPayoutModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in">
-      <div className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 text-left space-y-5">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+    <Dialog open={true} onOpenChange={(open) => !open && !isLoading && onClose()}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
           <div className="flex items-center gap-2.5">
             <span
               className={`flex h-9 w-9 items-center justify-center rounded-lg ${
                 isPay
-                  ? "bg-emerald-500/20 text-emerald-400"
-                  : "bg-rose-500/20 text-rose-400"
+                  ? "bg-emerald-500/15 text-emerald-500"
+                  : "bg-rose-500/15 text-rose-500"
               }`}
             >
               <CreditCard className="h-5 w-5" />
             </span>
             <div>
-              <h3 className="text-base font-bold text-white">
+              <DialogTitle className="text-base font-bold">
                 {isPay ? "Disburse Payout & Mark Settled" : "Reject Payout Request"}
-              </h3>
-              <p className="text-xs text-slate-400">
+              </DialogTitle>
+              <DialogDescription className="text-xs">
                 Request #{payout.id} • {payout.seller?.storeName ?? "Vendor"}
-              </p>
+              </DialogDescription>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
+        </DialogHeader>
 
         {/* Breakdown Card */}
-        <div className="rounded-xl border border-slate-800 bg-slate-800/40 p-4 space-y-2 text-xs">
-          <div className="flex justify-between py-1 border-b border-slate-800/60">
-            <span className="text-slate-400">Vendor Store:</span>
-            <strong className="text-white">{payout.seller?.storeName ?? "Unknown"}</strong>
+        <div className="rounded-xl border border-border bg-muted/40 p-4 space-y-2 text-xs">
+          <div className="flex justify-between py-1 border-b border-border">
+            <span className="text-muted-foreground">Vendor Store:</span>
+            <strong className="text-foreground">{payout.seller?.storeName ?? "Unknown"}</strong>
           </div>
-          <div className="flex justify-between py-1 border-b border-slate-800/60">
-            <span className="text-slate-400">Withdrawal Amount:</span>
-            <span className="font-bold text-emerald-400 text-sm">
+          <div className="flex justify-between py-1 border-b border-border">
+            <span className="text-muted-foreground">Withdrawal Amount:</span>
+            <span className="font-bold text-emerald-500 text-sm font-mono">
               ৳{Math.round(payout.amount).toLocaleString("en-US")}
             </span>
           </div>
-          <div className="flex justify-between py-1 border-b border-slate-800/60">
-            <span className="text-slate-400">Disbursement Method:</span>
-            <span className="font-semibold text-slate-200">{payout.paymentMethod}</span>
+          <div className="flex justify-between py-1 border-b border-border">
+            <span className="text-muted-foreground">Disbursement Method:</span>
+            <span className="font-semibold text-foreground">{payout.paymentMethod}</span>
           </div>
           <div className="flex justify-between py-1">
-            <span className="text-slate-400">Recipient Account:</span>
-            <span className="font-mono text-slate-300">
+            <span className="text-muted-foreground">Recipient Account:</span>
+            <span className="font-mono text-foreground">
               {payout.accountDetails
                 ? String(
                     payout.accountDetails.number ||
@@ -145,63 +159,64 @@ function ProcessPayoutModal({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {isPay ? (
-            <div>
-              <label className="mb-1.5 block text-xs font-semibold text-emerald-400">
-                Bank / MFS Transaction Reference (TrxID) <span className="text-rose-400">*</span>
-              </label>
-              <input
+            <div className="space-y-1.5">
+              <Label htmlFor="payout-trx" className="text-xs font-semibold text-emerald-500">
+                Bank / MFS Transaction Reference (TrxID) <span className="text-rose-500">*</span>
+              </Label>
+              <Input
+                id="payout-trx"
                 type="text"
                 required
                 value={transactionReference}
                 onChange={(e) => setTransactionReference(e.target.value)}
                 placeholder="e.g. BKASH-9A8B7C6D or BEFTN-20261027001"
-                className="w-full rounded-xl border border-slate-800 bg-slate-800/80 px-3.5 py-2.5 text-xs text-white placeholder-slate-500 font-mono outline-none focus:border-emerald-500"
+                className="font-mono"
               />
-              <p className="mt-1 text-[11px] text-slate-500">
+              <p className="text-[11px] text-muted-foreground">
                 Deducts ৳{Math.round(payout.amount).toLocaleString("en-US")} from the vendor&apos;s available wallet and records an immutable ledger withdrawal.
               </p>
             </div>
           ) : (
-            <div>
-              <label className="mb-1.5 block text-xs font-semibold text-rose-400">
-                Rejection Reason (Dispatched to Vendor) <span className="text-rose-400">*</span>
-              </label>
-              <textarea
-                rows={2}
+            <div className="space-y-1.5">
+              <Label htmlFor="payout-reason" className="text-xs font-semibold text-rose-500">
+                Rejection Reason (Dispatched to Vendor) <span className="text-rose-500">*</span>
+              </Label>
+              <Textarea
+                id="payout-reason"
+                rows={3}
                 required
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 placeholder="e.g. Incorrect bank account number or minimum threshold not reached..."
-                className="w-full rounded-xl border border-rose-500/30 bg-slate-800/80 p-3 text-xs text-white outline-none focus:border-rose-400"
               />
             </div>
           )}
 
-          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
-            <button
+          <DialogFooter className="pt-2 border-t border-border gap-2">
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={onClose}
               disabled={isLoading}
-              className="rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700 transition"
+              className="text-xs"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
+              size="sm"
+              variant={isPay ? "brand" : "destructive"}
               disabled={isLoading}
-              className={`inline-flex items-center gap-1.5 rounded-xl px-5 py-2 text-xs font-bold text-white transition disabled:opacity-50 ${
-                isPay
-                  ? "bg-emerald-600 hover:bg-emerald-500"
-                  : "bg-rose-600 hover:bg-rose-500"
-              }`}
+              className="text-xs font-bold"
             >
-              {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />}
               <span>{isPay ? "Confirm Settlement (PAID)" : "Reject Payout"}</span>
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -219,157 +234,119 @@ export default function AdminPayoutsPage() {
     { refetchOnMountOrArgChange: true }
   );
 
-  // Client search filter
   const filteredPayouts = useMemo(() => {
     if (!search.trim()) return payouts;
     const q = search.toLowerCase();
-    return payouts.filter(
-      (p) =>
-        String(p.id).includes(q) ||
-        (p.seller?.storeName && p.seller.storeName.toLowerCase().includes(q)) ||
-        p.paymentMethod.toLowerCase().includes(q) ||
-        (p.transactionReference && p.transactionReference.toLowerCase().includes(q))
-    );
+    return payouts.filter((p) => {
+      const storeName = p.seller?.storeName?.toLowerCase() || "";
+      const method = p.paymentMethod?.toLowerCase() || "";
+      const trx = p.transactionReference?.toLowerCase() || "";
+      return storeName.includes(q) || method.includes(q) || trx.includes(q);
+    });
   }, [payouts, search]);
 
-  // Statistics
   const metrics = useMemo(() => {
-    const pendingRequests = payouts.filter((p) => p.status === "PENDING");
-    const paidRequests = payouts.filter((p) => p.status === "PAID");
-    const rejectedRequests = payouts.filter((p) => p.status === "REJECTED");
+    let pendingSum = 0;
+    let paidSum = 0;
+    let pendingCount = 0;
+    let paidCount = 0;
+    let rejectedCount = 0;
 
-    const pendingTotal = pendingRequests.reduce((sum, p) => sum + p.amount, 0);
-    const paidTotal = paidRequests.reduce((sum, p) => sum + p.amount, 0);
+    payouts.forEach((p) => {
+      if (p.status === "PENDING") {
+        pendingSum += p.amount;
+        pendingCount += 1;
+      } else if (p.status === "PAID") {
+        paidSum += p.amount;
+        paidCount += 1;
+      } else if (p.status === "REJECTED") {
+        rejectedCount += 1;
+      }
+    });
 
-    return {
-      pendingCount: pendingRequests.length,
-      pendingTotal,
-      paidCount: paidRequests.length,
-      paidTotal,
-      rejectedCount: rejectedRequests.length,
-    };
+    return { pendingSum, paidSum, pendingCount, paidCount, rejectedCount };
   }, [payouts]);
-
-  const handleExportStatement = () => {
-    if (payouts.length === 0) {
-      toast.info("No payout transactions to export");
-      return;
-    }
-    const headers = "ID,Store,Method,Amount,Status,Reference,Date\n";
-    const rows = payouts
-      .map(
-        (p) =>
-          `"${p.id}","${p.seller?.storeName || ""}","${p.paymentMethod}",${p.amount},"${p.status}","${p.transactionReference || ""}","${p.createdAt}"`
-      )
-      .join("\n");
-    const blob = new Blob([headers + rows], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `shopora-payouts-${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success("Payout statement exported to CSV");
-  };
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col justify-between gap-4 border-b border-slate-800/80 pb-4 sm:flex-row sm:items-center">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
-            Vendor Payouts &amp; Disbursements
+          <h1 className="text-2xl font-black text-foreground tracking-tight">
+            Vendor Payout Settlements
           </h1>
-          <p className="mt-1 text-xs text-slate-400 sm:text-sm">
-            Review vendor withdrawal requests, settle bank and bKash disbursements, and record bank transaction references.
+          <p className="text-xs text-muted-foreground mt-1">
+            Review withdrawal requests, verify MFS/bank credentials, and settle merchant store earnings.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          <button
-            type="button"
-            onClick={handleExportStatement}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900 px-3.5 py-2 text-xs font-semibold text-slate-300 transition hover:bg-slate-800 hover:text-white"
-          >
-            <Download className="h-3.5 w-3.5" />
-            <span>Export Statement</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => refetch()}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-300 transition hover:bg-slate-800 hover:text-white"
-          >
-            <RefreshCw className="h-3.5 w-3.5" />
-            <span>Refresh</span>
-          </button>
-        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => refetch()}
+          className="text-xs gap-1.5 self-start sm:self-auto"
+        >
+          <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" />
+          <span>Refresh Queue</span>
+        </Button>
       </div>
 
-      {/* Metrics Cards */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Card className="p-5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-amber-400">Pending Requests</span>
-            <span className="rounded-lg bg-amber-500/10 p-2 text-amber-400">
+            <span className="text-xs font-semibold text-amber-500">Pending Review</span>
+            <span className="rounded-lg bg-amber-500/10 p-2 text-amber-500">
               <Clock className="h-4 w-4" />
             </span>
           </div>
-          <p className="mt-2 text-2xl font-black text-amber-400">{metrics.pendingCount}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">
-            Total: ৳{Math.round(metrics.pendingTotal).toLocaleString("en-US")}
+          <p className="mt-2 text-2xl font-black text-foreground font-mono">
+            ৳{Math.round(metrics.pendingSum).toLocaleString("en-US")}
           </p>
-        </div>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            {metrics.pendingCount} requests awaiting bank transfer
+          </p>
+        </Card>
 
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
+        <Card className="p-5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-emerald-400">Settled (Paid)</span>
-            <span className="rounded-lg bg-emerald-500/10 p-2 text-emerald-400">
+            <span className="text-xs font-semibold text-emerald-500">Settled (Paid)</span>
+            <span className="rounded-lg bg-emerald-500/10 p-2 text-emerald-500">
               <CheckCircle2 className="h-4 w-4" />
             </span>
           </div>
-          <p className="mt-2 text-2xl font-black text-emerald-400">
-            ৳{Math.round(metrics.paidTotal).toLocaleString("en-US")}
+          <p className="mt-2 text-2xl font-black text-foreground font-mono">
+            ৳{Math.round(metrics.paidSum).toLocaleString("en-US")}
           </p>
-          <p className="text-[11px] text-slate-500 mt-0.5">{metrics.paidCount} processed requests</p>
-        </div>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            {metrics.paidCount} successfully disbursed payouts
+          </p>
+        </Card>
 
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
+        <Card className="p-5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-rose-400">Rejected</span>
-            <span className="rounded-lg bg-rose-500/10 p-2 text-rose-400">
-              <XCircle className="h-4 w-4" />
-            </span>
-          </div>
-          <p className="mt-2 text-2xl font-black text-rose-400">{metrics.rejectedCount}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">Disallowed / Deficient</p>
-        </div>
-
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-sky-400">Total Disbursements</span>
-            <span className="rounded-lg bg-sky-500/10 p-2 text-brand">
+            <span className="text-xs font-semibold text-brand">Total Disbursements</span>
+            <span className="rounded-lg bg-brand/10 p-2 text-brand">
               <CreditCard className="h-4 w-4" />
             </span>
           </div>
-          <p className="mt-2 text-2xl font-black text-white">{payouts.length}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">All-time settlement logs</p>
-        </div>
+          <p className="mt-2 text-2xl font-black text-foreground font-mono">{payouts.length}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">All-time settlement logs</p>
+        </Card>
       </div>
 
       {/* Filter Tabs & Search */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-1.5">
+      <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-1.5 overflow-x-auto">
           {(["ALL", "PENDING", "PAID", "REJECTED"] as const).map((tab) => (
             <button
               key={tab}
               type="button"
               onClick={() => setFilterTab(tab)}
-              className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+              className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition cursor-pointer ${
                 filterTab === tab
-                  ? "bg-brand text-white"
-                  : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                  ? "bg-brand text-white shadow-xs"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
               {tab === "ALL" && "All Payouts"}
@@ -381,203 +358,204 @@ export default function AdminPayoutsPage() {
         </div>
 
         <div className="relative w-full sm:w-72">
-          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
-          <input
+          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground z-10" />
+          <Input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search vendor, method, TrxID…"
-            className="w-full rounded-xl border border-slate-800 bg-slate-800/80 py-2 pl-8 pr-3 text-xs text-white placeholder-slate-500 outline-none transition focus:border-brand"
+            className="pl-8 text-xs h-9"
           />
         </div>
       </div>
 
       {/* Table */}
       {isLoading ? (
-        <div className="flex h-72 flex-col items-center justify-center gap-3 text-slate-400">
+        <div className="flex h-72 flex-col items-center justify-center gap-3 text-muted-foreground">
           <Loader2 className="h-8 w-8 animate-spin text-brand" />
           <p className="text-xs">Loading payout requests…</p>
         </div>
       ) : isError ? (
-        <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-8 text-center text-rose-400">
+        <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-8 text-center text-rose-500">
           <AlertCircle className="mx-auto mb-2 h-8 w-8" />
-          <p className="text-sm font-bold text-white">Failed to load payouts</p>
-          <button
+          <p className="text-sm font-bold text-foreground">Failed to load payouts</p>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => refetch()}
-            className="mt-3 rounded-xl bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700"
+            className="mt-3 text-xs"
           >
             Retry
-          </button>
+          </Button>
         </div>
       ) : filteredPayouts.length === 0 ? (
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-12 text-center text-slate-400">
-          <CreditCard className="mx-auto mb-2 h-8 w-8 text-slate-600" />
-          <p className="text-sm font-bold text-white">No payout requests found</p>
-          <p className="text-xs text-slate-500 mt-1">
+        <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground">
+          <CreditCard className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
+          <p className="text-sm font-bold text-foreground">No payout requests found</p>
+          <p className="text-xs text-muted-foreground mt-1">
             {search ? "Try adjusting your search query" : "No requests in this queue"}
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="border-b border-slate-800 bg-slate-800/50 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                <tr>
-                  <th className="px-4 py-3.5">Ref / Payout ID</th>
-                  <th className="px-4 py-3.5">Vendor</th>
-                  <th className="px-4 py-3.5">Method &amp; Account</th>
-                  <th className="px-4 py-3.5">Amount</th>
-                  <th className="px-4 py-3.5">Status</th>
-                  <th className="px-4 py-3.5">Settlement Info</th>
-                  <th className="px-4 py-3.5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/70 text-slate-300">
-                {filteredPayouts.map((payout) => {
-                  const isPending = payout.status === "PENDING";
-                  const isPaid = payout.status === "PAID";
-                  const isRejected = payout.status === "REJECTED";
+        <Card className="overflow-hidden p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Ref / Payout ID</TableHead>
+                <TableHead>Vendor</TableHead>
+                <TableHead>Method &amp; Account</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Settlement Info</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredPayouts.map((payout) => {
+                const isPending = payout.status === "PENDING";
+                const isPaid = payout.status === "PAID";
+                const isRejected = payout.status === "REJECTED";
 
-                  return (
-                    <tr key={payout.id} className="hover:bg-slate-800/40 transition">
-                      {/* Payout ID */}
-                      <td className="px-4 py-3.5 font-mono text-slate-400">
-                        <span className="font-bold text-white">#PAY-{payout.id}</span>
-                        <p className="text-[10px] text-slate-500 mt-0.5">
-                          {new Date(payout.createdAt).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
+                return (
+                  <TableRow key={payout.id}>
+                    {/* Payout ID */}
+                    <TableCell className="font-mono text-muted-foreground">
+                      <span className="font-bold text-foreground">#PAY-{payout.id}</span>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        {new Date(payout.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </p>
+                    </TableCell>
+
+                    {/* Vendor */}
+                    <TableCell>
+                      <p className="font-bold text-foreground">
+                        {payout.seller?.storeName ?? `Seller #${payout.sellerId}`}
+                      </p>
+                      {payout.seller?.phone && (
+                        <p className="font-mono text-[11px] text-muted-foreground mt-0.5">
+                          {payout.seller.phone}
                         </p>
-                      </td>
+                      )}
+                    </TableCell>
 
-                      {/* Vendor */}
-                      <td className="px-4 py-3.5">
-                        <p className="font-bold text-white">
-                          {payout.seller?.storeName ?? `Seller #${payout.sellerId}`}
-                        </p>
-                        {payout.seller?.phone && (
-                          <p className="font-mono text-[11px] text-slate-400 mt-0.5">
-                            {payout.seller.phone}
-                          </p>
-                        )}
-                      </td>
+                    {/* Method & Account */}
+                    <TableCell>
+                      <span className="rounded bg-brand/10 px-2 py-0.5 text-[11px] font-bold text-brand border border-brand/20">
+                        {payout.paymentMethod}
+                      </span>
+                      <p className="font-mono text-[11px] text-foreground mt-1">
+                        {payout.accountDetails
+                          ? String(
+                              payout.accountDetails.number ||
+                                payout.accountDetails.accountNumber ||
+                                payout.accountDetails.bankName ||
+                                "Saved Account"
+                            )
+                          : "Default Account"}
+                      </p>
+                    </TableCell>
 
-                      {/* Method & Account */}
-                      <td className="px-4 py-3.5">
-                        <span className="rounded bg-slate-800 px-2 py-0.5 text-[11px] font-bold text-brand">
-                          {payout.paymentMethod}
+                    {/* Amount */}
+                    <TableCell>
+                      <span className="text-sm font-extrabold text-foreground font-mono">
+                        ৳{Math.round(payout.amount).toLocaleString("en-US")}
+                      </span>
+                    </TableCell>
+
+                    {/* Status */}
+                    <TableCell>
+                      {isPaid ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-500 border border-emerald-500/20">
+                          <CheckCircle2 className="h-3 w-3" />
+                          Settled (Paid)
                         </span>
-                        <p className="font-mono text-[11px] text-slate-300 mt-1">
-                          {payout.accountDetails
-                            ? String(
-                                payout.accountDetails.number ||
-                                  payout.accountDetails.accountNumber ||
-                                  payout.accountDetails.bankName ||
-                                  "Saved Account"
-                              )
-                            : "Default Account"}
-                        </p>
-                      </td>
-
-                      {/* Amount */}
-                      <td className="px-4 py-3.5">
-                        <span className="text-sm font-extrabold text-white">
-                          ৳{Math.round(payout.amount).toLocaleString("en-US")}
+                      ) : isPending ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-bold text-amber-500 border border-amber-500/20">
+                          <Clock className="h-3 w-3" />
+                          Pending Review
                         </span>
-                      </td>
+                      ) : isRejected ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-bold text-rose-500 border border-rose-500/20">
+                          <XCircle className="h-3 w-3" />
+                          Rejected
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-[11px] font-bold text-muted-foreground">
+                          {payout.status}
+                        </span>
+                      )}
+                    </TableCell>
 
-                      {/* Status */}
-                      <td className="px-4 py-3.5">
-                        {isPaid ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-400 ring-1 ring-emerald-500/20">
-                            <CheckCircle2 className="h-3 w-3" />
-                            Settled (Paid)
+                    {/* Settlement Info */}
+                    <TableCell className="text-xs">
+                      {payout.transactionReference ? (
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+                            Trx Reference
                           </span>
-                        ) : isPending ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-bold text-amber-400 ring-1 ring-amber-500/20">
-                            <Clock className="h-3 w-3" />
-                            Pending Review
+                          <span className="font-mono text-emerald-500 font-semibold">
+                            {payout.transactionReference}
                           </span>
-                        ) : isRejected ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-bold text-rose-400 ring-1 ring-rose-500/20">
-                            <XCircle className="h-3 w-3" />
-                            Rejected
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-500/10 px-2.5 py-0.5 text-[11px] font-bold text-slate-400">
-                            {payout.status}
-                          </span>
-                        )}
-                      </td>
+                        </div>
+                      ) : payout.rejectionReason ? (
+                        <span className="text-rose-500 text-[11px] line-clamp-2">
+                          Reason: {payout.rejectionReason}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground italic">Awaiting settlement</span>
+                      )}
+                    </TableCell>
 
-                      {/* Settlement Info */}
-                      <td className="px-4 py-3.5 text-xs">
-                        {payout.transactionReference ? (
-                          <div>
-                            <span className="text-[10px] uppercase font-bold text-slate-500 block">
-                              Trx Reference
-                            </span>
-                            <span className="font-mono text-emerald-400 font-semibold">
-                              {payout.transactionReference}
-                            </span>
-                          </div>
-                        ) : payout.rejectionReason ? (
-                          <span className="text-rose-400 text-[11px] line-clamp-2">
-                            Reason: {payout.rejectionReason}
-                          </span>
-                        ) : (
-                          <span className="text-slate-500 italic">Awaiting settlement</span>
-                        )}
-                      </td>
-
-                      {/* Actions */}
-                      <td className="px-4 py-3.5 text-right">
-                        {isPending ? (
-                          <div className="flex items-center justify-end gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setModalState({
-                                  isOpen: true,
-                                  type: "PAY",
-                                  payout,
-                                })
-                              }
-                              className="rounded-lg bg-emerald-600/20 px-3 py-1.5 text-xs font-bold text-emerald-400 hover:bg-emerald-600 hover:text-white transition"
-                            >
-                              Disburse
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setModalState({
-                                  isOpen: true,
-                                  type: "REJECT",
-                                  payout,
-                                })
-                              }
-                              className="rounded-lg bg-rose-500/10 px-2.5 py-1.5 text-xs font-semibold text-rose-400 hover:bg-rose-600 hover:text-white transition"
-                              title="Reject Payout"
-                            >
-                              <X className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                        ) : (
-                          <span className="text-[11px] text-slate-500 font-mono">Processed</span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                    {/* Actions */}
+                    <TableCell className="text-right">
+                      {isPending ? (
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button
+                            size="xs"
+                            variant="brand"
+                            onClick={() =>
+                              setModalState({
+                                isOpen: true,
+                                type: "PAY",
+                                payout,
+                              })
+                            }
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
+                          >
+                            Disburse
+                          </Button>
+                          <Button
+                            size="icon-sm"
+                            variant="destructive"
+                            onClick={() =>
+                              setModalState({
+                                isOpen: true,
+                                type: "REJECT",
+                                payout,
+                              })
+                            }
+                            title="Reject Payout"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <span className="text-[11px] text-muted-foreground font-mono">Processed</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Card>
       )}
 
-      {/* Disburse / Reject Dialog */}
+      {/* Disburse / Reject Dialog (shadcn Dialog) */}
       {modalState.isOpen && modalState.payout && (
         <ProcessPayoutModal
           payout={modalState.payout}

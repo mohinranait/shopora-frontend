@@ -25,6 +25,16 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
   useGetAdminOrderQuery,
@@ -71,41 +81,38 @@ function ReasonDialog({
 }) {
   const [reason, setReason] = useState("");
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label={title}>
-      <div className="absolute inset-0 bg-black/60" onClick={busy ? undefined : onClose} />
-      <div className="relative w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-5">
-        <div className="mb-3 flex items-start justify-between gap-3">
-          <div>
-            <h2 className="text-base font-bold text-white">{title}</h2>
-            <p className="mt-1 text-xs text-slate-400">{description}</p>
-          </div>
-          <button type="button" onClick={onClose} disabled={busy} className="rounded-md p-1 text-slate-400 hover:bg-slate-800" aria-label="Close">
-            <X className="h-4 w-4" />
-          </button>
+    <Dialog open={true} onOpenChange={(open) => !open && !busy && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+        <div className="py-2">
+          <Textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            rows={3}
+            maxLength={300}
+            placeholder="Reason (shared with the seller)"
+          />
         </div>
-        <textarea
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          rows={3}
-          maxLength={300}
-          placeholder="Reason (shared with the seller)"
-          className="w-full resize-none rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand"
-        />
-        <div className="mt-4 flex justify-end gap-2">
-          <button type="button" onClick={onClose} disabled={busy} className="rounded-lg border border-slate-700 px-3.5 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800">
+        <DialogFooter className="gap-2">
+          <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={busy} className="text-xs">
             Keep
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="destructive"
+            size="sm"
             onClick={() => onConfirm(reason.trim())}
             disabled={busy}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-60"
+            className="text-xs font-bold"
           >
-            {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />} {confirmLabel}
-          </button>
-        </div>
-      </div>
-    </div>
+            {busy && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />} {confirmLabel}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -668,22 +675,18 @@ function OrderDetailInner() {
         />
       )}
 
-      {/* Thermal Packaging Slip Modal (4x6 format preview) */}
-      {packagingSlip && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-white text-slate-900 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b pb-3 border-slate-200">
-              <div className="font-black text-base text-slate-900 tracking-tight">
+      {/* Thermal Packaging Slip Modal (4x6 format preview using shadcn Dialog) */}
+      <Dialog open={Boolean(packagingSlip)} onOpenChange={(open) => !open && setPackagingSlip(null)}>
+        {packagingSlip && (
+          <DialogContent className="max-w-md bg-white text-slate-900 border-slate-300">
+            <DialogHeader className="border-b pb-3 border-slate-200">
+              <DialogTitle className="font-black text-base text-slate-900 tracking-tight">
                 THERMAL PACKAGING SLIP (4x6)
-              </div>
-              <button
-                type="button"
-                onClick={() => setPackagingSlip(null)}
-                className="text-slate-500 hover:text-slate-900"
-              >
-                ✕
-              </button>
-            </div>
+              </DialogTitle>
+              <DialogDescription className="text-xs text-slate-500">
+                Print-ready consignment packing slip & courier manifest.
+              </DialogDescription>
+            </DialogHeader>
 
             {/* Slip Paper View */}
             <div id="thermal-slip-content" className="p-4 border-2 border-dashed border-slate-400 rounded-lg space-y-3 font-mono text-xs">
@@ -729,26 +732,29 @@ function OrderDetailInner() {
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2">
-              <button
+            <DialogFooter className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => setPackagingSlip(null)}
-                className="px-4 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                className="text-xs text-slate-700 hover:bg-slate-100"
               >
                 Close
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                size="sm"
                 onClick={() => window.print()}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800"
+                className="inline-flex items-center gap-1.5 bg-slate-900 text-white text-xs font-bold hover:bg-slate-800"
               >
                 <Printer className="h-4 w-4" />
                 Print Label
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
+      </Dialog>
 
       <ConfirmDialog
         isOpen={showReturnAllConfirm}

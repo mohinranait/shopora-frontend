@@ -1,11 +1,30 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { AlertCircle, Loader2, UserCog, X } from "lucide-react";
+import React, { useState } from "react";
+import { AlertCircle, Loader2, UserCog } from "lucide-react";
 import { toast } from "sonner";
 import { useUpdateAdminCustomerMutation } from "@/redux";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
-interface CustomerData {
+export interface CustomerData {
   id: string | number;
   name: string;
   email: string;
@@ -15,7 +34,7 @@ interface CustomerData {
   isVerified?: boolean;
 }
 
-interface EditCustomerDialogProps {
+export interface EditCustomerDialogProps {
   isOpen: boolean;
   onClose: () => void;
   customer: CustomerData | null;
@@ -80,137 +99,123 @@ function EditCustomerForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 py-1">
       {errorMsg && (
-        <div className="flex items-center gap-2 rounded-xl bg-rose-500/10 p-3 text-sm text-rose-400 ring-1 ring-rose-500/20">
+        <div className="flex items-center gap-2 rounded-lg bg-rose-500/10 p-3 text-xs text-rose-500 border border-rose-500/20">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{errorMsg}</span>
         </div>
       )}
 
-      <div>
-        <label className="mb-1.5 block text-xs font-semibold text-slate-300">
-          Full Name <span className="text-rose-400">*</span>
-        </label>
-        <input
+      <div className="space-y-1.5">
+        <Label htmlFor="cust-name">
+          Full Name <span className="text-rose-500">*</span>
+        </Label>
+        <Input
+          id="cust-name"
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition focus:border-brand focus:ring-1 focus:ring-brand"
           placeholder="e.g. Rahim Chowdhury"
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="mb-1.5 block text-xs font-semibold text-slate-300">
-            Email Address <span className="text-rose-400">*</span>
-          </label>
-          <input
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="space-y-1.5">
+          <Label htmlFor="cust-email">
+            Email Address <span className="text-rose-500">*</span>
+          </Label>
+          <Input
+            id="cust-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition focus:border-brand focus:ring-1 focus:ring-brand"
             placeholder="customer@domain.com"
           />
         </div>
-        <div>
-          <label className="mb-1.5 block text-xs font-semibold text-slate-300">
-            Mobile Number
-          </label>
-          <input
+        <div className="space-y-1.5">
+          <Label htmlFor="cust-phone">Mobile Number</Label>
+          <Input
+            id="cust-phone"
             type="text"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition focus:border-brand focus:ring-1 focus:ring-brand"
             placeholder="01XXXXXXXXX"
           />
         </div>
       </div>
 
-      <div>
-        <label className="mb-1.5 block text-xs font-semibold text-slate-300">
-          User Role
-        </label>
-        <select
+      <div className="space-y-1.5">
+        <Label htmlFor="cust-role">User Role</Label>
+        <Select
           value={role}
-          onChange={(e) => setRole(e.target.value as "CUSTOMER" | "SELLER" | "ADMIN")}
-          className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-brand focus:ring-1 focus:ring-brand"
+          onValueChange={(val) => setRole(val as "CUSTOMER" | "SELLER" | "ADMIN")}
         >
-          <option value="CUSTOMER">Customer (Default)</option>
-          <option value="SELLER">Vendor / Seller</option>
-          <option value="ADMIN">System Administrator</option>
-        </select>
+          <SelectTrigger id="cust-role">
+            <SelectValue placeholder="Select role">
+              {role === "CUSTOMER"
+                ? "Customer (Default)"
+                : role === "SELLER"
+                ? "Vendor / Seller"
+                : "System Administrator"}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="CUSTOMER">Customer (Default)</SelectItem>
+            <SelectItem value="SELLER">Vendor / Seller</SelectItem>
+            <SelectItem value="ADMIN">System Administrator</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Toggles */}
-      <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-800/40 p-3">
+      <div className="pt-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
           <div>
-            <p className="text-xs font-bold text-white">Account Status</p>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-xs font-bold text-foreground">Account Status</p>
+            <p className="text-[11px] text-muted-foreground">
               {isActive ? "Active (Can login & order)" : "Suspended (Blocked)"}
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setIsActive(!isActive)}
-            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-              isActive ? "bg-emerald-500" : "bg-slate-700"
-            }`}
-          >
-            <span
-              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white ring-0 transition duration-200 ease-in-out ${
-                isActive ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
-          </button>
+          <Switch checked={isActive} onCheckedChange={setIsActive} />
         </div>
 
-        <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-800/40 p-3">
+        <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
           <div>
-            <p className="text-xs font-bold text-white">Email Verified</p>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-xs font-bold text-foreground">Email Verified</p>
+            <p className="text-[11px] text-muted-foreground">
               {isVerified ? "Verified user badge" : "Unverified email"}
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setIsVerified(!isVerified)}
-            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-              isVerified ? "bg-sky-500" : "bg-slate-700"
-            }`}
-          >
-            <span
-              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white ring-0 transition duration-200 ease-in-out ${
-                isVerified ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
-          </button>
+          <Switch checked={isVerified} onCheckedChange={setIsVerified} />
         </div>
       </div>
 
       {/* Footer Buttons */}
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
-        <button
+      <DialogFooter className="pt-3 border-t border-border gap-2">
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={onClose}
           disabled={isLoading}
-          className="rounded-xl border border-slate-700 px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-800 transition"
+          className="text-xs cursor-pointer"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
+          variant="brand"
+          size="sm"
           disabled={isLoading}
-          className="inline-flex items-center gap-2 rounded-xl bg-brand-deep px-5 py-2.5 text-xs font-bold text-white transition hover:bg-brand disabled:opacity-50"
+          className="text-xs font-bold cursor-pointer"
         >
-          {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+          {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />}
           Save Changes
-        </button>
-      </div>
+        </Button>
+      </DialogFooter>
     </form>
   );
 }
@@ -221,59 +226,30 @@ export function EditCustomerDialog({
   customer,
   onSuccess,
 }: EditCustomerDialogProps) {
-  // Handle ESC key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) onClose();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
-
-  if (!isOpen || !customer) return null;
+  if (!customer) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
-      role="dialog"
-      aria-modal="true"
-    >
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-      />
-
-      {/* Dialog Panel */}
-      <div className="relative w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 transition-all">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
-          <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-deep/20 text-brand ring-1 ring-brand/30">
-              <UserCog className="h-5 w-5" />
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10 text-brand">
+              <UserCog className="h-4 w-4" />
             </span>
-            <div>
-              <h3 className="text-base font-bold text-white">Edit Customer Profile</h3>
-              <p className="text-xs text-slate-400">ID #{customer.id} &bull; {customer.email}</p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+            <span>Edit Customer Profile</span>
+          </DialogTitle>
+          <DialogDescription>
+            ID #{customer.id} &bull; {customer.email}
+          </DialogDescription>
+        </DialogHeader>
 
-        {/* Form Body keyed by customer ID to initialize state purely on mount without set-state-in-effect */}
         <EditCustomerForm
           key={customer.id}
           customer={customer}
           onClose={onClose}
           onSuccess={onSuccess}
         />
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

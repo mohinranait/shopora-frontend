@@ -14,6 +14,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import {
   useGetCategoriesQuery,
   useGetCategoryTreeQuery,
@@ -350,39 +361,45 @@ export default function AdminCategoriesPage() {
       >
         <form onSubmit={handleSaveCategory} className="space-y-4">
           {/* Category Name */}
-          <div>
-            <label className="block text-xs font-semibold text-foreground">
+          <div className="space-y-1.5">
+            <Label htmlFor="cat-name">
               Category Name <span className="text-rose-400">*</span>
-            </label>
-            <input
+            </Label>
+            <Input
+              id="cat-name"
               type="text"
               required
               placeholder="e.g. Smartwatches, Men's Clothing"
               value={formName}
               onChange={(e) => setFormName(e.target.value)}
-              className="mt-1 w-full h-9 rounded-lg border border-border bg-card px-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand shadow-xs transition"
             />
           </div>
 
           {/* Parent Category */}
-          <div>
-            <label className="block text-xs font-semibold text-foreground">
-              Parent Category
-            </label>
-            <select
+          <div className="space-y-1.5">
+            <Label htmlFor="cat-parent">Parent Category</Label>
+            <Select
               value={formParentId || ""}
-              onChange={(e) => setFormParentId(e.target.value ? e.target.value : null)}
-              className="mt-1 w-full h-9 rounded-lg border border-border bg-card px-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand shadow-xs transition cursor-pointer"
+              onValueChange={(val) => setFormParentId(val === "root" || !val ? null : val)}
             >
-              <option value="" className="bg-popover text-popover-foreground">None (Top-Level Root Category)</option>
-              {categories
-                .filter((c) => editingCategory ? c.id !== editingCategory.id : true)
-                .map((c) => (
-                  <option key={c.id} value={c.id} className="bg-popover text-popover-foreground">
-                    {c.name} {c.parentId ? "(Subcategory)" : "(Root)"}
-                  </option>
-                ))}
-            </select>
+              <SelectTrigger id="cat-parent">
+                <SelectValue placeholder="Select Parent Category">
+                  {formParentId
+                    ? categories.find((c) => c.id === formParentId)?.name || "Selected Subcategory"
+                    : "None (Top-Level Root Category)"}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="root">None (Top-Level Root Category)</SelectItem>
+                {categories
+                  .filter((c) => (editingCategory ? c.id !== editingCategory.id : true))
+                  .map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name} {c.parentId ? "(Subcategory)" : "(Root)"}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* WordPress-Style Media Library Image Upload Field */}
@@ -397,40 +414,34 @@ export default function AdminCategoriesPage() {
           </div>
 
           {/* Description */}
-          <div>
-            <label className="block text-xs font-semibold text-foreground">
-              Description
-            </label>
-            <textarea
+          <div className="space-y-1.5">
+            <Label htmlFor="cat-desc">Description</Label>
+            <Textarea
+              id="cat-desc"
               rows={2}
               placeholder="Short summary for SEO and navigation cards..."
               value={formDescription}
               onChange={(e) => setFormDescription(e.target.value)}
-              className="mt-1 w-full p-2.5 rounded-lg border border-border bg-card text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand resize-none shadow-xs transition"
             />
           </div>
 
           {/* Display Order & Active */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-foreground">
-                Display Order
-              </label>
-              <input
+          <div className="grid grid-cols-2 gap-3 items-end">
+            <div className="space-y-1.5">
+              <Label htmlFor="cat-order">Display Order</Label>
+              <Input
+                id="cat-order"
                 type="number"
                 value={formDisplayOrder}
                 onChange={(e) => setFormDisplayOrder(Number(e.target.value))}
-                className="mt-1 w-full h-9 rounded-lg border border-border bg-card px-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand shadow-xs transition"
               />
             </div>
 
-            <div className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-muted/30 mt-4">
+            <div className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-muted/30 h-9">
               <span className="text-xs font-bold text-foreground">Active</span>
-              <input
-                type="checkbox"
+              <Switch
                 checked={formIsActive}
-                onChange={(e) => setFormIsActive(e.target.checked)}
-                className="h-4 w-4 rounded border-border text-brand focus:ring-brand cursor-pointer"
+                onCheckedChange={setFormIsActive}
               />
             </div>
           </div>

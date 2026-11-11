@@ -21,6 +21,16 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { DataTable, type ColumnDef } from "@/components/ui/DataTable";
 import {
   useGetAdminProductsQuery,
@@ -112,6 +122,11 @@ function AdminProductsInner() {
   const pendingCount = counts?.pending ?? 0;
   const lowStockCount = counts?.lowStock ?? 0;
 
+  // Rejection Dialog State
+  const [rejectingProductId, setRejectingProductId] = useState<string | number | null>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [isRejecting, setIsRejecting] = useState(false);
+
   const handleApprove = async (id: string | number) => {
     try {
       await reviewProductApproval({ id, status: "APPROVED" }).unwrap();
@@ -122,15 +137,32 @@ function AdminProductsInner() {
     }
   };
 
-  const handleReject = async (id: string | number) => {
-    const reason = prompt("Enter rejection reason:");
-    if (!reason) return;
+  const handleOpenReject = (id: string | number) => {
+    setRejectingProductId(id);
+    setRejectionReason("");
+  };
+
+  const handleConfirmReject = async () => {
+    if (!rejectingProductId) return;
+    if (!rejectionReason.trim()) {
+      toast.error("Please provide a rejection reason for the seller.");
+      return;
+    }
     try {
-      await reviewProductApproval({ id, status: "REJECTED", rejectionReason: reason }).unwrap();
+      setIsRejecting(true);
+      await reviewProductApproval({
+        id: rejectingProductId,
+        status: "REJECTED",
+        rejectionReason: rejectionReason.trim(),
+      }).unwrap();
       toast.info("Product marked as rejected.");
+      setRejectingProductId(null);
+      setRejectionReason("");
       refetch();
     } catch (err: unknown) {
       toast.error(getApiErrorMessage(err));
+    } finally {
+      setIsRejecting(false);
     }
   };
 
@@ -311,7 +343,7 @@ function AdminProductsInner() {
                     <CheckCircle2 className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => handleReject(prod.id)}
+                    onClick={() => handleOpenReject(prod.id)}
                     className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition cursor-pointer"
                     title="Reject with Reason"
                   >
@@ -518,6 +550,60 @@ function AdminProductsInner() {
         confirmText="Delete Product"
         variant="danger"
       />
+
+      {/* shadcn Rejection Dialog Modal */}
+      <Dialog
+        open={Boolean(rejectingProductId)}
+        onOpenChange={(open) => !open && setRejectingProductId(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-rose-500">
+              <AlertTriangle className="h-5 w-5" />
+              <span>Reject Submitted Product</span>
+            </DialogTitle>
+            <DialogDescription>
+              Please provide clear feedback explaining why this product is rejected so the seller can revise and resubmit.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2 py-2">
+            <Label htmlFor="rejection-reason" className="text-xs">
+              Rejection Reason & Compliance Notes <span className="text-rose-500">*</span>
+            </Label>
+            <Textarea
+              id="rejection-reason"
+              placeholder="e.g. Incomplete specifications, low image resolution, or trademark violation..."
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              rows={4}
+            />
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setRejectingProductId(null)}
+              disabled={isRejecting}
+              className="text-xs cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={handleConfirmReject}
+              disabled={isRejecting}
+              className="text-xs font-bold cursor-pointer"
+            >
+              {isRejecting ? "Rejecting..." : "Confirm Rejection"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

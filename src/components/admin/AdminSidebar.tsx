@@ -172,12 +172,12 @@ export interface AdminSidebarProps {
   onMobileClose?: () => void;
 }
 
-export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps = {}) {
+export function AdminSidebar({  onMobileClose }: AdminSidebarProps = {}) {
   const pathname = usePathname();
-  const { toggleSidebar, state, isMobile, setOpenMobile } = useSidebar();
+  const { toggleSidebar,  isMobile, setOpenMobile } = useSidebar();
   const { user, logout } = useAuth();
 
-  const isCollapsed = state === "collapsed" && !isMobile;
+
 
   const getInitials = (name?: string) => {
     if (!name) return "SA";
@@ -207,14 +207,14 @@ export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps 
     >
       {/* Brand Header */}
       <SidebarHeader className="p-0 border-b border-sidebar-border">
-        <div className="h-16 flex items-center justify-between px-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 transition-all duration-200">
+        <div className="h-15.75 flex items-center justify-between px-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 transition-all duration-200">
           {/* Expanded Brand View */}
           <Link
             href="/admin/dashboard"
             onClick={handleNavClick}
             className="flex items-center gap-2.5 overflow-hidden min-w-0 group-data-[collapsible=icon]:hidden"
           >
-            <div className="h-9 w-9 shrink-0 rounded-xl bg-gradient-to-br from-brand to-brand-deep flex items-center justify-center text-white shadow-md">
+            <div className="h-9 w-9 shrink-0 rounded-xl bg-linear-to-br from-brand to-brand-deep flex items-center justify-center text-white shadow-md">
               <Sparkles className="h-5 w-5" />
             </div>
             <div className="flex flex-col min-w-0">
@@ -249,7 +249,7 @@ export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps 
                 <button
                   type="button"
                   onClick={toggleSidebar}
-                  className="hidden group-data-[collapsible=icon]:flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-brand to-brand-deep text-white shadow-md hover:ring-2 hover:ring-brand/50 transition cursor-pointer relative group/collapse-btn"
+                  className="hidden group-data-[collapsible=icon]:flex items-center justify-center h-10 w-10 rounded-xl bg-linear-to-br from-brand to-brand-deep text-white shadow-md hover:ring-2 hover:ring-brand/50 transition cursor-pointer relative group/collapse-btn"
                 />
               }
             >
@@ -301,7 +301,7 @@ export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps 
                       className={cn(
                         "h-9 px-3 text-xs font-semibold rounded-lg transition-all relative group-data-[collapsible=icon]:size-9 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:mx-auto",
                         isActive
-                          ? "bg-gradient-to-r from-brand to-brand-deep text-white font-bold shadow-sm"
+                          ? "bg-linear-to-r from-brand to-brand-deep text-white font-bold "
                           : "text-sidebar-foreground/75 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent"
                       )}
                     >
@@ -388,7 +388,7 @@ export function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSidebarProps 
                     className="h-8 w-8 rounded-full object-cover ring-2 ring-sidebar-border"
                   />
                 ) : (
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-sidebar-border">
+                  <div className="h-8 w-8 rounded-full bg-linear-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-sidebar-border">
                     {getInitials(user?.name)}
                   </div>
                 )}

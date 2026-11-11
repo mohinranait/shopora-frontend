@@ -33,6 +33,14 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table";
+import {
   useGetBrandsQuery,
   useGetAttributesQuery,
   useGetProductsQuery,
@@ -700,7 +708,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
   return (
     <form onSubmit={handleSubmit} className="space-y-8 pb-20">
       {/* Top Header & Save Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
         <div className="flex items-center gap-3">
           <Link href={backUrl}>
             <Button size="sm" variant="outline" type="button" className="h-9 w-9 p-0">
@@ -709,14 +717,14 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
                 {isEdit ? `Edit Product: ${initialData?.name}` : "Create New Product"}
               </h1>
               <Badge variant={productType === "VARIABLE" ? "purple" : "brand"} className="text-[10px] uppercase font-bold">
                 {productType === "VARIABLE" ? "Variable Product" : "Simple Product"}
               </Badge>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               Fill in product specifications, dynamic variants, media, and SEO attributes.
             </p>
           </div>
@@ -753,9 +761,9 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* SECTION 1: Product Type Toggle (Simple vs Variable)               */}
       {/* ================================================================= */}
-      <Card className="bg-slate-900 border-slate-800 overflow-hidden">
-        <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
-          <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+      <Card className="bg-card border-border overflow-hidden shadow-xs">
+        <CardHeader className="bg-muted/30 p-4 border-b border-border">
+          <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
             <Layers className="h-4 w-4 text-brand" />
             <span>Select Product Architecture</span>
           </CardTitle>
@@ -767,25 +775,25 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
               onClick={() => setProductType("SIMPLE")}
               className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-3.5 ${
                 productType === "SIMPLE"
-                  ? "bg-brand/10 border-brand text-white"
-                  : "bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700"
+                  ? "bg-brand/10 border-brand text-foreground"
+                  : "bg-muted/30 border-border text-muted-foreground hover:border-border/80"
               }`}
             >
               <div
                 className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
-                  productType === "SIMPLE" ? "bg-brand text-white" : "bg-slate-800 text-slate-400"
+                  productType === "SIMPLE" ? "bg-brand text-white" : "bg-muted text-muted-foreground border border-border"
                 }`}
               >
                 <Package className="h-5 w-5" />
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-sm font-bold text-white">Simple Product</h4>
+                  <h4 className="text-sm font-bold text-foreground">Simple Product</h4>
                   {productType === "SIMPLE" && (
                     <span className="h-2 w-2 rounded-full bg-brand" />
                   )}
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   Single SKU item with a single set price, weight, and inventory level (e.g. books, single-size tech accessories).
                 </p>
               </div>
@@ -796,27 +804,27 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
               onClick={() => setProductType("VARIABLE")}
               className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-3.5 ${
                 productType === "VARIABLE"
-                  ? "bg-purple-600/10 border-purple-500 text-white"
-                  : "bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700"
+                  ? "bg-purple-600/10 border-purple-500 text-foreground"
+                  : "bg-muted/30 border-border text-muted-foreground hover:border-border/80"
               }`}
             >
               <div
                 className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
                   productType === "VARIABLE"
                     ? "bg-purple-600 text-white"
-                    : "bg-slate-800 text-slate-400"
+                    : "bg-muted text-muted-foreground border border-border"
                 }`}
               >
                 <Sparkles className="h-5 w-5" />
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-sm font-bold text-white">Variable Product (Dynamic Variants)</h4>
+                  <h4 className="text-sm font-bold text-foreground">Variable Product (Dynamic Variants)</h4>
                   {productType === "VARIABLE" && (
                     <span className="h-2 w-2 rounded-full bg-purple-400" />
                   )}
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   Generates multi-attribute variations (e.g. Color × Size, RAM × Storage) with custom pricing, SKU, and stock per row.
                 </p>
               </div>
@@ -828,9 +836,9 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* SECTION 2: General Information                                    */}
       {/* ================================================================= */}
-      <Card className="bg-slate-900 border-slate-800 overflow-hidden">
-        <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
-          <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+      <Card className="bg-card border-border overflow-hidden shadow-xs">
+        <CardHeader className="bg-muted/30 p-4 border-b border-border">
+          <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
             <Info className="h-4 w-4 text-sky-400" />
             <span>General Information</span>
           </CardTitle>
@@ -838,7 +846,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
         <CardContent className="p-4 sm:p-6 space-y-4">
           {/* Title */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-slate-300">
+            <label className="block text-xs font-semibold text-foreground">
               Product Title / Name <span className="text-rose-500">*</span>
             </label>
             <input
@@ -847,14 +855,14 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
               placeholder="e.g. Apex Swift Pro Ultra Wireless Gaming Mouse"
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
-              className="w-full h-10 px-3.5 rounded-xl border border-slate-800 bg-slate-950 text-xs sm:text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand font-medium"
+              className="w-full h-10 px-3.5 rounded-xl border border-border bg-background text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand font-medium"
             />
           </div>
 
           {/* Slug (URL Identifier) */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-slate-300">
+              <label className="block text-xs font-semibold text-foreground">
                 SEO Permalinks / Slug
               </label>
               <button
@@ -865,15 +873,15 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                 {isSlugCustomized ? "Lock (Auto-generate)" : "Customize Slug"}
               </button>
             </div>
-            <div className="flex items-center rounded-xl border border-slate-800 bg-slate-950/80 px-3 text-xs text-slate-400 font-mono">
-              <span className="text-slate-500 select-none">shopora.com/products/</span>
+            <div className="flex items-center rounded-xl border border-border bg-muted/40 px-3 text-xs text-muted-foreground font-mono">
+              <span className="text-muted-foreground select-none">shopora.com/products/</span>
               <input
                 type="text"
                 value={slug}
                 readOnly={!isSlugCustomized}
                 onChange={(e) => setSlug(e.target.value)}
-                className={`flex-1 h-9 bg-transparent px-1 text-white font-mono text-xs focus:outline-none ${
-                  isSlugCustomized ? "border-b border-brand" : "text-slate-300"
+                className={`flex-1 h-9 bg-transparent px-1 text-foreground font-mono text-xs focus:outline-none ${
+                  isSlugCustomized ? "border-b border-brand" : "text-foreground"
                 }`}
               />
             </div>
@@ -882,10 +890,10 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
           {/* Category Selection (Hierarchical Tree & Cascading Drilldown) */}
           <div className="space-y-2 pt-1">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-slate-300">
+              <label className="block text-xs font-semibold text-foreground">
                 Primary Product Category <span className="text-rose-500">*</span>
               </label>
-              <span className="text-[11px] text-slate-400">
+              <span className="text-[11px] text-muted-foreground">
                 Main Category → Subcategory hierarchy
               </span>
             </div>
@@ -898,13 +906,13 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
 
           {/* Brand Selection */}
           <div className="space-y-1.5 pt-1">
-            <label className="block text-xs font-semibold text-slate-300">
+            <label className="block text-xs font-semibold text-foreground">
               Brand / Manufacturer (Optional)
             </label>
             <select
               value={brandId}
               onChange={(e) => setBrandId(e.target.value)}
-              className="w-full h-10 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand font-medium"
+              className="w-full h-10 px-3 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-brand font-medium"
             >
               <option value="">-- Select Brand (No Brand) --</option>
               {brands.map((b) => (
@@ -917,7 +925,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
 
           {/* Short Description */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-slate-300">
+            <label className="block text-xs font-semibold text-foreground">
               Short Description / Key Highlights
             </label>
             <input
@@ -925,13 +933,13 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
               placeholder="e.g. PixArt 3395 Sensor, 26,000 DPI, 54g Ultra-lightweight, 80-Hour Battery"
               value={shortDescription}
               onChange={(e) => setShortDescription(e.target.value)}
-              className="w-full h-10 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand"
+              className="w-full h-10 px-3 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
 
           {/* Full Description */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-slate-300">
+            <label className="block text-xs font-semibold text-foreground">
               Detailed Description & Specifications <span className="text-rose-500">*</span>
             </label>
             <textarea
@@ -940,14 +948,14 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
               placeholder="Provide a comprehensive product overview, in-depth technical specifications, box contents, and customer benefits..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full p-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand leading-relaxed"
+              className="w-full p-3 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand leading-relaxed"
             />
           </div>
 
           {/* Warranty, Tags & Video URL */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-slate-300">
+              <label className="block text-xs font-semibold text-foreground">
                 Official Warranty
               </label>
               <input
@@ -955,12 +963,12 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                 placeholder="e.g. 1 Year Official Brand Warranty"
                 value={warranty}
                 onChange={(e) => setWarranty(e.target.value)}
-                className="w-full h-9 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand"
+                className="w-full h-9 px-3 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-slate-300">
+              <label className="block text-xs font-semibold text-foreground">
                 Search Tags (Comma-separated)
               </label>
               <input
@@ -968,12 +976,12 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                 placeholder="e.g. gaming, wireless, rgb, lightweight"
                 value={tagsInput}
                 onChange={(e) => setTagsInput(e.target.value)}
-                className="w-full h-9 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand"
+                className="w-full h-9 px-3 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-slate-300">
+              <label className="block text-xs font-semibold text-foreground">
                 Product Video Embed / URL (Optional)
               </label>
               <input
@@ -981,7 +989,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                 placeholder="https://youtube.com/watch?v=..."
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
-                className="w-full h-9 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand"
+                className="w-full h-9 px-3 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand"
               />
             </div>
           </div>
@@ -991,9 +999,9 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* SECTION 3: Media & Gallery                                        */}
       {/* ================================================================= */}
-      <Card className="bg-slate-900 border-slate-800 overflow-hidden">
-        <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
-          <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+      <Card className="bg-card border-border overflow-hidden shadow-xs">
+        <CardHeader className="bg-muted/30 p-4 border-b border-border">
+          <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
             <ImageIcon className="h-4 w-4 text-emerald-400" />
             <span>Product Imagery &amp; Media Assets</span>
           </CardTitle>
@@ -1001,7 +1009,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
         <CardContent className="p-4 sm:p-6 space-y-5">
           {/* Main Product Thumbnail */}
           <div className="space-y-2">
-            <label className="block text-xs font-semibold text-slate-300">
+            <label className="block text-xs font-semibold text-foreground">
               Primary Product Thumbnail <span className="text-rose-500">*</span>
             </label>
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -1010,7 +1018,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                   setMediaTarget("main");
                   setIsMediaModalOpen(true);
                 }}
-                className="h-28 w-28 rounded-2xl border-2 border-dashed border-slate-700 bg-slate-950 hover:border-brand transition flex flex-col items-center justify-center p-2 text-center cursor-pointer group relative overflow-hidden"
+                className="h-28 w-28 rounded-2xl border-2 border-dashed border-border bg-muted/20 hover:border-brand transition flex flex-col items-center justify-center p-2 text-center cursor-pointer group relative overflow-hidden"
               >
                 {mainImageUrl ? (
                   <>
@@ -1025,15 +1033,15 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                   </>
                 ) : (
                   <>
-                    <Upload className="h-6 w-6 text-slate-500 group-hover:text-brand transition mb-1" />
-                    <span className="text-[10px] text-slate-400 group-hover:text-slate-200">
+                    <Upload className="h-6 w-6 text-muted-foreground group-hover:text-brand transition mb-1" />
+                    <span className="text-[10px] text-muted-foreground group-hover:text-foreground">
                       Select Main Image
                     </span>
                   </>
                 )}
               </div>
 
-              <div className="space-y-1 text-xs text-slate-400">
+              <div className="space-y-1 text-xs text-muted-foreground">
                 <Button
                   type="button"
                   variant="outline"
@@ -1047,7 +1055,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                   <Upload className="h-3.5 w-3.5 text-brand" />
                   <span>Choose from Cloudinary Media Library</span>
                 </Button>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-muted-foreground">
                   Recommended size: 1000 × 1000 px. Transparent PNG or clean white background.
                 </p>
               </div>
@@ -1055,9 +1063,9 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
           </div>
 
           {/* Product Gallery Images */}
-          <div className="space-y-2 pt-3 border-t border-slate-800">
+          <div className="space-y-2 pt-3 border-t border-border">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-slate-300">
+              <label className="block text-xs font-semibold text-foreground">
                 Product Image Gallery ({galleryImages.length})
               </label>
               <Button
@@ -1079,7 +1087,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
               {galleryImages.map((img, idx) => (
                 <div
                   key={idx}
-                  className="h-20 w-20 rounded-xl border border-slate-800 bg-slate-950 p-1 relative group overflow-hidden"
+                  className="h-20 w-20 rounded-xl border border-border bg-muted/30 p-1 relative group overflow-hidden"
                 >
                   <img
                     src={img.url}
@@ -1102,7 +1110,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                   setMediaTarget("gallery");
                   setIsMediaModalOpen(true);
                 }}
-                className="h-20 w-20 rounded-xl border-2 border-dashed border-slate-800 hover:border-slate-600 bg-slate-950/50 flex flex-col items-center justify-center cursor-pointer transition text-slate-500 hover:text-white"
+                className="h-20 w-20 rounded-xl border-2 border-dashed border-border hover:border-foreground/50 bg-muted/20 flex flex-col items-center justify-center cursor-pointer transition text-muted-foreground hover:text-foreground"
               >
                 <Plus className="h-5 w-5" />
                 <span className="text-[9px] mt-0.5">Add More</span>
@@ -1116,9 +1124,9 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* SECTION 4: SIMPLE PRODUCT PRICING & INVENTORY                     */}
       {/* ================================================================= */}
       {productType === "SIMPLE" && (
-        <Card className="bg-slate-900 border-slate-800 overflow-hidden">
-          <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+        <Card className="bg-card border-border overflow-hidden shadow-xs">
+          <CardHeader className="bg-muted/30 p-4 border-b border-border">
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-emerald-400" />
               <span>Simple Product Pricing &amp; Stock</span>
             </CardTitle>
@@ -1127,11 +1135,11 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Base Price */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-300">
+                <label className="block text-xs font-semibold text-foreground">
                   Regular / Selling Price (BDT) <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-bold text-xs">
                     ৳
                   </span>
                   <input
@@ -1142,18 +1150,18 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                     placeholder="2500"
                     value={basePrice}
                     onChange={(e) => setBasePrice(e.target.value ? Number(e.target.value) : "")}
-                    className="w-full h-10 pl-8 pr-3 rounded-xl border border-slate-800 bg-slate-950 text-xs font-bold text-white focus:outline-none focus:ring-1 focus:ring-brand"
+                    className="w-full h-10 pl-8 pr-3 rounded-xl border border-border bg-background text-xs font-bold text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
                   />
                 </div>
               </div>
 
               {/* Compare Price */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-300">
+                <label className="block text-xs font-semibold text-foreground">
                   Original / Strikethrough Price (Optional)
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-bold text-xs">
                     ৳
                   </span>
                   <input
@@ -1163,7 +1171,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                     placeholder="2990"
                     value={comparePrice}
                     onChange={(e) => setComparePrice(e.target.value ? Number(e.target.value) : "")}
-                    className="w-full h-10 pl-8 pr-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-brand"
+                    className="w-full h-10 pl-8 pr-3 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
                   />
                 </div>
                 {typeof basePrice === "number" &&
@@ -1177,11 +1185,11 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
 
               {/* Cost Price */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-300">
+                <label className="block text-xs font-semibold text-foreground">
                   Cost Price (For Merchant Profit Calculation)
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-bold text-xs">
                     ৳
                   </span>
                   <input
@@ -1191,7 +1199,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                     placeholder="1800"
                     value={costPrice}
                     onChange={(e) => setCostPrice(e.target.value ? Number(e.target.value) : "")}
-                    className="w-full h-10 pl-8 pr-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-brand"
+                    className="w-full h-10 pl-8 pr-3 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
                   />
                 </div>
                 {typeof basePrice === "number" &&
@@ -1208,7 +1216,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
             {/* Inventory Row */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-300">
+                <label className="block text-xs font-semibold text-foreground">
                   Master SKU (Stock Keeping Unit)
                 </label>
                 <input
@@ -1216,12 +1224,12 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                   placeholder="e.g. SHO-APX-001"
                   value={sku}
                   onChange={(e) => setSku(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs font-mono uppercase text-white focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="w-full h-10 px-3 rounded-xl border border-border bg-background text-xs font-mono uppercase text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-300">
+                <label className="block text-xs font-semibold text-foreground">
                   Stock Units Available
                 </label>
                 <input
@@ -1229,12 +1237,12 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                   min={0}
                   value={stock}
                   onChange={(e) => setStock(e.target.value ? Number(e.target.value) : 0)}
-                  className="w-full h-10 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs font-bold text-white focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="w-full h-10 px-3 rounded-xl border border-border bg-background text-xs font-bold text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-300">
+                <label className="block text-xs font-semibold text-foreground">
                   Low Stock Alert Threshold
                 </label>
                 <input
@@ -1244,22 +1252,22 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                   onChange={(e) =>
                     setLowStockThreshold(e.target.value ? Number(e.target.value) : 5)
                   }
-                  className="w-full h-10 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="w-full h-10 px-3 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
                 />
               </div>
             </div>
 
-            <div className="flex items-center gap-2 pt-3 border-t border-slate-800/60 mt-3">
+            <div className="flex items-center gap-2 pt-3 border-t border-border mt-3">
               <input
                 type="checkbox"
                 id="trackStockCheckbox"
                 checked={trackStock}
                 onChange={(e) => setTrackStock(e.target.checked)}
-                className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-brand focus:ring-brand"
+                className="h-4 w-4 rounded border-border bg-background text-brand focus:ring-brand"
               />
               <label
                 htmlFor="trackStockCheckbox"
-                className="text-xs text-slate-300 font-medium cursor-pointer select-none"
+                className="text-xs text-foreground font-medium cursor-pointer select-none"
               >
                 Track inventory stock count automatically
               </label>
@@ -1272,7 +1280,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* SECTION 5: VARIABLE PRODUCT (Attributes Selection & Matrix Table)  */}
       {/* ================================================================= */}
       {productType === "VARIABLE" && (
-        <Card className="bg-slate-900 border-purple-900/60 overflow-hidden">
+        <Card className="bg-card border-purple-500/30 overflow-hidden shadow-xs">
           <CardHeader className="bg-purple-950/40 p-4 border-b border-purple-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <CardTitle className="text-sm font-bold uppercase tracking-wider text-purple-200 flex items-center gap-2">
@@ -1293,7 +1301,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                     e.target.value = "";
                   }
                 }}
-                className="h-9 px-3 rounded-xl border border-purple-800 bg-slate-950 text-xs text-purple-200 focus:outline-none focus:ring-1 focus:ring-purple-400 font-semibold"
+                className="h-9 px-3 rounded-xl border border-purple-500/40 bg-background text-xs text-purple-700 dark:text-purple-200 focus:outline-none focus:ring-1 focus:ring-purple-400 font-semibold"
               >
                 <option value="">+ Add Attribute (e.g. Color, Size)...</option>
                 {availableAttributes
@@ -1311,19 +1319,19 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
             {/* Step 1: Selected Attributes Box */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">
                   Step 1: Choose Attribute Values for this Product
                 </h4>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-[11px] text-muted-foreground">
                   {selectedAttributeGroups.length} attributes active
                 </span>
               </div>
 
               {selectedAttributeGroups.length === 0 ? (
-                <div className="p-8 text-center border-2 border-dashed border-slate-800 rounded-2xl space-y-2 bg-slate-950/40">
+                <div className="p-8 text-center border-2 border-dashed border-border rounded-2xl space-y-2 bg-muted/20">
                   <SlidersHorizontal className="h-7 w-7 text-purple-400 mx-auto" />
-                  <p className="text-xs font-bold text-slate-300">No attributes added yet</p>
-                  <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
+                  <p className="text-xs font-bold text-foreground">No attributes added yet</p>
+                  <p className="text-[11px] text-muted-foreground max-w-sm mx-auto">
                     Choose attributes (such as Color and Size) from the dropdown above to define variations for this product.
                   </p>
                 </div>
@@ -1336,15 +1344,15 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                     return (
                       <div
                         key={group.attributeId}
-                        className="p-4 rounded-xl border border-slate-800 bg-slate-950/80 space-y-3"
+                        className="p-4 rounded-xl border border-border bg-muted/30 space-y-3"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-xs text-white">{group.attributeName}</span>
-                            <Badge variant="outline" className="text-[10px] border-slate-700 text-slate-400">
+                            <span className="font-bold text-xs text-foreground">{group.attributeName}</span>
+                            <Badge variant="outline" className="text-[10px] border-border text-muted-foreground">
                               {group.type}
                             </Badge>
-                            <span className="text-[11px] text-slate-400">
+                            <span className="text-[11px] text-muted-foreground">
                               ({group.selectedValues.length} of {valuesList.length} selected)
                             </span>
                           </div>
@@ -1357,15 +1365,15 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                             >
                               Select All
                             </button>
-                            <span className="text-slate-700">•</span>
+                            <span className="text-muted-foreground/60">•</span>
                             <button
                               type="button"
                               onClick={() => handleClearAllValues(group.attributeId)}
-                              className="text-[11px] text-slate-400 hover:text-white font-medium"
+                              className="text-[11px] text-muted-foreground hover:text-foreground font-medium"
                             >
                               Clear
                             </button>
-                            <span className="text-slate-700">•</span>
+                            <span className="text-muted-foreground/60">•</span>
                             <button
                               type="button"
                               onClick={() => handleRemoveAttributeGroup(group.attributeId)}
@@ -1388,7 +1396,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                                   isChecked
                                     ? "bg-purple-600 text-white border-purple-500"
-                                    : "bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200"
+                                    : "bg-background text-muted-foreground border-border hover:border-foreground/30 hover:text-foreground"
                                 }`}
                               >
                                 {group.type === "COLOR" && val.colorCode && (
@@ -1412,13 +1420,13 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
 
             {/* Step 2: "Generate Variants" Action Button */}
             {selectedAttributeGroups.length > 0 && (
-              <div className="pt-2 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-linear-to-r from-purple-950/60 to-slate-900 border border-purple-800/40">
+              <div className="pt-2 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-purple-500/5 border border-purple-500/20">
                 <div className="space-y-0.5">
                   <h4 className="text-xs font-bold text-purple-200 flex items-center gap-1.5">
                     <Sparkles className="h-4 w-4 text-purple-400" />
                     <span>Variant Multiplier Ready</span>
                   </h4>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-muted-foreground">
                     Click the button to automatically compute combinations and generate individual variation rows.
                   </p>
                 </div>
@@ -1447,13 +1455,13 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
 
             {/* Step 3: Variants Matrix Table */}
             {variantRows.length > 0 && (
-              <div className="space-y-4 pt-3 border-t border-slate-800">
+              <div className="space-y-4 pt-3 border-t border-border">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
                       <span>Step 3: Variant Inventory Matrix ({variantRows.length} Rows)</span>
                     </h4>
-                    <p className="text-[11px] text-slate-400">
+                    <p className="text-[11px] text-muted-foreground">
                       Configure individual price, stock, and thumbnail per variation.
                     </p>
                   </div>
@@ -1461,13 +1469,13 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                   {/* Bulk Action Controls */}
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Bulk Price */}
-                    <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 rounded-lg p-1" title="Set price for all variations">
+                    <div className="flex items-center gap-1 bg-muted/40 border border-border rounded-lg p-1" title="Set price for all variations">
                       <input
                         type="number"
                         placeholder="Price ৳"
                         value={bulkPrice}
                         onChange={(e) => setBulkPrice(e.target.value)}
-                        className="w-20 h-7 bg-transparent px-2 text-xs text-white focus:outline-none"
+                        className="w-20 h-7 bg-transparent px-2 text-xs text-foreground focus:outline-none"
                       />
                       <Button
                         type="button"
@@ -1481,13 +1489,13 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                     </div>
 
                     {/* Bulk Cost Price */}
-                    <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 rounded-lg p-1" title="Set cost price for profit calculation on all variations">
+                    <div className="flex items-center gap-1 bg-muted/40 border border-border rounded-lg p-1" title="Set cost price for profit calculation on all variations">
                       <input
                         type="number"
                         placeholder="Cost ৳"
                         value={bulkCostPrice}
                         onChange={(e) => setBulkCostPrice(e.target.value)}
-                        className="w-20 h-7 bg-transparent px-2 text-xs text-slate-300 focus:outline-none"
+                        className="w-20 h-7 bg-transparent px-2 text-xs text-foreground focus:outline-none"
                       />
                       <Button
                         type="button"
@@ -1501,13 +1509,13 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                     </div>
 
                     {/* Bulk Stock */}
-                    <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 rounded-lg p-1" title="Set stock units for all variations">
+                    <div className="flex items-center gap-1 bg-muted/40 border border-border rounded-lg p-1" title="Set stock units for all variations">
                       <input
                         type="number"
                         placeholder="Stock"
                         value={bulkStock}
                         onChange={(e) => setBulkStock(e.target.value)}
-                        className="w-16 h-7 bg-transparent px-2 text-xs text-white focus:outline-none"
+                        className="w-16 h-7 bg-transparent px-2 text-xs text-foreground focus:outline-none"
                       />
                       <Button
                         type="button"
@@ -1521,7 +1529,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                     </div>
 
                     {/* Bulk Low Stock Alert */}
-                    <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 rounded-lg p-1" title="Set low stock alert threshold for all variations">
+                    <div className="flex items-center gap-1 bg-muted/40 border border-border rounded-lg p-1" title="Set low stock alert threshold for all variations">
                       <input
                         type="number"
                         placeholder="Alert ≤"
@@ -1543,27 +1551,27 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                 </div>
 
                 {/* Table */}
-                <div className="rounded-xl border border-slate-800 overflow-x-auto shadow-inner">
-                  <table className="w-full text-left text-xs min-w-237.5">
-                    <thead className="bg-slate-950 text-[11px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">
-                      <tr>
-                        <th className="py-2.5 px-3">Image</th>
-                        <th className="py-2.5 px-3">Variant Combination</th>
-                        <th className="py-2.5 px-3">SKU</th>
-                        <th className="py-2.5 px-3">Cost (৳)</th>
-                        <th className="py-2.5 px-3">Price (৳)</th>
-                        <th className="py-2.5 px-3">Compare (৳)</th>
-                        <th className="py-2.5 px-3">Stock Units</th>
-                        <th className="py-2.5 px-3">Low Alert</th>
-                        <th className="py-2.5 px-3 text-center">Specs</th>
-                        <th className="py-2.5 px-3 text-center">Default</th>
-                        <th className="py-2.5 px-3 text-right">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800/80 bg-slate-900/60">
+                <div className="rounded-xl border border-border overflow-x-auto shadow-inner">
+                  <Table className="w-full text-left text-xs min-w-237.5">
+                    <TableHeader className="bg-muted/40 border-b border-border">
+                      <TableRow className="border-border hover:bg-transparent">
+                        <TableHead className="py-2.5 px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Image</TableHead>
+                        <TableHead className="py-2.5 px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Variant Combination</TableHead>
+                        <TableHead className="py-2.5 px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">SKU</TableHead>
+                        <TableHead className="py-2.5 px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Cost (৳)</TableHead>
+                        <TableHead className="py-2.5 px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Price (৳)</TableHead>
+                        <TableHead className="py-2.5 px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Compare (৳)</TableHead>
+                        <TableHead className="py-2.5 px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Stock Units</TableHead>
+                        <TableHead className="py-2.5 px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Low Alert</TableHead>
+                        <TableHead className="py-2.5 px-3 text-center text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Specs</TableHead>
+                        <TableHead className="py-2.5 px-3 text-center text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Default</TableHead>
+                        <TableHead className="py-2.5 px-3 text-right text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Action</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody className="divide-y divide-border bg-card">
                       {variantRows.map((v, idx) => (
                         <React.Fragment key={idx}>
-                          <tr className="hover:bg-slate-800/30 transition">
+                          <tr className="hover:bg-muted/50 transition">
                             {/* Image */}
                             <td className="py-2 px-3">
                               <div
@@ -1571,7 +1579,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                                   setMediaTarget({ variantIndex: idx });
                                   setIsMediaModalOpen(true);
                                 }}
-                                className="h-10 w-10 rounded-lg border border-slate-700 bg-slate-950 flex items-center justify-center cursor-pointer hover:border-brand overflow-hidden shrink-0 group relative"
+                                className="h-10 w-10 rounded-lg border border-border bg-muted/20 flex items-center justify-center cursor-pointer hover:border-brand overflow-hidden shrink-0 group relative"
                                 title="Click to select image for this variant"
                               >
                                 {v.image ? (
@@ -1581,17 +1589,17 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                                     className="h-full w-full object-contain"
                                   />
                                 ) : (
-                                  <Upload className="h-3.5 w-3.5 text-slate-500 group-hover:text-brand" />
+                                  <Upload className="h-3.5 w-3.5 text-muted-foreground group-hover:text-brand" />
                                 )}
                               </div>
                             </td>
 
                             {/* Variant Title */}
-                            <td className="py-2 px-3 font-semibold text-white">
+                            <td className="py-2 px-3 font-semibold text-foreground">
                               <div className="flex items-center gap-1.5">
                                 <span>{v.title}</span>
                                 {v.isActive === false && (
-                                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 font-normal">
+                                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-muted text-muted-foreground border border-border font-normal">
                                     Disabled
                                   </span>
                                 )}
@@ -1610,7 +1618,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                                     )
                                   )
                                 }
-                                className="w-32 h-8 px-2 rounded-lg border border-slate-800 bg-slate-950 text-[11px] font-mono text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand"
+                                className="w-32 h-8 px-2 rounded-lg border border-border bg-background text-[11px] font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
                                 placeholder="SKU"
                               />
                             </td>
@@ -1635,7 +1643,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                                     )
                                   )
                                 }
-                                className="w-24 h-8 px-2 rounded-lg border border-slate-800 bg-slate-950 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-brand"
+                                className="w-24 h-8 px-2 rounded-lg border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
                                 title="Merchant cost price for profit calculation"
                               />
                             </td>
@@ -1658,7 +1666,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                                     )
                                   )
                                 }
-                                className="w-24 h-8 px-2 rounded-lg border border-slate-800 bg-slate-950 text-xs font-bold text-white focus:outline-none focus:ring-1 focus:ring-brand"
+                                className="w-24 h-8 px-2 rounded-lg border border-border bg-background text-xs font-bold text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
                               />
                             </td>
 
@@ -1684,7 +1692,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                                     )
                                   )
                                 }
-                                className="w-24 h-8 px-2 rounded-lg border border-slate-800 bg-slate-950 text-xs text-slate-400 focus:outline-none focus:ring-1 focus:ring-brand"
+                                className="w-24 h-8 px-2 rounded-lg border border-border bg-background text-xs text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand"
                               />
                             </td>
 
@@ -1707,12 +1715,12 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                                       )
                                     )
                                   }
-                                  className={`w-20 h-8 px-2 rounded-lg border bg-slate-950 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-brand ${
+                                  className={`w-20 h-8 px-2 rounded-lg border bg-background text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-brand ${
                                     v.stock === 0
                                       ? "border-rose-500/60 text-rose-400"
                                       : v.stock <= (v.lowStockThreshold ?? 5)
                                       ? "border-amber-500/60 text-amber-300"
-                                      : "border-slate-800 text-white"
+                                      : "border-border text-foreground"
                                   }`}
                                 />
                                 {v.stock === 0 ? (
@@ -1748,7 +1756,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                                     )
                                   )
                                 }
-                                className="w-16 h-8 px-2 rounded-lg border border-slate-800 bg-slate-950 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-brand"
+                                className="w-16 h-8 px-2 rounded-lg border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
                                 title="Threshold to trigger low stock notification"
                               />
                             </td>
@@ -1763,7 +1771,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                                     ? "border-purple-600 bg-purple-500/20 text-purple-300"
                                     : v.barcode || v.weightKg
                                     ? "border-sky-500/40 bg-sky-500/10 text-sky-400"
-                                    : "border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800"
+                                    : "border-border text-muted-foreground hover:text-foreground hover:bg-muted"
                                 }`}
                                 title="Toggle extra specs: Barcode & Shipping Weight"
                               >
@@ -1789,7 +1797,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                               <button
                                 type="button"
                                 onClick={() => handleRemoveVariantRow(idx)}
-                                className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-slate-800 transition cursor-pointer"
+                                className="p-1 rounded-lg text-muted-foreground hover:text-rose-500 hover:bg-muted transition cursor-pointer"
                                 title="Remove Variant"
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -1799,12 +1807,12 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
 
                           {/* Expanded Specifications Row */}
                           {expandedRowIndices[idx] && (
-                            <tr className="bg-slate-950/80 border-b border-purple-900/40 animate-in fade-in duration-150">
+                            <tr className="bg-muted/40 border-b border-purple-500/20 animate-in fade-in duration-150">
                               <td colSpan={11} className="py-2.5 px-4">
                                 <div className="flex flex-wrap items-center gap-4 text-xs">
                                   {/* Barcode */}
                                   <div className="flex items-center gap-2">
-                                    <label className="text-[11px] font-semibold text-slate-400">
+                                    <label className="text-[11px] font-semibold text-muted-foreground">
                                       Barcode (UPC/EAN):
                                     </label>
                                     <input
@@ -1818,13 +1826,13 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                                           )
                                         )
                                       }
-                                      className="w-48 h-7 px-2 rounded-lg border border-slate-800 bg-slate-900 text-xs font-mono text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand"
+                                      className="w-48 h-7 px-2 rounded-lg border border-border bg-background text-xs font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
                                     />
                                   </div>
 
                                   {/* Weight for courier */}
                                   <div className="flex items-center gap-2">
-                                    <label className="text-[11px] font-semibold text-slate-400">
+                                    <label className="text-[11px] font-semibold text-muted-foreground">
                                       Weight (Kg) for Shipping:
                                     </label>
                                     <input
@@ -1847,13 +1855,13 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                                           )
                                         )
                                       }
-                                      className="w-28 h-7 px-2 rounded-lg border border-slate-800 bg-slate-900 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand"
+                                      className="w-28 h-7 px-2 rounded-lg border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
                                     />
                                   </div>
 
                                   {/* Active for sale */}
                                   <div className="flex items-center gap-2 ml-auto">
-                                    <label className="flex items-center gap-1.5 cursor-pointer text-[11px] text-slate-300 select-none">
+                                    <label className="flex items-center gap-1.5 cursor-pointer text-[11px] text-foreground select-none">
                                       <input
                                         type="checkbox"
                                         checked={v.isActive !== false}
@@ -1864,7 +1872,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                                             )
                                           )
                                         }
-                                        className="h-3.5 w-3.5 rounded border-slate-700 bg-slate-900 text-brand focus:ring-brand cursor-pointer"
+                                        className="h-3.5 w-3.5 rounded border-border bg-background text-brand focus:ring-brand cursor-pointer"
                                       />
                                       <span>Active for sale</span>
                                     </label>
@@ -1875,8 +1883,8 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                           )}
                         </React.Fragment>
                       ))}
-                    </tbody>
-                  </table>
+                    </TableBody>
+                  </Table>
                 </div>
               </div>
             )}
@@ -1887,9 +1895,9 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* SECTION 6: Shipping & Logistics                                   */}
       {/* ================================================================= */}
-      <Card className="bg-slate-900 border-slate-800 overflow-hidden">
-        <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
-          <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+      <Card className="bg-card border-border overflow-hidden shadow-xs">
+        <CardHeader className="bg-muted/30 p-4 border-b border-border">
+          <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
             <Truck className="h-4 w-4 text-sky-400" />
             <span>Shipping &amp; Physical Dimensions</span>
           </CardTitle>
@@ -1897,7 +1905,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
         <CardContent className="p-4 sm:p-6 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-slate-300">Weight (KG)</label>
+              <label className="block text-xs font-semibold text-foreground">Weight (KG)</label>
               <input
                 type="number"
                 step="0.01"
@@ -1905,12 +1913,12 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                 placeholder="0.25"
                 value={weightKg}
                 onChange={(e) => setWeightKg(e.target.value ? Number(e.target.value) : "")}
-                className="w-full h-9 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand"
+                className="w-full h-9 px-3 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-slate-300">Length (CM)</label>
+              <label className="block text-xs font-semibold text-foreground">Length (CM)</label>
               <input
                 type="number"
                 step="0.1"
@@ -1918,12 +1926,12 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                 placeholder="12.5"
                 value={lengthCm}
                 onChange={(e) => setLengthCm(e.target.value ? Number(e.target.value) : "")}
-                className="w-full h-9 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand"
+                className="w-full h-9 px-3 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-slate-300">Width (CM)</label>
+              <label className="block text-xs font-semibold text-foreground">Width (CM)</label>
               <input
                 type="number"
                 step="0.1"
@@ -1931,12 +1939,12 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                 placeholder="6.5"
                 value={widthCm}
                 onChange={(e) => setWidthCm(e.target.value ? Number(e.target.value) : "")}
-                className="w-full h-9 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand"
+                className="w-full h-9 px-3 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-slate-300">Height (CM)</label>
+              <label className="block text-xs font-semibold text-foreground">Height (CM)</label>
               <input
                 type="number"
                 step="0.1"
@@ -1944,7 +1952,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                 placeholder="4.0"
                 value={heightCm}
                 onChange={(e) => setHeightCm(e.target.value ? Number(e.target.value) : "")}
-                className="w-full h-9 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand"
+                className="w-full h-9 px-3 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
               />
             </div>
           </div>
@@ -1955,9 +1963,9 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
               id="freeShippingCheck"
               checked={isFreeShipping}
               onChange={(e) => setFreeShipping(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-brand focus:ring-brand"
+              className="h-4 w-4 rounded border-border bg-background text-brand focus:ring-brand"
             />
-            <label htmlFor="freeShippingCheck" className="text-xs text-slate-300 cursor-pointer select-none">
+            <label htmlFor="freeShippingCheck" className="text-xs text-foreground cursor-pointer select-none">
               Free Shipping for this Product across Bangladesh
             </label>
           </div>
@@ -1967,24 +1975,24 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* SECTION 6: Frequently Bought Together (Bundle Recommendations)    */}
       {/* ================================================================= */}
-      <Card className="bg-slate-900 border-slate-800 overflow-hidden">
-        <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
-          <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+      <Card className="bg-card border-border overflow-hidden shadow-xs">
+        <CardHeader className="bg-muted/30 p-4 border-b border-border">
+          <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-indigo-400" />
             <span>Frequently Bought Together / Companion Products</span>
           </CardTitle>
-          <CardDescription className="text-xs text-slate-400">
+          <CardDescription className="text-xs text-muted-foreground">
             Select up to 4 companion products from your catalog to recommend as a bundle on this product page (e.g. phone case, charger, screen protector). Customers get an instant 5% bundle discount when buying them together. If left empty, the system will automatically recommend items from the same category.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-4 sm:p-6 space-y-4">
           {/* Selected Products Chips */}
           <div className="space-y-2">
-            <span className="text-xs font-semibold text-slate-300">
+            <span className="text-xs font-semibold text-foreground">
               Selected Companion Items ({selectedBundleProductIds.length}/4):
             </span>
             {selectedBundleProductIds.length === 0 ? (
-              <p className="text-xs text-slate-500 italic">
+              <p className="text-xs text-muted-foreground italic">
                 No companion products manually selected. System will auto-recommend relevant items from the same category.
               </p>
             ) : (
@@ -1994,10 +2002,10 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                   return (
                     <div
                       key={pId}
-                      className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs"
+                      className="flex items-center justify-between p-2.5 rounded-xl bg-card border border-border text-xs"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="h-9 w-9 rounded-lg bg-slate-800 overflow-hidden shrink-0 relative flex items-center justify-center">
+                        <div className="h-9 w-9 rounded-lg bg-muted border border-border overflow-hidden shrink-0 relative flex items-center justify-center">
                           {pItem?.mainImage ? (
                             <img
                               src={
@@ -2009,14 +2017,14 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                               className="h-full w-full object-cover"
                             />
                           ) : (
-                            <Package className="h-4 w-4 text-slate-500" />
+                            <Package className="h-4 w-4 text-muted-foreground" />
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-bold text-white truncate max-w-50">
+                          <p className="font-bold text-foreground truncate max-w-50">
                             {pItem?.name || pId}
                           </p>
-                          <p className="text-[11px] text-slate-400">
+                          <p className="text-[11px] text-muted-foreground">
                             ৳{pItem?.basePrice?.toLocaleString()} {pItem?.sku ? `• SKU: ${pItem.sku}` : ""}
                           </p>
                         </div>
@@ -2026,7 +2034,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                         onClick={() =>
                           setSelectedBundleProductIds((prev) => prev.filter((id) => id !== pId))
                         }
-                        className="p-1 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800"
+                        className="p-1 rounded-lg text-muted-foreground hover:text-rose-500 hover:bg-muted"
                         title="Remove from bundle"
                       >
                         <X className="h-4 w-4" />
@@ -2040,8 +2048,8 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
 
           {/* Add companion item selector */}
           {selectedBundleProductIds.length < 4 && (
-            <div className="pt-2 border-t border-slate-800/80 space-y-2">
-              <label className="block text-xs font-semibold text-slate-300">
+            <div className="pt-2 border-t border-border space-y-2">
+              <label className="block text-xs font-semibold text-foreground">
                 Search & Add Companion Product:
               </label>
               <div className="flex gap-2">
@@ -2050,12 +2058,12 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                   value={bundleSearchQuery}
                   onChange={(e) => setBundleSearchQuery(e.target.value)}
                   placeholder="Search catalog product by title or SKU..."
-                  className="flex-1 px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                  className="flex-1 px-3 py-2 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               {bundleSearchQuery.trim().length >= 2 && (
-                <div className="max-h-48 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 divide-y divide-slate-800/80">
+                <div className="max-h-48 overflow-y-auto rounded-xl border border-border bg-card divide-y divide-border">
                   {allCatalogProducts
                     .filter(
                       (p) =>
@@ -2068,10 +2076,10 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                     .map((item) => (
                       <div
                         key={item.id}
-                        className="p-2.5 flex items-center justify-between hover:bg-slate-900 transition-colors"
+                        className="p-2.5 flex items-center justify-between hover:bg-muted/50 transition-colors"
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="h-8 w-8 rounded-lg bg-slate-800 overflow-hidden shrink-0 relative flex items-center justify-center">
+                          <div className="h-8 w-8 rounded-lg bg-muted border border-border overflow-hidden shrink-0 relative flex items-center justify-center">
                             {item.mainImage ? (
                               <img
                                 src={
@@ -2083,14 +2091,14 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                                 className="h-full w-full object-cover"
                               />
                             ) : (
-                              <Package className="h-3.5 w-3.5 text-slate-500" />
+                              <Package className="h-3.5 w-3.5 text-muted-foreground" />
                             )}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-xs font-semibold text-white truncate max-w-60">
+                            <p className="text-xs font-semibold text-foreground truncate max-w-60">
                               {item.name}
                             </p>
-                            <p className="text-[10px] text-slate-400">
+                            <p className="text-[10px] text-muted-foreground">
                               ৳{item.basePrice.toLocaleString()} {item.sku ? `• ${item.sku}` : ""}
                             </p>
                           </div>
@@ -2119,17 +2127,17 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* SECTION 7: SEO Friendly Metadata & Live Google Preview            */}
       {/* ================================================================= */}
-      <Card className="bg-slate-900 border-slate-800 overflow-hidden">
-        <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
-          <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+      <Card className="bg-card border-border overflow-hidden shadow-xs">
+        <CardHeader className="bg-muted/30 p-4 border-b border-border">
+          <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
             <Globe className="h-4 w-4 text-emerald-400" />
             <span>Search Engine Optimization (SEO Friendly)</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4 sm:p-6 space-y-5">
           {/* Live Google Search Snippet Box */}
-          <div className="p-4 rounded-xl border border-slate-800 bg-slate-950 space-y-1.5">
-            <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+          <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-1.5">
+            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
               Google SERP Search Preview
             </span>
             <div className="space-y-0.5">
@@ -2137,7 +2145,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
               <h4 className="text-base text-sky-400 font-medium hover:underline cursor-pointer truncate">
                 {seoPreviewTitle}
               </h4>
-              <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                 {seoPreviewDesc}
               </p>
             </div>
@@ -2146,25 +2154,25 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
           {/* Meta Title */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-slate-300">Meta Title</label>
-              <span className="text-[11px] text-slate-500">{metaTitle.length} / 60 characters</span>
+              <label className="block text-xs font-semibold text-foreground">Meta Title</label>
+              <span className="text-[11px] text-muted-foreground">{metaTitle.length} / 60 characters</span>
             </div>
             <input
               type="text"
               placeholder="e.g. Apex Swift Pro Ultra Gaming Mouse | Shopora Bangladesh"
               value={metaTitle}
               onChange={(e) => setMetaTitle(e.target.value)}
-              className="w-full h-9 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand font-medium"
+              className="w-full h-9 px-3 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand font-medium"
             />
           </div>
 
           {/* Meta Description */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-slate-300">
+              <label className="block text-xs font-semibold text-foreground">
                 Meta Description
               </label>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-[11px] text-muted-foreground">
                 {metaDescription.length} / 160 characters
               </span>
             </div>
@@ -2173,13 +2181,13 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
               placeholder="Provide a concise summary for search engine bots (aim for 120-160 characters)..."
               value={metaDescription}
               onChange={(e) => setMetaDescription(e.target.value)}
-              className="w-full p-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand leading-relaxed"
+              className="w-full p-3 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand leading-relaxed"
             />
           </div>
 
           {/* Meta Focus Keywords */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-slate-300">
+            <label className="block text-xs font-semibold text-foreground">
               Meta Keywords (Comma-separated)
             </label>
             <input
@@ -2187,7 +2195,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
               placeholder="e.g. gaming mouse, wireless mouse, apex swift pro, buy mouse bangladesh"
               value={metaKeywords}
               onChange={(e) => setMetaKeywords(e.target.value)}
-              className="w-full h-9 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand"
+              className="w-full h-9 px-3 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
         </CardContent>
@@ -2196,9 +2204,9 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* SECTION 8: Visibility & Flags                                     */}
       {/* ================================================================= */}
-      <Card className="bg-slate-900 border-slate-800 overflow-hidden">
-        <CardHeader className="bg-slate-950/40 p-4 border-b border-slate-800">
-          <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+      <Card className="bg-card border-border overflow-hidden shadow-xs">
+        <CardHeader className="bg-muted/30 p-4 border-b border-border">
+          <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-brand" />
             <span>Publishing Status &amp; Storefront Flags</span>
           </CardTitle>
@@ -2206,13 +2214,13 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
         <CardContent className="p-4 sm:p-6 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-slate-300">Publishing Status</label>
+              <label className="block text-xs font-semibold text-foreground">Publishing Status</label>
               <select
                 value={status}
                 onChange={(e) =>
                   setStatus(e.target.value as "PUBLISHED" | "UNPUBLISHED" | "ARCHIVED")
                 }
-                className="w-full h-9 px-3 rounded-xl border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand"
+                className="w-full h-9 px-3 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
               >
                 <option value="PUBLISHED">Published (Visible on storefront)</option>
                 <option value="UNPUBLISHED">Unpublished (Hidden from search)</option>
@@ -2226,9 +2234,9 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                 id="isFeaturedCheck"
                 checked={isFeatured}
                 onChange={(e) => setIsFeatured(e.target.checked)}
-                className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-brand focus:ring-brand"
+                className="h-4 w-4 rounded border-border bg-background text-brand focus:ring-brand"
               />
-              <label htmlFor="isFeaturedCheck" className="text-xs text-slate-300 cursor-pointer select-none">
+              <label htmlFor="isFeaturedCheck" className="text-xs text-foreground cursor-pointer select-none">
                 Featured Deal / Homepage Spotlight
               </label>
             </div>
@@ -2239,9 +2247,9 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                 id="isTrendingCheck"
                 checked={isTrending}
                 onChange={(e) => setIsTrending(e.target.checked)}
-                className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-brand focus:ring-brand"
+                className="h-4 w-4 rounded border-border bg-background text-brand focus:ring-brand"
               />
-              <label htmlFor="isTrendingCheck" className="text-xs text-slate-300 cursor-pointer select-none">
+              <label htmlFor="isTrendingCheck" className="text-xs text-foreground cursor-pointer select-none">
                 Trending / Best Seller Badge
               </label>
             </div>
@@ -2252,8 +2260,8 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* Bottom Sticky Action Bar                                          */}
       {/* ================================================================= */}
-      <div className="sticky bottom-4 z-30 p-3 sm:p-4 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-slate-700 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2 text-xs text-slate-400">
+      <div className="sticky bottom-4 z-30 p-3 sm:p-4 rounded-2xl bg-card/90 backdrop-blur-md border border-border shadow-lg flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
           <span>Ready to save changes</span>
         </div>

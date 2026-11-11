@@ -21,6 +21,16 @@ import {
   XCircle,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table";
 import { toast } from "sonner";
 import {
   useGetAdminCustomersQuery,
@@ -57,16 +67,16 @@ function StatCard({
   tone: string;
 }) {
   return (
-    <Card className="border-slate-800 bg-slate-900/60">
+    <Card className="hover:border-brand/40 transition">
       <CardContent className="flex items-center gap-3.5 p-4 sm:p-5">
         <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tone}`}>
           {icon}
         </span>
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             {label}
           </p>
-          <p className="text-xl font-black text-white">{value}</p>
+          <p className="text-xl font-black text-foreground">{value}</p>
         </div>
       </CardContent>
     </Card>
@@ -100,116 +110,112 @@ export default function AdminCustomersPage() {
   const isVerifiedFilter =
     filterTab === "verified" ? true : filterTab === "unverified" ? false : undefined;
 
-  const { data, isLoading, isFetching, isError, refetch } = useGetAdminCustomersQuery(
-    {
-      role: "CUSTOMER",
-      isActive: isActiveFilter,
-      isVerified: isVerifiedFilter,
-      search: search || undefined,
-      page,
-      limit,
-    },
-    { refetchOnMountOrArgChange: true, pollingInterval: 60_000 }
-  );
+  const { data, isLoading, isFetching, isError, refetch } = useGetAdminCustomersQuery({
+    page,
+    limit,
+    search: search || undefined,
+    isActive: isActiveFilter,
+    isVerified: isVerifiedFilter,
+  });
 
   const [toggleStatus, { isLoading: isToggling }] = useToggleCustomerStatusMutation();
 
   const customers = data?.users ?? [];
   const meta = data?.meta;
-  const counts = (meta as any)?.counts;
-
+  const counts = (data as unknown as { counts?: Record<string, number> })?.counts;
   const totalPages = meta?.totalPages ?? 1;
-
-  // Calculate gross spend of visible customers or lifetime sum
-  const totalRevenueSum = customers.reduce((acc, c) => acc + (c.totalSpent || 0), 0);
-
-  const handleQuickView = (customerId: string | number) => {
-    setSelectedCustomerId(customerId);
-    setDrawerOpen(true);
-  };
 
   const handleQuickToggle = async (customer: ICustomerItem) => {
     try {
-      const nextStatus = !customer.isActive;
-      await toggleStatus({ id: customer.id, isActive: nextStatus }).unwrap();
+      const nextActive = !customer.isActive;
+      await toggleStatus({ id: customer.id, isActive: nextActive }).unwrap();
       toast.success(
-        `Customer “${customer.name}” ${nextStatus ? "activated" : "suspended"} successfully`
+        `Customer ${customer.name} ${nextActive ? "activated" : "suspended"} successfully`
       );
+      void refetch();
     } catch {
-      toast.error("Failed to update status");
+      toast.error("Failed to update customer status");
     }
+  };
+
+  const handleQuickView = (id: string | number) => {
+    setSelectedCustomerId(id);
+    setDrawerOpen(true);
   };
 
   return (
     <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col justify-between gap-4 border-b border-slate-800/80 pb-4 sm:flex-row sm:items-center">
+      {/* Page Header */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-2 border-b border-border">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
-            Customers
+          <h1 className="text-2xl font-black tracking-tight text-foreground">
+            Customer Directory
           </h1>
-          <p className="mt-1 text-xs text-slate-400 sm:text-sm">
-            Manage customer accounts, review orders &amp; spend, and control account permissions.
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Manage buyer accounts, verified profiles, order histories, and platform access.
           </p>
         </div>
+
         <div className="flex items-center gap-2">
-          <button
-            type="button"
+          <Button
+            size="sm"
+            variant="outline"
             onClick={() => refetch()}
             disabled={isFetching}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900 px-3.5 py-2 text-xs font-semibold text-slate-300 transition hover:bg-slate-800 hover:text-white disabled:opacity-50"
-            title="Refresh list"
+            className="text-xs gap-1.5 cursor-pointer shadow-xs"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${isFetching ? "animate-spin text-brand" : "text-muted-foreground"}`}
+            />
             <span>Refresh</span>
-          </button>
+          </Button>
         </div>
       </div>
 
-      {/* 4 Stat Overview Cards */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+      {/* Overview Stat Counters */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard
           icon={<Users className="h-5 w-5" />}
-          label="Total Customers"
-          value={counts?.totalCustomers !== undefined ? String(counts.totalCustomers) : "—"}
-          tone="bg-brand-deep/20 text-brand ring-1 ring-brand/30"
+          label="Total Users"
+          value={counts?.total?.toLocaleString() ?? "—"}
+          tone="bg-brand/10 text-brand border border-brand/20"
         />
         <StatCard
           icon={<CheckCircle2 className="h-5 w-5" />}
           label="Active Accounts"
-          value={counts?.activeCustomers !== undefined ? String(counts.activeCustomers) : "—"}
-          tone="bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20"
+          value={counts?.active?.toLocaleString() ?? "—"}
+          tone="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
         />
         <StatCard
           icon={<ShieldCheck className="h-5 w-5" />}
-          label="Verified Customers"
-          value={counts?.verifiedCustomers !== undefined ? String(counts.verifiedCustomers) : "—"}
-          tone="bg-sky-500/10 text-sky-400 ring-1 ring-sky-500/20"
+          label="Verified Emails"
+          value={counts?.verified?.toLocaleString() ?? "—"}
+          tone="bg-sky-500/10 text-sky-500 border border-sky-500/20"
         />
         <StatCard
           icon={<Banknote className="h-5 w-5" />}
-          label="Visible Revenue"
-          value={formatTaka(totalRevenueSum)}
-          tone="bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20"
+          label="Lifetime GMV"
+          value={counts?.totalRevenue ? formatTaka(counts.totalRevenue) : "৳ 0"}
+          tone="bg-amber-500/10 text-amber-500 border border-amber-500/20"
         />
       </div>
 
-      {/* Search & Filter Tabs */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-900/60 p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
-        {/* Search Input */}
+      {/* Filters Toolbar */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        {/* Search Field */}
         <div className="relative flex-1 max-w-md">
-          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <input
+          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+          <Input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search by name, email, or phone number…"
-            className="w-full rounded-xl border border-slate-800 bg-slate-800/80 py-2 pl-9 pr-8 text-xs text-white placeholder-slate-400 outline-none transition focus:border-brand focus:ring-1 focus:ring-brand"
+            className="pl-9 pr-8 h-9 text-xs"
           />
           {searchInput && (
             <button
               onClick={() => setSearchInput("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground cursor-pointer z-10"
             >
               &times;
             </button>
@@ -217,7 +223,7 @@ export default function AdminCustomersPage() {
         </div>
 
         {/* Status Filter Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto rounded-xl bg-slate-800/60 p-1 scrollbar-none">
+        <div className="flex items-center gap-1 overflow-x-auto rounded-lg bg-muted/60 p-1 border border-border">
           {FILTER_TABS.map((tab) => (
             <button
               key={tab.value}
@@ -226,10 +232,10 @@ export default function AdminCustomersPage() {
                 setFilterTab(tab.value);
                 setPage(1);
               }}
-              className={`rounded-lg px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition ${
+              className={`rounded-md px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
                 filterTab === tab.value
-                  ? "bg-brand text-white"
-                  : "text-slate-400 hover:text-white hover:bg-slate-700/50"
+                  ? "bg-brand text-white shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {tab.label}
@@ -238,247 +244,239 @@ export default function AdminCustomersPage() {
         </div>
       </div>
 
-      {/* Main Customers Table */}
-      <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
+      {/* Main Customers Table (shadcn Table) */}
+      <Card className="overflow-hidden p-0">
         {isLoading ? (
-          <div className="flex h-72 flex-col items-center justify-center gap-3 text-slate-400">
+          <div className="flex h-72 flex-col items-center justify-center gap-3 text-muted-foreground">
             <Loader2 className="h-8 w-8 animate-spin text-brand" />
             <p className="text-xs">Loading customer directory…</p>
           </div>
         ) : isError ? (
-          <div className="flex h-72 flex-col items-center justify-center gap-2 p-6 text-center text-rose-400">
+          <div className="flex h-72 flex-col items-center justify-center gap-2 p-6 text-center text-rose-500">
             <AlertCircle className="h-8 w-8" />
-            <p className="font-bold text-white">Failed to load customers</p>
-            <p className="text-xs text-slate-400">Please verify your connection and permissions.</p>
-            <button
+            <p className="font-bold text-foreground">Failed to load customers</p>
+            <p className="text-xs text-muted-foreground">Please verify your connection and permissions.</p>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => refetch()}
-              className="mt-2 rounded-xl bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700"
+              className="mt-2 text-xs"
             >
               Retry
-            </button>
+            </Button>
           </div>
         ) : customers.length === 0 ? (
           <div className="flex h-72 flex-col items-center justify-center gap-2 p-6 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800 text-slate-500">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
               <Users className="h-6 w-6" />
             </div>
-            <p className="font-bold text-white">No customers found</p>
-            <p className="text-xs text-slate-400">
+            <p className="font-bold text-foreground">No customers found</p>
+            <p className="text-xs text-muted-foreground">
               {search
                 ? `No customers matched “${search}”.`
                 : "No customer records currently exist under this filter."}
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="border-b border-slate-800 bg-slate-800/40 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                <tr>
-                  <th scope="col" className="px-5 py-3.5">Customer</th>
-                  <th scope="col" className="px-4 py-3.5">Contact</th>
-                  <th scope="col" className="px-4 py-3.5">Orders &amp; Spend</th>
-                  <th scope="col" className="px-4 py-3.5">Location</th>
-                  <th scope="col" className="px-4 py-3.5">Status</th>
-                  <th scope="col" className="px-4 py-3.5">Joined</th>
-                  <th scope="col" className="px-5 py-3.5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/60">
-                {customers.map((c) => (
-                  <tr
-                    key={c.id}
-                    className="transition hover:bg-slate-800/30"
-                  >
-                    {/* 1. Customer Name & Avatar */}
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-deep to-sky-600 font-bold text-white">
-                          {c.avatar ? (
-                            <img
-                              src={c.avatar}
-                              alt={c.name}
-                              className="h-full w-full rounded-xl object-cover"
-                            />
-                          ) : (
-                            c.name.charAt(0).toUpperCase()
-                          )}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <span
-                              className="font-bold text-white hover:text-brand transition cursor-pointer"
-                              onClick={() => handleQuickView(c.id)}
-                            >
-                              {c.name}
-                            </span>
-                            <CustomerRoleBadge role={c.role} />
-                          </div>
-                          <span className="text-[11px] font-mono text-slate-500">
-                            ID #{c.id}
-                          </span>
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* 2. Contact Details */}
-                    <td className="px-4 py-4">
-                      <div className="space-y-0.5">
-                        <p className="flex items-center gap-1.5 text-slate-300">
-                          <Mail className="h-3 w-3 text-slate-500 shrink-0" />
-                          <span>{c.email}</span>
-                        </p>
-                        {c.phone ? (
-                          <p className="flex items-center gap-1.5 text-slate-400">
-                            <Phone className="h-3 w-3 text-slate-500 shrink-0" />
-                            <span>{c.phone}</span>
-                          </p>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Customer</TableHead>
+                <TableHead>Contact</TableHead>
+                <TableHead>Orders &amp; Spend</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Joined</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {customers.map((c: ICustomerItem) => (
+                <TableRow key={c.id}>
+                  {/* 1. Customer Name & Avatar */}
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-brand-deep to-sky-600 font-bold text-white shadow-xs">
+                        {c.avatar ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={c.avatar}
+                            alt={c.name}
+                            className="h-full w-full rounded-xl object-cover"
+                          />
                         ) : (
-                          <span className="text-[11px] text-slate-600 italic">No phone</span>
+                          c.name.charAt(0).toUpperCase()
                         )}
                       </div>
-                    </td>
-
-                    {/* 3. Orders & Spend */}
-                    <td className="px-4 py-4">
                       <div>
-                        <span className="font-bold text-white">
-                          {formatTaka(c.totalSpent)}
-                        </span>
-                        <p className="text-[11px] text-slate-400">
-                          {c.ordersCount} order{c.ordersCount !== 1 ? "s" : ""}
-                        </p>
-                      </div>
-                    </td>
-
-                    {/* 4. Location */}
-                    <td className="px-4 py-4">
-                      {c.defaultAddress ? (
-                        <div className="flex items-center gap-1.5 text-slate-300">
-                          <MapPin className="h-3 w-3 text-slate-500 shrink-0" />
-                          <span>
-                            {c.defaultAddress.city}
-                            {c.defaultAddress.state ? `, ${c.defaultAddress.state}` : ""}
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className="font-bold text-foreground hover:text-brand transition cursor-pointer"
+                            onClick={() => handleQuickView(c.id)}
+                          >
+                            {c.name}
                           </span>
+                          <CustomerRoleBadge role={c.role} />
                         </div>
+                        <span className="text-[11px] font-mono text-muted-foreground">
+                          ID #{c.id}
+                        </span>
+                      </div>
+                    </div>
+                  </TableCell>
+
+                  {/* 2. Contact Details */}
+                  <TableCell>
+                    <div className="space-y-0.5">
+                      <p className="flex items-center gap-1.5 text-foreground">
+                        <Mail className="h-3 w-3 text-muted-foreground shrink-0" />
+                        <span>{c.email}</span>
+                      </p>
+                      {c.phone ? (
+                        <p className="flex items-center gap-1.5 text-muted-foreground">
+                          <Phone className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <span>{c.phone}</span>
+                        </p>
                       ) : (
-                        <span className="text-slate-600 italic">—</span>
+                        <span className="text-[11px] text-muted-foreground italic">No phone</span>
                       )}
-                    </td>
+                    </div>
+                  </TableCell>
 
-                    {/* 5. Status & Verified */}
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col gap-1.5 items-start">
-                        <CustomerStatusBadge isActive={c.isActive} />
-                        <CustomerVerifiedBadge isVerified={c.isVerified} />
+                  {/* 3. Orders & Spend */}
+                  <TableCell>
+                    <div>
+                      <span className="font-bold text-foreground font-mono">
+                        {formatTaka(c.totalSpent)}
+                      </span>
+                      <p className="text-[11px] text-muted-foreground">
+                        {c.ordersCount} order{c.ordersCount !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+                  </TableCell>
+
+                  {/* 4. Location */}
+                  <TableCell>
+                    {c.defaultAddress ? (
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <MapPin className="h-3 w-3 text-muted-foreground shrink-0" />
+                        <span>
+                          {c.defaultAddress.city}
+                          {c.defaultAddress.state ? `, ${c.defaultAddress.state}` : ""}
+                        </span>
                       </div>
-                    </td>
+                    ) : (
+                      <span className="text-muted-foreground italic">—</span>
+                    )}
+                  </TableCell>
 
-                    {/* 6. Joined Date */}
-                    <td className="px-4 py-4 whitespace-nowrap text-slate-400">
-                      {formatCustomerDate(c.createdAt)}
-                    </td>
+                  {/* 5. Status & Verified */}
+                  <TableCell>
+                    <div className="flex flex-col gap-1.5 items-start">
+                      <CustomerStatusBadge isActive={c.isActive} />
+                      <CustomerVerifiedBadge isVerified={c.isVerified} />
+                    </div>
+                  </TableCell>
 
-                    {/* 7. Action Controls */}
-                    <td className="px-5 py-4 text-right whitespace-nowrap">
-                      <div className="inline-flex items-center gap-1.5">
-                        {/* Quick View Button */}
-                        <button
-                          type="button"
-                          onClick={() => handleQuickView(c.id)}
-                          className="rounded-lg border border-slate-800 bg-slate-800/80 p-1.5 text-slate-300 transition hover:border-brand hover:bg-brand/10 hover:text-brand"
-                          title="Quick View Profile"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </button>
+                  {/* 6. Joined Date */}
+                  <TableCell className="whitespace-nowrap text-muted-foreground font-mono text-[11px]">
+                    {formatCustomerDate(c.createdAt)}
+                  </TableCell>
 
-                        {/* Edit Button */}
-                        <button
-                          type="button"
-                          onClick={() => setEditingCustomer(c)}
-                          className="rounded-lg border border-slate-800 bg-slate-800/80 p-1.5 text-slate-300 transition hover:border-sky-500 hover:bg-sky-500/10 hover:text-sky-400"
-                          title="Edit Customer"
-                        >
-                          <UserCog className="h-4 w-4" />
-                        </button>
+                  {/* 7. Action Controls */}
+                  <TableCell className="text-right whitespace-nowrap">
+                    <div className="inline-flex items-center gap-1.5">
+                      <Button
+                        size="icon-sm"
+                        variant="outline"
+                        onClick={() => handleQuickView(c.id)}
+                        title="Quick View Profile"
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                      </Button>
 
-                        {/* Toggle Status Button */}
-                        <button
-                          type="button"
-                          onClick={() => handleQuickToggle(c)}
-                          disabled={isToggling}
-                          className={`rounded-lg border p-1.5 transition ${
-                            c.isActive
-                              ? "border-rose-500/20 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
-                              : "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                          }`}
-                          title={c.isActive ? "Suspend Customer" : "Activate Customer"}
-                        >
-                          {c.isActive ? (
-                            <XCircle className="h-4 w-4" />
-                          ) : (
-                            <CheckCircle2 className="h-4 w-4" />
-                          )}
-                        </button>
+                      <Button
+                        size="icon-sm"
+                        variant="outline"
+                        onClick={() => setEditingCustomer(c)}
+                        title="Edit Customer"
+                      >
+                        <UserCog className="h-3.5 w-3.5" />
+                      </Button>
 
-                        {/* Full Profile Page Link */}
-                        <Link
-                          href={`/admin/customers/${c.id}`}
-                          className="rounded-lg border border-slate-800 bg-slate-800/80 p-1.5 text-slate-300 transition hover:border-white hover:text-white"
-                          title="Open Full Profile Page"
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </Link>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      <Button
+                        size="icon-sm"
+                        variant={c.isActive ? "destructive" : "outline"}
+                        onClick={() => handleQuickToggle(c)}
+                        disabled={isToggling}
+                        title={c.isActive ? "Suspend Customer" : "Activate Customer"}
+                      >
+                        {c.isActive ? (
+                          <XCircle className="h-3.5 w-3.5" />
+                        ) : (
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                        )}
+                      </Button>
+
+                      <Link
+                        href={`/admin/customers/${c.id}`}
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition"
+                        title="Open Full Profile Page"
+                      >
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
 
         {/* Pagination Bar */}
         {!isLoading && customers.length > 0 && (
-          <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-800 px-5 py-3 sm:flex-row">
-            <p className="text-xs text-slate-400">
-              Showing <span className="font-bold text-white">{(page - 1) * limit + 1}</span> to{" "}
-              <span className="font-bold text-white">
+          <div className="flex flex-col items-center justify-between gap-3 border-t border-border px-5 py-3 sm:flex-row">
+            <p className="text-xs text-muted-foreground">
+              Showing <span className="font-bold text-foreground">{(page - 1) * limit + 1}</span> to{" "}
+              <span className="font-bold text-foreground">
                 {Math.min(page * limit, meta?.total ?? customers.length)}
               </span>{" "}
-              of <span className="font-bold text-white">{meta?.total ?? customers.length}</span>{" "}
+              of <span className="font-bold text-foreground">{meta?.total ?? customers.length}</span>{" "}
               customers
             </p>
 
             <div className="flex items-center gap-1.5">
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="inline-flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-700 disabled:opacity-40"
+                className="text-xs gap-1"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
                 Previous
-              </button>
+              </Button>
 
-              <span className="px-2 text-xs font-bold text-white">
+              <span className="px-2 text-xs font-bold text-foreground">
                 {page} / {totalPages}
               </span>
 
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="inline-flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-700 disabled:opacity-40"
+                className="text-xs gap-1"
               >
                 Next
                 <ChevronRight className="h-3.5 w-3.5" />
-              </button>
+              </Button>
             </div>
           </div>
         )}
-      </div>
+      </Card>
 
-      {/* Quick View Drawer */}
+      {/* Quick View Drawer (shadcn Sheet) */}
       <CustomerDetailsDrawer
         customerId={selectedCustomerId}
         isOpen={isDrawerOpen}
@@ -488,7 +486,7 @@ export default function AdminCustomersPage() {
         }}
       />
 
-      {/* Edit Customer Dialog */}
+      {/* Edit Customer Dialog (shadcn Dialog) */}
       <EditCustomerDialog
         isOpen={Boolean(editingCustomer)}
         onClose={() => setEditingCustomer(null)}

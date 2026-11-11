@@ -20,6 +20,18 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
   useGetSlidersQuery,
   useCreateSliderMutation,
   useUpdateSliderMutation,
@@ -206,7 +218,7 @@ export default function AdminSlidersPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-black text-white tracking-tight">
@@ -216,7 +228,7 @@ export default function AdminSlidersPage() {
               Storefront Hero
             </Badge>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Configure homepage hero carousel slides across 3 distinct variants: Image Only, Background Image with Content, and Content Only.
           </p>
         </div>
@@ -247,13 +259,13 @@ export default function AdminSlidersPage() {
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <Card className="bg-slate-900/60 border-slate-800">
+        <Card className="bg-card border-border shadow-xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
                 Total Slides
               </p>
-              <p className="text-2xl font-black text-white mt-1">{sliders.length}</p>
+              <p className="text-2xl font-black text-foreground mt-1">{sliders.length}</p>
             </div>
             <div className="h-10 w-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center">
               <SlidersHorizontal className="h-5 w-5" />
@@ -261,7 +273,7 @@ export default function AdminSlidersPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/60 border-slate-800">
+        <Card className="bg-card border-border shadow-xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-[11px] font-medium text-purple-400 uppercase tracking-wider">
@@ -275,7 +287,7 @@ export default function AdminSlidersPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/60 border-slate-800">
+        <Card className="bg-card border-border shadow-xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-[11px] font-medium text-sky-400 uppercase tracking-wider">
@@ -289,7 +301,7 @@ export default function AdminSlidersPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/60 border-slate-800">
+        <Card className="bg-card border-border shadow-xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-[11px] font-medium text-emerald-400 uppercase tracking-wider">
@@ -306,11 +318,11 @@ export default function AdminSlidersPage() {
 
       {/* Filter Tabs & Search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-1 text-xs font-semibold gap-1 overflow-x-auto">
+        <div className="flex items-center bg-card border border-border rounded-lg p-1 text-xs font-semibold gap-1 overflow-x-auto shadow-xs">
           <button
             onClick={() => setTypeFilter("ALL")}
             className={`px-3 py-1.5 rounded-md transition whitespace-nowrap ${
-              typeFilter === "ALL" ? "bg-brand text-white" : "text-slate-400 hover:text-white"
+              typeFilter === "ALL" ? "bg-brand text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
             All Variants ({sliders.length})
@@ -318,7 +330,7 @@ export default function AdminSlidersPage() {
           <button
             onClick={() => setTypeFilter("IMAGE_BG_CONTENT")}
             className={`px-3 py-1.5 rounded-md transition whitespace-nowrap ${
-              typeFilter === "IMAGE_BG_CONTENT" ? "bg-brand text-white" : "text-slate-400 hover:text-white"
+              typeFilter === "IMAGE_BG_CONTENT" ? "bg-brand text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
             Bg Image + Content ({imageBgCount})
@@ -326,7 +338,7 @@ export default function AdminSlidersPage() {
           <button
             onClick={() => setTypeFilter("IMAGE_ONLY")}
             className={`px-3 py-1.5 rounded-md transition whitespace-nowrap ${
-              typeFilter === "IMAGE_ONLY" ? "bg-brand text-white" : "text-slate-400 hover:text-white"
+              typeFilter === "IMAGE_ONLY" ? "bg-brand text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
             Image Only ({imageOnlyCount})
@@ -334,7 +346,7 @@ export default function AdminSlidersPage() {
           <button
             onClick={() => setTypeFilter("CONTENT_ONLY")}
             className={`px-3 py-1.5 rounded-md transition whitespace-nowrap ${
-              typeFilter === "CONTENT_ONLY" ? "bg-brand text-white" : "text-slate-400 hover:text-white"
+              typeFilter === "CONTENT_ONLY" ? "bg-brand text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
             Content Only ({contentOnlyCount})
@@ -342,25 +354,25 @@ export default function AdminSlidersPage() {
         </div>
 
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search slides..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-9 pl-9 pr-3 text-xs bg-slate-900 border border-slate-800 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand"
+            className="w-full h-9 pl-9 pr-3 text-xs bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand shadow-xs"
           />
         </div>
       </div>
 
       {/* Sliders Grid */}
       {loading ? (
-        <Card className="p-12 text-center text-slate-400 bg-slate-900 border-slate-800">
+        <Card className="p-12 text-center text-muted-foreground bg-card border-border shadow-xs">
           <Loader2 className="h-6 w-6 text-sky-400 animate-spin mx-auto mb-2" />
           Loading hero sliders...
         </Card>
       ) : filteredSliders.length === 0 ? (
-        <Card className="p-12 text-center text-slate-500 bg-slate-900 border-slate-800">
+        <Card className="p-12 text-center text-muted-foreground bg-card border-border shadow-xs">
           No hero sliders found. Click &quot;Add Slider&quot; to create your first slide.
         </Card>
       ) : (
@@ -371,10 +383,10 @@ export default function AdminSlidersPage() {
             return (
               <div
                 key={slider.id}
-                className="group relative rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden hover:border-slate-700 transition flex flex-col justify-between"
+                className="group relative rounded-2xl border border-border bg-card overflow-hidden hover:border-border/80 transition flex flex-col justify-between shadow-xs"
               >
                 {/* Visual Preview Box */}
-                <div className="relative h-48 w-full overflow-hidden bg-slate-950 flex items-center justify-center">
+                <div className="relative h-48 w-full overflow-hidden bg-muted flex items-center justify-center">
                   {slider.type === "IMAGE_ONLY" && displayImg ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -396,7 +408,7 @@ export default function AdminSlidersPage() {
                             {slider.badgeText}
                           </span>
                         )}
-                        <h4 className="text-sm font-bold text-white line-clamp-1">
+                        <h4 className="text-sm font-bold text-foreground line-clamp-1">
                           {slider.title || "No Title"}
                         </h4>
                       </div>
@@ -465,30 +477,30 @@ export default function AdminSlidersPage() {
                 {/* Details Strip */}
                 <div className="p-4 space-y-2 flex-1">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-sm font-bold text-white line-clamp-1">
+                    <h3 className="text-sm font-bold text-foreground line-clamp-1">
                       {slider.title || `Slide #${slider.id}`}
                     </h3>
                   </div>
 
                   {slider.subtitle && (
-                    <p className="text-xs text-slate-400 line-clamp-2">{slider.subtitle}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-2">{slider.subtitle}</p>
                   )}
 
-                  <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400 pt-1">
-                    <span className="text-slate-500">CTA:</span>
+                  <div className="flex items-center gap-2 text-[11px] font-mono text-muted-foreground pt-1">
+                    <span className="text-muted-foreground">CTA:</span>
                     <span className="text-sky-400 truncate">{slider.buttonText || "Shop Now"}</span>
-                    <span className="text-slate-600">•</span>
+                    <span className="text-muted-foreground/60">•</span>
                     <span className="truncate">{slider.linkUrl || "/products"}</span>
                   </div>
                 </div>
 
                 {/* Actions Footer */}
-                <div className="px-4 py-2.5 border-t border-slate-800 bg-slate-950/40 flex items-center justify-between">
+                <div className="px-4 py-2.5 border-t border-border bg-muted/30 flex items-center justify-between">
                   <a
                     href={slider.linkUrl || "/products"}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-xs text-slate-400 hover:text-white inline-flex items-center gap-1 transition"
+                    className="text-xs text-muted-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1 transition"
                   >
                     <Eye className="h-3.5 w-3.5" />
                     Preview Target
@@ -497,14 +509,14 @@ export default function AdminSlidersPage() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => handleOpenEdit(slider)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-sky-400 hover:bg-slate-800 transition"
+                      className="p-1.5 rounded-lg text-muted-foreground hover:text-sky-500 hover:bg-muted transition"
                       title="Edit slide"
                     >
                       <Edit className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => setSliderToDelete(slider)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
+                      className="p-1.5 rounded-lg text-muted-foreground hover:text-rose-500 hover:bg-muted transition"
                       title="Delete slide"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -518,297 +530,267 @@ export default function AdminSlidersPage() {
       )}
 
       {/* ========================================================= */}
-      {/* ADD / EDIT MODAL                                          */}
+      {/* ADD / EDIT MODAL (shadcn Dialog)                          */}
       {/* ========================================================= */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 text-slate-100">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
-              <div>
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <SlidersHorizontal className="h-4 w-4 text-brand" />
-                  <span>{modalMode === "create" ? "Create New Hero Slide" : "Edit Hero Slide"}</span>
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Select a variant type and customize visuals, typography, and CTA button.
-                </p>
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <SlidersHorizontal className="h-4 w-4 text-brand" />
+              <span>{modalMode === "create" ? "Create New Hero Slide" : "Edit Hero Slide"}</span>
+            </DialogTitle>
+            <DialogDescription>
+              Select a variant type and customize visuals, typography, and CTA button.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveSlider} className="space-y-4 py-1">
+            {/* Variant Selector (Tabs) */}
+            <div className="space-y-2">
+              <Label>
+                Slider Variant Type <span className="text-rose-500">*</span>
+              </Label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setFormType("IMAGE_BG_CONTENT")}
+                  className={`p-3 rounded-xl border text-left transition flex flex-col justify-between cursor-pointer ${
+                    formType === "IMAGE_BG_CONTENT"
+                      ? "bg-purple-950/20 border-purple-500 ring-1 ring-purple-500/50"
+                      : "bg-card border-border hover:border-border/80"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <Sparkles className="h-4 w-4 text-purple-500" />
+                    <span className="text-[10px] font-bold text-purple-500 uppercase">Hybrid</span>
+                  </div>
+                  <div className="mt-2">
+                    <p className="text-xs font-bold text-foreground">Bg Image + Text</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">Full background image with floating headline &amp; CTA</p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFormType("IMAGE_ONLY")}
+                  className={`p-3 rounded-xl border text-left transition flex flex-col justify-between cursor-pointer ${
+                    formType === "IMAGE_ONLY"
+                      ? "bg-sky-950/20 border-sky-500 ring-1 ring-sky-500/50"
+                      : "bg-card border-border hover:border-border/80"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <ImageIcon className="h-4 w-4 text-brand" />
+                    <span className="text-[10px] font-bold text-brand uppercase">Poster</span>
+                  </div>
+                  <div className="mt-2">
+                    <p className="text-xs font-bold text-foreground">Image Only</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">High-impact creative banner or ad poster</p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFormType("CONTENT_ONLY")}
+                  className={`p-3 rounded-xl border text-left transition flex flex-col justify-between cursor-pointer ${
+                    formType === "CONTENT_ONLY"
+                      ? "bg-emerald-950/20 border-emerald-500 ring-1 ring-emerald-500/50"
+                      : "bg-card border-border hover:border-border/80"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <Flame className="h-4 w-4 text-emerald-500" />
+                    <span className="text-[10px] font-bold text-emerald-500 uppercase">Gradient</span>
+                  </div>
+                  <div className="mt-2">
+                    <p className="text-xs font-bold text-foreground">Content Only</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">CSS gradient card for discount coupons &amp; events</p>
+                  </div>
+                </button>
               </div>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-              >
-                <X className="h-5 w-5" />
-              </button>
             </div>
 
-            <form onSubmit={handleSaveSlider} className="space-y-5">
-              {/* Variant Selector (Tabs) */}
+            {/* Title Input */}
+            <div className="space-y-1.5">
+              <Label htmlFor="slide-title">
+                {formType === "IMAGE_ONLY" ? "Slide Title / Identifier" : "Slide Headline"}{" "}
+                {formType !== "IMAGE_ONLY" && <span className="text-rose-500">*</span>}
+              </Label>
+              <Input
+                id="slide-title"
+                type="text"
+                required={formType !== "IMAGE_ONLY"}
+                placeholder={
+                  formType === "IMAGE_ONLY"
+                    ? "e.g. Brand Week Promo Banner"
+                    : "e.g. Sony WH-1000XM5 Studio Wireless"
+                }
+                value={formTitle}
+                onChange={(e) => setFormTitle(e.target.value)}
+              />
+            </div>
+
+            {/* Image Upload Field */}
+            {(formType === "IMAGE_BG_CONTENT" || formType === "IMAGE_ONLY") && (
               <div>
-                <label className="block text-xs font-semibold text-slate-200 mb-2">
-                  Slider Variant Type <span className="text-rose-400">*</span>
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setFormType("IMAGE_BG_CONTENT")}
-                    className={`p-3 rounded-xl border text-left transition flex flex-col justify-between ${
-                      formType === "IMAGE_BG_CONTENT"
-                        ? "bg-purple-950/40 border-purple-500 ring-1 ring-purple-500/50"
-                        : "bg-slate-950 border-slate-800 hover:border-slate-700"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <Sparkles className="h-4 w-4 text-purple-400" />
-                      <span className="text-[10px] font-bold text-purple-300 uppercase">Hybrid</span>
-                    </div>
-                    <div className="mt-2">
-                      <p className="text-xs font-bold text-white">Bg Image + Text</p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">Full background image with floating headline &amp; CTA</p>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setFormType("IMAGE_ONLY")}
-                    className={`p-3 rounded-xl border text-left transition flex flex-col justify-between ${
-                      formType === "IMAGE_ONLY"
-                        ? "bg-sky-950/40 border-sky-500 ring-1 ring-sky-500/50"
-                        : "bg-slate-950 border-slate-800 hover:border-slate-700"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <ImageIcon className="h-4 w-4 text-sky-400" />
-                      <span className="text-[10px] font-bold text-sky-300 uppercase">Poster</span>
-                    </div>
-                    <div className="mt-2">
-                      <p className="text-xs font-bold text-white">Image Only</p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">High-impact creative banner or ad poster</p>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setFormType("CONTENT_ONLY")}
-                    className={`p-3 rounded-xl border text-left transition flex flex-col justify-between ${
-                      formType === "CONTENT_ONLY"
-                        ? "bg-emerald-950/40 border-emerald-500 ring-1 ring-emerald-500/50"
-                        : "bg-slate-950 border-slate-800 hover:border-slate-700"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <Flame className="h-4 w-4 text-emerald-400" />
-                      <span className="text-[10px] font-bold text-emerald-300 uppercase">Gradient</span>
-                    </div>
-                    <div className="mt-2">
-                      <p className="text-xs font-bold text-white">Content Only</p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">CSS gradient card for discount coupons &amp; events</p>
-                    </div>
-                  </button>
-                </div>
-              </div>
-
-              {/* Title Input (Internal name for Image-Only, Main headline for others) */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-200">
-                  {formType === "IMAGE_ONLY" ? "Slide Title / Identifier" : "Slide Headline"}{" "}
-                  {formType !== "IMAGE_ONLY" && <span className="text-rose-400">*</span>}
-                </label>
-                <input
-                  type="text"
-                  required={formType !== "IMAGE_ONLY"}
-                  placeholder={
-                    formType === "IMAGE_ONLY"
-                      ? "e.g. Brand Week Promo Banner"
-                      : "e.g. Sony WH-1000XM5 Studio Wireless"
-                  }
-                  value={formTitle}
-                  onChange={(e) => setFormTitle(e.target.value)}
-                  className="mt-1 w-full h-9 rounded-lg border border-slate-700 bg-slate-950 px-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand font-medium"
+                <ImageUploadField
+                  label={formType === "IMAGE_ONLY" ? "Slide Banner Image" : "Background Backdrop Image"}
+                  value={formImage}
+                  onChange={setFormImage}
+                  helperText="Select or upload high-resolution 1800x600 banner from WordPress-style Media Library."
+                  modalTitle="Select Hero Slide Image"
                 />
               </div>
+            )}
 
-              {/* Image Upload Field (for IMAGE_BG_CONTENT and IMAGE_ONLY) */}
-              {(formType === "IMAGE_BG_CONTENT" || formType === "IMAGE_ONLY") && (
-                <div>
-                  <ImageUploadField
-                    label={formType === "IMAGE_ONLY" ? "Slide Banner Image" : "Background Backdrop Image"}
-                    value={formImage}
-                    onChange={setFormImage}
-                    helperText="Select or upload high-resolution 1800x600 banner from WordPress-style Media Library."
-                    modalTitle="Select Hero Slide Image"
-                  />
-                </div>
-              )}
-
-              {/* Specific Content Inputs (Badge, Subtitle, Description) */}
-              {formType !== "IMAGE_ONLY" && (
-                <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-200">
-                        Promo Badge Text (Optional)
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. ✨ New Arrival • 2026 or 🔥 30% OFF"
-                        value={formBadgeText}
-                        onChange={(e) => setFormBadgeText(e.target.value)}
-                        className="mt-1 w-full h-9 rounded-lg border border-slate-700 bg-slate-950 px-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-200">
-                        CTA Button Label
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Shop Now or Explore"
-                        value={formButtonText}
-                        onChange={(e) => setFormButtonText(e.target.value)}
-                        className="mt-1 w-full h-9 rounded-lg border border-slate-700 bg-slate-950 px-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand font-medium"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-200">
-                      Subtitle / Brief Copy
-                    </label>
-                    <textarea
-                      rows={2}
-                      placeholder="Catchy secondary line that elaborates on the headline..."
-                      value={formSubtitle}
-                      onChange={(e) => setFormSubtitle(e.target.value)}
-                      className="mt-1 w-full p-2.5 rounded-lg border border-slate-700 bg-slate-950 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand resize-none"
+            {/* Specific Content Inputs */}
+            {formType !== "IMAGE_ONLY" && (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="slide-badge">Promo Badge Text (Optional)</Label>
+                    <Input
+                      id="slide-badge"
+                      type="text"
+                      placeholder="e.g. ✨ New Arrival • 2026 or 🔥 30% OFF"
+                      value={formBadgeText}
+                      onChange={(e) => setFormBadgeText(e.target.value)}
                     />
                   </div>
 
-                  {formType === "CONTENT_ONLY" && (
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-200">
-                        Voucher Code / Additional Description
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Use code 'SHOPORA2026' for instant ৳500 discount"
-                        value={formDescription}
-                        onChange={(e) => setFormDescription(e.target.value)}
-                        className="mt-1 w-full h-9 rounded-lg border border-slate-700 bg-slate-950 px-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand"
-                      />
-                    </div>
-                  )}
-                </>
-              )}
-
-              {/* Gradient Presets for CONTENT_ONLY */}
-              {formType === "CONTENT_ONLY" && (
-                <div>
-                  <label className="block text-xs font-semibold text-slate-200 mb-1.5">
-                    Background Color Gradient Preset
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {GRADIENT_PRESETS.map((p) => (
-                      <button
-                        key={p.value}
-                        type="button"
-                        onClick={() => setFormBgGradient(p.value)}
-                        className={`h-11 rounded-lg bg-gradient-to-r ${p.value} p-2 text-left flex items-center justify-between border transition ${
-                          formBgGradient === p.value
-                            ? "border-white ring-2 ring-white/50"
-                            : "border-slate-700/60 opacity-80 hover:opacity-100"
-                        }`}
-                      >
-                        <span className="text-[11px] font-bold text-white">
-                          {p.label}
-                        </span>
-                        {formBgGradient === p.value && (
-                          <CheckCircle2 className="h-4 w-4 text-white" />
-                        )}
-                      </button>
-                    ))}
+                  <div className="space-y-1.5">
+                    <Label htmlFor="slide-cta">CTA Button Label</Label>
+                    <Input
+                      id="slide-cta"
+                      type="text"
+                      placeholder="e.g. Shop Now or Explore"
+                      value={formButtonText}
+                      onChange={(e) => setFormButtonText(e.target.value)}
+                    />
                   </div>
                 </div>
-              )}
 
-              {/* Target Link URL */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-200">
-                  Target Link URL
-                </label>
-                <input
-                  type="text"
-                  placeholder="/products or /products/sony-wh-1000xm5"
-                  value={formLinkUrl}
-                  onChange={(e) => setFormLinkUrl(e.target.value)}
-                  className="mt-1 w-full h-9 rounded-lg border border-slate-700 bg-slate-950 px-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand font-mono"
+                <div className="space-y-1.5">
+                  <Label htmlFor="slide-sub">Subtitle / Brief Copy</Label>
+                  <Textarea
+                    id="slide-sub"
+                    rows={2}
+                    placeholder="Catchy secondary line that elaborates on the headline..."
+                    value={formSubtitle}
+                    onChange={(e) => setFormSubtitle(e.target.value)}
+                  />
+                </div>
+
+                {formType === "CONTENT_ONLY" && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="slide-desc">Voucher Code / Additional Description</Label>
+                    <Input
+                      id="slide-desc"
+                      type="text"
+                      placeholder="e.g. Use code 'SHOPORA2026' for instant ৳500 discount"
+                      value={formDescription}
+                      onChange={(e) => setFormDescription(e.target.value)}
+                    />
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Gradient Presets for CONTENT_ONLY */}
+            {formType === "CONTENT_ONLY" && (
+              <div className="space-y-2">
+                <Label>Background Color Gradient Preset</Label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {GRADIENT_PRESETS.map((p) => (
+                    <button
+                      key={p.value}
+                      type="button"
+                      onClick={() => setFormBgGradient(p.value)}
+                      className={`h-11 rounded-lg bg-gradient-to-r ${p.value} p-2 text-left flex items-center justify-between border transition cursor-pointer ${
+                        formBgGradient === p.value
+                          ? "border-white ring-2 ring-brand"
+                          : "border-border/60 opacity-80 hover:opacity-100"
+                      }`}
+                    >
+                      <span className="text-[11px] font-bold text-white">
+                        {p.label}
+                      </span>
+                      {formBgGradient === p.value && (
+                        <CheckCircle2 className="h-4 w-4 text-white" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Target Link URL */}
+            <div className="space-y-1.5">
+              <Label htmlFor="slide-link">Target Link URL</Label>
+              <Input
+                id="slide-link"
+                type="text"
+                placeholder="/products or /products/sony-wh-1000xm5"
+                value={formLinkUrl}
+                onChange={(e) => setFormLinkUrl(e.target.value)}
+                className="font-mono"
+              />
+            </div>
+
+            {/* Order & Active Status */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+              <div className="space-y-1.5">
+                <Label htmlFor="slide-order">Display Order</Label>
+                <Input
+                  id="slide-order"
+                  type="number"
+                  min={0}
+                  value={formDisplayOrder}
+                  onChange={(e) => setFormDisplayOrder(Number(e.target.value))}
                 />
               </div>
 
-              {/* Order & Active Status */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-muted/30 h-9">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-200">
-                    Display Order (Sorting sequence)
-                  </label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={formDisplayOrder}
-                    onChange={(e) => setFormDisplayOrder(Number(e.target.value))}
-                    className="mt-1 w-full h-9 rounded-lg border border-slate-700 bg-slate-950 px-3 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand font-bold"
-                  />
+                  <p className="text-xs font-bold text-foreground">Active in Carousel</p>
                 </div>
-
-                <div className="flex items-center justify-between p-3 rounded-lg border border-slate-800 bg-slate-950">
-                  <div>
-                    <p className="text-xs font-bold text-white">Active in Hero Carousel</p>
-                    <p className="text-[10px] text-slate-400">Visible to storefront visitors</p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={formIsActive}
-                    onChange={(e) => setFormIsActive(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-700 text-brand focus:ring-brand"
-                  />
-                </div>
+                <Switch checked={formIsActive} onCheckedChange={setFormIsActive} />
               </div>
+            </div>
 
-              {/* Submit Buttons */}
-              <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-800">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsModalOpen(false)}
-                  className="text-xs"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="brand"
-                  size="sm"
-                  disabled={formSubmitting || isCreating || isUpdating}
-                  className="text-xs font-bold px-5"
-                >
-                  {formSubmitting || isCreating || isUpdating ? (
-                    <>
-                      <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
-                      Saving...
-                    </>
-                  ) : modalMode === "create" ? (
-                    "Create Slider"
-                  ) : (
-                    "Save Changes"
-                  )}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            {/* Submit Buttons */}
+            <DialogFooter className="pt-3 border-t border-border gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsModalOpen(false)}
+                className="text-xs"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="brand"
+                size="sm"
+                disabled={formSubmitting || isCreating || isUpdating}
+                className="text-xs font-bold px-5"
+              >
+                {formSubmitting || isCreating || isUpdating ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
+                    Saving...
+                  </>
+                ) : modalMode === "create" ? (
+                  "Create Slider"
+                ) : (
+                  "Save Changes"
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Slider Confirmation Dialog */}
       <ConfirmDialog

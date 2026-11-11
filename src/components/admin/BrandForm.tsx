@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
 
 export interface BrandFormProps {
   mode: "create" | "edit";
@@ -170,12 +171,10 @@ export function BrandForm({
             Visible in catalog filters and storefront navigation
           </p>
         </div>
-        <input
-          type="checkbox"
+        <Switch
           checked={isActive}
-          onChange={(e) => setIsActive(e.target.checked)}
+          onCheckedChange={setIsActive}
           disabled={isSubmitting}
-          className="h-4 w-4 rounded border-border text-brand focus:ring-brand disabled:opacity-50 cursor-pointer"
         />
       </div>
 

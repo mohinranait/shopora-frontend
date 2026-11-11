@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   AlertCircle,
@@ -15,7 +15,6 @@ import {
   ShoppingBag,
   Star,
   UserCog,
-  X,
   XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -31,6 +30,15 @@ import {
   formatTaka,
 } from "./CustomerBadges";
 import { EditCustomerDialog } from "./EditCustomerDialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface CustomerDetailsDrawerProps {
   customerId: string | number | null;
@@ -51,29 +59,6 @@ export function CustomerDetailsDrawer({
   });
 
   const [toggleStatus, { isLoading: isToggling }] = useToggleCustomerStatusMutation();
-
-  // Close on Escape key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) onClose();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
-
-  // Lock body scroll
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
-
-  if (!isOpen || !customerId) return null;
 
   const user = data?.user;
   const addresses = data?.addresses ?? [];
@@ -97,79 +82,69 @@ export function CustomerDetailsDrawer({
 
   return (
     <>
-      <div
-        className="fixed inset-0 z-50 flex justify-end"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Customer profile details"
-      >
-        {/* Backdrop */}
-        <div
-          className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
-          onClick={onClose}
-        />
-
-        {/* Slide-over Drawer Panel */}
-        <div className="relative z-10 flex h-full w-full max-w-xl flex-col border-l border-slate-800 bg-slate-900 text-slate-100 transition-transform">
+      <Sheet open={isOpen && Boolean(customerId)} onOpenChange={(open) => !open && onClose()}>
+        <SheetContent side="right" className="w-full sm:max-w-xl p-0 flex flex-col h-full bg-card">
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
+          <SheetHeader className="border-b border-border px-6 py-4 flex flex-row items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800 text-brand ring-1 ring-slate-700">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10 text-brand">
                 <ShoppingBag className="h-4 w-4" />
               </span>
               <div>
-                <h2 className="text-base font-bold text-white">Customer Profile</h2>
-                <p className="text-xs text-slate-400">ID #{customerId}</p>
+                <SheetTitle className="text-base font-bold text-foreground">
+                  Customer Profile
+                </SheetTitle>
+                <SheetDescription className="text-xs text-muted-foreground">
+                  ID #{customerId}
+                </SheetDescription>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Link
-                href={`/admin/customers/${customerId}`}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-brand hover:text-brand"
-                title="Open full page view"
-              >
-                <span>Full Page</span>
-                <ExternalLink className="h-3.5 w-3.5" />
-              </Link>
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
+            {customerId && (
+              <div className="flex items-center gap-2 pr-6">
+                <Link
+                  href={`/admin/customers/${customerId}`}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-xs font-semibold text-foreground transition hover:border-brand hover:text-brand"
+                  title="Open full page view"
+                >
+                  <span>Full Page</span>
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+            )}
+          </SheetHeader>
 
           {/* Body Content */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {isLoading ? (
-              <div className="flex h-96 flex-col items-center justify-center gap-3 text-slate-400">
+              <div className="flex h-96 flex-col items-center justify-center gap-3 text-muted-foreground">
                 <Loader2 className="h-8 w-8 animate-spin text-brand" />
                 <p className="text-sm">Loading customer information...</p>
               </div>
             ) : isError || !user ? (
-              <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-6 text-center text-rose-400">
+              <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-6 text-center text-rose-500">
                 <AlertCircle className="mx-auto mb-2 h-8 w-8" />
-                <h3 className="font-bold text-white">Failed to load customer details</h3>
-                <p className="mt-1 text-xs text-slate-400">
+                <h3 className="font-bold text-foreground">Failed to load customer details</h3>
+                <p className="mt-1 text-xs text-muted-foreground">
                   Customer record could not be retrieved.
                 </p>
-                <button
+                <Button
                   onClick={() => refetch()}
-                  className="mt-4 rounded-xl bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700"
+                  variant="outline"
+                  size="sm"
+                  className="mt-4 text-xs"
                 >
                   Try Again
-                </button>
+                </Button>
               </div>
             ) : (
               <>
                 {/* 1. Profile Overview Card */}
-                <div className="rounded-2xl border border-slate-800 bg-slate-800/50 p-5">
+                <Card className="p-5">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-deep to-sky-600 text-lg font-black text-white ring-2 ring-white/10">
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-brand-deep to-sky-600 text-lg font-black text-white shadow-xs">
                         {user.avatar ? (
+                          // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={user.avatar}
                             alt={user.name}
@@ -181,17 +156,17 @@ export function CustomerDetailsDrawer({
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-bold text-white">{user.name}</h3>
+                          <h3 className="text-lg font-bold text-foreground">{user.name}</h3>
                           <CustomerRoleBadge role={user.role} />
                         </div>
-                        <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-slate-400">
+                        <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1.5">
-                            <Mail className="h-3.5 w-3.5 text-slate-500" />
+                            <Mail className="h-3.5 w-3.5 text-muted-foreground" />
                             {user.email}
                           </span>
                           {user.phone && (
                             <span className="flex items-center gap-1.5">
-                              <Phone className="h-3.5 w-3.5 text-slate-500" />
+                              <Phone className="h-3.5 w-3.5 text-muted-foreground" />
                               {user.phone}
                             </span>
                           )}
@@ -206,25 +181,25 @@ export function CustomerDetailsDrawer({
                   </div>
 
                   {/* Actions Bar */}
-                  <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-slate-700/60 pt-4">
-                    <button
+                  <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-border pt-4">
+                    <Button
                       type="button"
+                      variant="outline"
+                      size="sm"
                       onClick={() => setEditDialogOpen(true)}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 hover:text-white"
+                      className="text-xs gap-1.5"
                     >
                       <UserCog className="h-3.5 w-3.5 text-brand" />
                       Edit Profile
-                    </button>
+                    </Button>
 
-                    <button
+                    <Button
                       type="button"
+                      variant={user.isActive ? "destructive" : "brand"}
+                      size="sm"
                       onClick={handleToggleStatus}
                       disabled={isToggling}
-                      className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition ${
-                        user.isActive
-                          ? "border-rose-500/30 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
-                          : "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                      }`}
+                      className="text-xs gap-1.5"
                     >
                       {isToggling ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -234,45 +209,45 @@ export function CustomerDetailsDrawer({
                         <CheckCircle2 className="h-3.5 w-3.5" />
                       )}
                       {user.isActive ? "Suspend Account" : "Activate Account"}
-                    </button>
+                    </Button>
                   </div>
-                </div>
+                </Card>
 
                 {/* 2. Stat Highlights Grid */}
                 {stats && (
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    <div className="rounded-xl border border-slate-800 bg-slate-800/40 p-3.5 text-center">
-                      <p className="text-[11px] font-semibold text-slate-400">Total Orders</p>
-                      <p className="mt-1 text-lg font-black text-white">{stats.totalOrders}</p>
-                    </div>
-                    <div className="rounded-xl border border-slate-800 bg-slate-800/40 p-3.5 text-center">
-                      <p className="text-[11px] font-semibold text-slate-400">Total Spent</p>
+                    <Card className="p-3.5 text-center">
+                      <p className="text-[11px] font-semibold text-muted-foreground">Total Orders</p>
+                      <p className="mt-1 text-lg font-black text-foreground">{stats.totalOrders}</p>
+                    </Card>
+                    <Card className="p-3.5 text-center">
+                      <p className="text-[11px] font-semibold text-muted-foreground">Total Spent</p>
                       <p className="mt-1 text-lg font-black text-brand">
                         {formatTaka(stats.totalSpent)}
                       </p>
-                    </div>
-                    <div className="rounded-xl border border-slate-800 bg-slate-800/40 p-3.5 text-center">
-                      <p className="text-[11px] font-semibold text-emerald-400">Delivered</p>
-                      <p className="mt-1 text-lg font-black text-white">{stats.deliveredOrders}</p>
-                    </div>
-                    <div className="rounded-xl border border-slate-800 bg-slate-800/40 p-3.5 text-center">
-                      <p className="text-[11px] font-semibold text-rose-400">Cancelled</p>
-                      <p className="mt-1 text-lg font-black text-white">{stats.cancelledOrders}</p>
-                    </div>
+                    </Card>
+                    <Card className="p-3.5 text-center">
+                      <p className="text-[11px] font-semibold text-emerald-500">Delivered</p>
+                      <p className="mt-1 text-lg font-black text-foreground">{stats.deliveredOrders}</p>
+                    </Card>
+                    <Card className="p-3.5 text-center">
+                      <p className="text-[11px] font-semibold text-rose-500">Cancelled</p>
+                      <p className="mt-1 text-lg font-black text-foreground">{stats.cancelledOrders}</p>
+                    </Card>
                   </div>
                 )}
 
                 {/* 3. Saved Addresses */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                       <MapPin className="h-4 w-4 text-brand" />
                       Saved Delivery Addresses ({addresses.length})
                     </h4>
                   </div>
 
                   {addresses.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-slate-800 p-4 text-center text-xs text-slate-500">
+                    <div className="rounded-xl border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
                       No addresses saved for this customer yet.
                     </div>
                   ) : (
@@ -280,22 +255,22 @@ export function CustomerDetailsDrawer({
                       {addresses.map((addr) => (
                         <div
                           key={addr.id}
-                          className="rounded-xl border border-slate-800 bg-slate-800/40 p-3.5 text-xs text-slate-300 transition hover:border-slate-700"
+                          className="rounded-xl border border-border bg-card p-3.5 text-xs text-foreground transition hover:border-brand/40"
                         >
-                          <div className="flex items-center justify-between font-semibold text-white">
+                          <div className="flex items-center justify-between font-semibold">
                             <span>{addr.fullName}</span>
                             {addr.isDefault && (
-                              <span className="rounded-md bg-brand-deep/20 px-2 py-0.5 text-[10px] font-bold text-brand ring-1 ring-brand/30">
+                              <span className="rounded-md bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-brand border border-brand/20">
                                 Default
                               </span>
                             )}
                           </div>
-                          <p className="mt-1 text-slate-400">
+                          <p className="mt-1 text-muted-foreground">
                             {addr.streetAddress}, {addr.city}
                             {addr.state ? `, ${addr.state}` : ""}
                             {addr.postalCode ? ` - ${addr.postalCode}` : ""}
                           </p>
-                          <p className="mt-1 flex items-center gap-1.5 text-slate-500">
+                          <p className="mt-1 flex items-center gap-1.5 text-muted-foreground">
                             <Phone className="h-3 w-3" />
                             {addr.phone}
                           </p>
@@ -308,23 +283,23 @@ export function CustomerDetailsDrawer({
                 {/* 4. Recent Orders Table */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                       <Package className="h-4 w-4 text-brand" />
                       Order History ({orders.length})
                     </h4>
                   </div>
 
                   {orders.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-slate-800 p-6 text-center text-xs text-slate-500">
+                    <div className="rounded-xl border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
                       This customer has not placed any orders yet.
                     </div>
                   ) : (
-                    <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-800/30">
-                      <div className="divide-y divide-slate-800/60">
+                    <div className="overflow-hidden rounded-xl border border-border bg-card">
+                      <div className="divide-y divide-border">
                         {orders.map((ord) => (
                           <div
                             key={ord.id}
-                            className="flex items-center justify-between p-3.5 transition hover:bg-slate-800/50"
+                            className="flex items-center justify-between p-3.5 transition hover:bg-muted/40"
                           >
                             <div>
                               <Link
@@ -333,7 +308,7 @@ export function CustomerDetailsDrawer({
                               >
                                 {ord.orderNumber}
                               </Link>
-                              <p className="mt-0.5 text-[11px] text-slate-400">
+                              <p className="mt-0.5 text-[11px] text-muted-foreground">
                                 {formatCustomerDate(ord.createdAt)} &bull; {ord.itemsCount} item
                                 {ord.itemsCount !== 1 ? "s" : ""}
                               </p>
@@ -341,16 +316,16 @@ export function CustomerDetailsDrawer({
 
                             <div className="flex items-center gap-3">
                               <div className="text-right">
-                                <p className="text-xs font-bold text-white">
+                                <p className="text-xs font-bold text-foreground">
                                   {formatTaka(ord.totalAmount)}
                                 </p>
                                 <span
                                   className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold ${
                                     ord.orderStatus === "DELIVERED"
-                                      ? "bg-emerald-500/10 text-emerald-400"
+                                      ? "bg-emerald-500/10 text-emerald-500"
                                       : ord.orderStatus === "CANCELLED"
-                                      ? "bg-rose-500/10 text-rose-400"
-                                      : "bg-amber-500/10 text-amber-400"
+                                      ? "bg-rose-500/10 text-rose-500"
+                                      : "bg-amber-500/10 text-amber-500"
                                   }`}
                                 >
                                   {ord.orderStatus}
@@ -358,7 +333,7 @@ export function CustomerDetailsDrawer({
                               </div>
                               <Link
                                 href={`/admin/orders/${ord.id}`}
-                                className="rounded-lg p-1 text-slate-400 hover:bg-slate-700 hover:text-white"
+                                className="rounded-lg p-1 text-muted-foreground hover:text-foreground"
                                 title="View Order"
                               >
                                 <Eye className="h-4 w-4" />
@@ -374,26 +349,26 @@ export function CustomerDetailsDrawer({
                 {/* 5. Product Reviews (if any) */}
                 {reviews.length > 0 && (
                   <div className="space-y-3">
-                    <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
-                      <Star className="h-4 w-4 text-amber-400" />
+                    <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      <Star className="h-4 w-4 text-amber-500" />
                       Product Reviews ({reviews.length})
                     </h4>
                     <div className="space-y-2">
                       {reviews.map((rev) => (
                         <div
                           key={rev.id}
-                          className="rounded-xl border border-slate-800 bg-slate-800/30 p-3 text-xs"
+                          className="rounded-xl border border-border bg-card p-3 text-xs"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-semibold text-white">
+                            <span className="font-semibold text-foreground">
                               {rev.product?.name || "Product"}
                             </span>
-                            <span className="flex items-center text-amber-400">
+                            <span className="flex items-center text-amber-500 font-bold">
                               {rev.rating} ★
                             </span>
                           </div>
-                          <p className="mt-1 text-slate-300">&ldquo;{rev.comment}&rdquo;</p>
-                          <p className="mt-1 text-[11px] text-slate-500">
+                          <p className="mt-1 text-muted-foreground">&ldquo;{rev.comment}&rdquo;</p>
+                          <p className="mt-1 text-[11px] text-muted-foreground">
                             {formatCustomerDate(rev.createdAt)}
                           </p>
                         </div>
@@ -404,8 +379,8 @@ export function CustomerDetailsDrawer({
               </>
             )}
           </div>
-        </div>
-      </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Edit Dialog */}
       {user && (

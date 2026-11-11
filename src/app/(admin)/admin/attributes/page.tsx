@@ -27,6 +27,32 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table";
+import {
   useGetAttributesQuery,
   useCreateAttributeMutation,
   useUpdateAttributeMutation,
@@ -310,7 +336,7 @@ export default function AdminAttributesPage() {
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-muted text-muted-foreground border border-border">
             <SlidersHorizontal className="h-3 w-3" />
             <span>Dropdown Select</span>
           </span>
@@ -321,17 +347,17 @@ export default function AdminAttributesPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-white tracking-tight">
+            <h1 className="text-2xl font-black text-foreground tracking-tight">
               Attributes & Specifications
             </h1>
             <Badge variant="brand" className="text-[10px] uppercase font-bold">
               Global Catalog
             </Badge>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Configure reusable specifications (Color, Size, Storage, RAM) and manage predefined values for variable products.
           </p>
         </div>
@@ -362,13 +388,13 @@ export default function AdminAttributesPage() {
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-slate-900/60 border-slate-800">
+        <Card className="bg-card border-border shadow-xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
                 Total Attributes
               </p>
-              <p className="text-2xl font-black text-white mt-1">{totalAttributes}</p>
+              <p className="text-2xl font-black text-foreground mt-1">{totalAttributes}</p>
             </div>
             <div className="h-10 w-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center">
               <Layers className="h-5 w-5" />
@@ -376,10 +402,10 @@ export default function AdminAttributesPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/60 border-slate-800">
+        <Card className="bg-card border-border shadow-xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
                 Total Attribute Values
               </p>
               <p className="text-2xl font-black text-emerald-400 mt-1">{totalValues}</p>
@@ -390,10 +416,10 @@ export default function AdminAttributesPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/60 border-slate-800">
+        <Card className="bg-card border-border shadow-xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
                 Active in Catalog
               </p>
               <p className="text-2xl font-black text-purple-400 mt-1">{activeCount}</p>
@@ -410,35 +436,35 @@ export default function AdminAttributesPage() {
         {/* Left Column: Attribute List (5 Cols) */}
         <div className="lg:col-span-5 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
               Attribute Groups ({filteredAttributes.length})
             </h3>
-            <span className="text-[11px] text-slate-500">Click to view values</span>
+            <span className="text-[11px] text-muted-foreground">Click to view values</span>
           </div>
 
           {/* Search Box */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
-            <input
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground z-10" />
+            <Input
               type="text"
               placeholder="Search attributes by name or slug..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-9 pl-9 pr-3 rounded-xl border border-slate-800 bg-slate-900/80 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand focus:border-brand"
+              className="pl-9 h-9"
             />
           </div>
 
           {/* Attributes Scrollable Stack */}
           {loading ? (
-            <div className="p-8 text-center bg-slate-900/40 rounded-2xl border border-slate-800">
+            <div className="p-8 text-center bg-card rounded-2xl border border-border shadow-xs">
               <Loader2 className="h-6 w-6 text-sky-400 animate-spin mx-auto" />
-              <p className="text-xs text-slate-400 mt-2">Loading attributes...</p>
+              <p className="text-xs text-muted-foreground mt-2">Loading attributes...</p>
             </div>
           ) : filteredAttributes.length === 0 ? (
-            <div className="p-8 text-center bg-slate-900/40 rounded-2xl border border-slate-800 space-y-2">
-              <Layers className="h-8 w-8 text-slate-600 mx-auto" />
-              <p className="text-xs font-medium text-slate-300">No attributes found</p>
-              <p className="text-[11px] text-slate-500">
+            <div className="p-8 text-center bg-card rounded-2xl border border-border shadow-xs space-y-2">
+              <Layers className="h-8 w-8 text-muted-foreground/60 mx-auto" />
+              <p className="text-xs font-medium text-muted-foreground">No attributes found</p>
+              <p className="text-[11px] text-muted-foreground">
                 Click &quot;New Attribute&quot; above to create your first specification attribute.
               </p>
             </div>
@@ -452,15 +478,15 @@ export default function AdminAttributesPage() {
                     onClick={() => setSelectedAttributeId(attr.id)}
                     className={`p-3.5 rounded-xl border transition-all cursor-pointer select-none group ${
                       isSelected
-                        ? "bg-slate-900 border-brand ring-1 ring-brand/40"
-                        : "bg-slate-900/50 hover:bg-slate-900/90 border-slate-800 hover:border-slate-700"
+                        ? "bg-brand/10 border-brand shadow-xs"
+                        : "bg-card hover:bg-muted/40 border-border hover:border-border/80 shadow-xs"
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-xs font-bold text-white truncate">{attr.name}</p>
-                          <span className="text-[10px] font-mono text-slate-400">({attr.slug})</span>
+                          <p className="text-xs font-bold text-foreground truncate">{attr.name}</p>
+                          <span className="text-[10px] font-mono text-muted-foreground">({attr.slug})</span>
                           {!attr.isActive && (
                             <Badge variant="outline" className="text-[9px] py-0 px-1 border-rose-500/40 text-rose-400">
                               Inactive
@@ -469,7 +495,7 @@ export default function AdminAttributesPage() {
                         </div>
                         <div className="flex items-center gap-2 mt-1.5">
                           {renderTypeBadge(attr.type)}
-                          <span className="text-[11px] text-slate-400">
+                          <span className="text-[11px] text-muted-foreground">
                             {attr.values?.length || 0} values defined
                           </span>
                         </div>
@@ -479,7 +505,7 @@ export default function AdminAttributesPage() {
                         <button
                           type="button"
                           onClick={(e) => handleOpenEditAttr(attr, e)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                          className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition"
                           title="Edit Attribute"
                         >
                           <Edit2 className="h-3.5 w-3.5" />
@@ -490,14 +516,14 @@ export default function AdminAttributesPage() {
                             e.stopPropagation();
                             setAttrToDelete(attr);
                           }}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
+                          className="p-1.5 rounded-lg text-muted-foreground hover:text-rose-500 hover:bg-muted transition"
                           title="Delete Attribute"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
                         <ChevronRight
                           className={`h-4 w-4 transition-transform ${
-                            isSelected ? "text-brand translate-x-0.5" : "text-slate-600"
+                            isSelected ? "text-brand translate-x-0.5" : "text-muted-foreground/60"
                           }`}
                         />
                       </div>
@@ -505,11 +531,11 @@ export default function AdminAttributesPage() {
 
                     {/* Value Preview Pills */}
                     {attr.values && attr.values.length > 0 && (
-                      <div className="mt-2.5 pt-2 border-t border-slate-800/60 flex flex-wrap gap-1">
+                      <div className="mt-2.5 pt-2 border-t border-border flex flex-wrap gap-1">
                         {attr.values.slice(0, 5).map((val) => (
                           <span
                             key={val.id}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] bg-slate-800/80 text-slate-300 border border-slate-700/60 font-mono"
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] bg-muted text-muted-foreground border border-border font-mono"
                           >
                             {attr.type === "COLOR" && val.colorCode && (
                               <span
@@ -521,7 +547,7 @@ export default function AdminAttributesPage() {
                           </span>
                         ))}
                         {attr.values.length > 5 && (
-                          <span className="text-[10px] text-slate-500 self-center pl-1 font-medium">
+                          <span className="text-[10px] text-muted-foreground self-center pl-1 font-medium">
                             +{attr.values.length - 5} more
                           </span>
                         )}
@@ -537,16 +563,16 @@ export default function AdminAttributesPage() {
         {/* Right Column: Values Workspace for Selected Attribute (7 Cols) */}
         <div className="lg:col-span-7">
           {selectedAttribute ? (
-            <Card className="bg-slate-900 border-slate-800 overflow-hidden">
-              <CardHeader className="bg-slate-950/40 border-b border-slate-800 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <Card className="bg-card border-border overflow-hidden shadow-xs">
+              <CardHeader className="bg-muted/30 border-b border-border p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <CardTitle className="text-base font-black text-white">
+                    <CardTitle className="text-base font-black text-foreground">
                       {selectedAttribute.name} Values
                     </CardTitle>
                     {renderTypeBadge(selectedAttribute.type)}
                   </div>
-                  <CardDescription className="text-xs text-slate-400 mt-1">
+                  <CardDescription className="text-xs text-muted-foreground mt-1">
                     Manage the selectable options for this attribute used when generating product variants.
                   </CardDescription>
                 </div>
@@ -565,13 +591,13 @@ export default function AdminAttributesPage() {
               <CardContent className="p-4 sm:p-5 space-y-4">
                 {/* Values Table / Grid */}
                 {!selectedAttribute.values || selectedAttribute.values.length === 0 ? (
-                  <div className="p-8 text-center border-2 border-dashed border-slate-800 rounded-2xl space-y-3">
-                    <Tag className="h-8 w-8 text-slate-600 mx-auto" />
+                  <div className="p-8 text-center border-2 border-dashed border-border rounded-2xl space-y-3">
+                    <Tag className="h-8 w-8 text-muted-foreground/60 mx-auto" />
                     <div>
-                      <p className="text-xs font-bold text-slate-200">
+                      <p className="text-xs font-bold text-foreground">
                         No values configured for &quot;{selectedAttribute.name}&quot;
                       </p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
                         Add options such as sizes (e.g. S, M, L), colors (e.g. Red, Black), or specifications.
                       </p>
                     </div>
@@ -586,31 +612,31 @@ export default function AdminAttributesPage() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="rounded-xl border border-slate-800 overflow-hidden">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-950/70 border-b border-slate-800 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                        <tr>
-                          <th className="py-2.5 px-3">Order</th>
-                          <th className="py-2.5 px-3">Value Name</th>
+                  <div className="rounded-xl border border-border overflow-hidden">
+                    <Table>
+                      <TableHeader className="bg-muted/50 border-b border-border">
+                        <TableRow className="border-border hover:bg-transparent">
+                          <TableHead className="py-2.5 px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Order</TableHead>
+                          <TableHead className="py-2.5 px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Value Name</TableHead>
                           {selectedAttribute.type === "COLOR" && (
-                            <th className="py-2.5 px-3">Swatch / Code</th>
+                            <TableHead className="py-2.5 px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Swatch / Code</TableHead>
                           )}
-                          <th className="py-2.5 px-3 text-right">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-800/60 bg-slate-900/40">
+                          <TableHead className="py-2.5 px-3 text-right text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody className="divide-y divide-border bg-card">
                         {selectedAttribute.values.map((val, idx) => (
-                          <tr key={val.id} className="hover:bg-slate-800/40 transition">
-                            <td className="py-2.5 px-3 font-mono text-slate-500 text-[11px]">
+                          <TableRow key={val.id} className="border-border hover:bg-muted/40 transition">
+                            <TableCell className="py-2.5 px-3 font-mono text-muted-foreground text-[11px]">
                               #{val.displayOrder !== undefined ? val.displayOrder : idx + 1}
-                            </td>
-                            <td className="py-2.5 px-3 font-medium text-slate-200">
-                              <span className="font-semibold text-white">{val.value}</span>
-                            </td>
+                            </TableCell>
+                            <TableCell className="py-2.5 px-3 font-medium text-foreground">
+                              <span className="font-semibold text-foreground">{val.value}</span>
+                            </TableCell>
                             {selectedAttribute.type === "COLOR" && (
-                              <td className="py-2.5 px-3">
+                              <TableCell className="py-2.5 px-3">
                                 {val.colorCode ? (
-                                  <div className="inline-flex items-center gap-2 px-2 py-1 rounded-md bg-slate-950/60 border border-slate-800 font-mono text-[11px] text-slate-300">
+                                  <div className="inline-flex items-center gap-2 px-2 py-1 rounded-md bg-muted/60 border border-border font-mono text-[11px] text-foreground">
                                     <span
                                       className="h-3.5 w-3.5 rounded-full border border-white/20 shrink-0"
                                       style={{ backgroundColor: val.colorCode }}
@@ -618,34 +644,38 @@ export default function AdminAttributesPage() {
                                     <span>{val.colorCode}</span>
                                   </div>
                                 ) : (
-                                  <span className="text-[11px] text-slate-500 italic">None</span>
+                                  <span className="text-[11px] text-muted-foreground italic">None</span>
                                 )}
-                              </td>
+                              </TableCell>
                             )}
-                            <td className="py-2.5 px-3 text-right">
+                            <TableCell className="py-2.5 px-3 text-right">
                               <div className="inline-flex items-center gap-1">
-                                <button
+                                <Button
                                   type="button"
+                                  variant="ghost"
+                                  size="sm"
                                   onClick={() => handleOpenEditValue(val)}
-                                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                                  className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground hover:bg-muted"
                                   title="Edit Value"
                                 >
                                   <Edit2 className="h-3.5 w-3.5" />
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                   type="button"
+                                  variant="ghost"
+                                  size="sm"
                                   onClick={() => setValToDelete(val)}
-                                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
+                                  className="h-7 w-7 p-0 text-muted-foreground hover:text-rose-500 hover:bg-muted"
                                   title="Delete Value"
                                 >
                                   <Trash2 className="h-3.5 w-3.5" />
-                                </button>
+                                </Button>
                               </div>
-                            </td>
-                          </tr>
+                            </TableCell>
+                          </TableRow>
                         ))}
-                      </tbody>
-                    </table>
+                      </TableBody>
+                    </Table>
                   </div>
                 )}
 
@@ -654,17 +684,17 @@ export default function AdminAttributesPage() {
                   <Sparkles className="h-4 w-4 text-sky-400 shrink-0 mt-0.5" />
                   <div className="space-y-1">
                     <p className="font-semibold text-sky-300">How attributes work in Product Creation:</p>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
-                      When adding a <strong className="text-slate-200">Variable Product</strong>, select this attribute, check the values you want, and click &quot;Generate Variants&quot;. The system will automatically calculate the multiplication matrix of SKUs and rows for you.
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      When adding a <strong className="text-foreground">Variable Product</strong>, select this attribute, check the values you want, and click &quot;Generate Variants&quot;. The system will automatically calculate the multiplication matrix of SKUs and rows for you.
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           ) : (
-            <div className="p-12 text-center border border-slate-800 bg-slate-900/40 rounded-2xl space-y-2">
-              <Layers className="h-10 w-10 text-slate-600 mx-auto" />
-              <p className="text-sm font-bold text-slate-300">Select an attribute to manage its values</p>
+            <div className="p-12 text-center border border-border bg-card rounded-2xl space-y-2">
+              <Layers className="h-10 w-10 text-muted-foreground/60 mx-auto" />
+              <p className="text-sm font-bold text-foreground">Select an attribute to manage its values</p>
             </div>
           )}
         </div>
@@ -673,256 +703,240 @@ export default function AdminAttributesPage() {
       {/* ================================================================= */}
       {/* MODAL 1: Create / Edit Attribute                                 */}
       {/* ================================================================= */}
-      {isAttrModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <SlidersHorizontal className="h-4 w-4 text-brand" />
-                <h3 className="text-sm font-bold text-white">
-                  {attrModalMode === "create" ? "Add New Specification Attribute" : "Edit Attribute"}
-                </h3>
-              </div>
-              <button
-                onClick={() => setIsAttrModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-              >
-                <X className="h-4 w-4" />
-              </button>
+      <Dialog open={isAttrModalOpen} onOpenChange={setIsAttrModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <SlidersHorizontal className="h-4 w-4 text-brand" />
+              <span>{attrModalMode === "create" ? "Add New Specification Attribute" : "Edit Attribute"}</span>
+            </DialogTitle>
+            <DialogDescription>
+              Configure attribute key, input presentation type, and storefront visibility.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveAttribute} className="space-y-4 py-1">
+            {/* Name */}
+            <div className="space-y-1.5">
+              <Label htmlFor="attr-name">
+                Attribute Name <span className="text-rose-500">*</span>
+              </Label>
+              <Input
+                id="attr-name"
+                type="text"
+                required
+                placeholder="e.g. Color, Size, Storage, RAM, Switch Type"
+                value={attrFormName}
+                onChange={(e) => setAttrFormName(e.target.value)}
+              />
             </div>
 
-            <form onSubmit={handleSaveAttribute} className="p-4 sm:p-5 space-y-4">
-              {/* Name */}
+            {/* Type */}
+            <div className="space-y-1.5">
+              <Label htmlFor="attr-type">Display / Input Type</Label>
+              <Select
+                value={attrFormType}
+                onValueChange={(val) => setAttrFormType(val as AttributeDisplayType)}
+              >
+                <SelectTrigger id="attr-type">
+                  <SelectValue placeholder="Select Display Type">
+                    {attrFormType === "SELECT"
+                      ? "Dropdown Select (Standard)"
+                      : attrFormType === "BUTTON"
+                      ? "Button Pills (Sizes, RAM, Storage)"
+                      : attrFormType === "COLOR"
+                      ? "Color Swatch (Visual Color Circles)"
+                      : attrFormType === "RADIO"
+                      ? "Radio List"
+                      : "Text Field (Custom Spec)"}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="SELECT">Dropdown Select (Standard)</SelectItem>
+                  <SelectItem value="BUTTON">Button Pills (Sizes, RAM, Storage)</SelectItem>
+                  <SelectItem value="COLOR">Color Swatch (Visual Color Circles)</SelectItem>
+                  <SelectItem value="RADIO">Radio List</SelectItem>
+                  <SelectItem value="TEXT">Text Field (Custom Spec)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Description */}
+            <div className="space-y-1.5">
+              <Label htmlFor="attr-desc">Description (Optional)</Label>
+              <Input
+                id="attr-desc"
+                type="text"
+                placeholder="e.g. Apparel sizes according to international chart"
+                value={attrFormDescription}
+                onChange={(e) => setAttrFormDescription(e.target.value)}
+              />
+            </div>
+
+            {/* Initial Values (Only in create mode) */}
+            {attrModalMode === "create" && (
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-300">
-                  Attribute Name <span className="text-rose-500">*</span>
-                </label>
-                <input
+                <Label htmlFor="attr-init-vals">Initial Values (Comma-separated)</Label>
+                <Input
+                  id="attr-init-vals"
                   type="text"
-                  required
-                  placeholder="e.g. Color, Size, Storage, RAM, Switch Type"
-                  value={attrFormName}
-                  onChange={(e) => setAttrFormName(e.target.value)}
-                  className="w-full h-9 px-3 rounded-lg border border-slate-800 bg-slate-950 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand"
+                  placeholder="e.g. Small, Medium, Large, Extra Large"
+                  value={attrFormInitialValues}
+                  onChange={(e) => setAttrFormInitialValues(e.target.value)}
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  You can also add or customize individual values after creating the attribute.
+                </p>
+              </div>
+            )}
+
+            {/* Display Order & Active */}
+            <div className="grid grid-cols-2 gap-3 items-end">
+              <div className="space-y-1.5">
+                <Label htmlFor="attr-order">Display Order</Label>
+                <Input
+                  id="attr-order"
+                  type="number"
+                  min={0}
+                  value={attrFormDisplayOrder}
+                  onChange={(e) => setAttrFormDisplayOrder(Number(e.target.value))}
                 />
               </div>
 
-              {/* Type */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-300">
-                  Display / Input Type
-                </label>
-                <select
-                  value={attrFormType}
-                  onChange={(e) =>
-                    setAttrFormType(e.target.value as AttributeDisplayType)
-                  }
-                  className="w-full h-9 px-3 rounded-lg border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand"
-                >
-                  <option value="SELECT">Dropdown Select (Standard)</option>
-                  <option value="BUTTON">Button Pills (Great for Sizes, RAM, Storage)</option>
-                  <option value="COLOR">Color Swatch (Visual Color Circles)</option>
-                  <option value="RADIO">Radio List</option>
-                  <option value="TEXT">Text Field (Custom Spec)</option>
-                </select>
-              </div>
-
-              {/* Description */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-300">
-                  Description (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Apparel sizes according to international chart"
-                  value={attrFormDescription}
-                  onChange={(e) => setAttrFormDescription(e.target.value)}
-                  className="w-full h-9 px-3 rounded-lg border border-slate-800 bg-slate-950 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand"
+              <div className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-muted/30 h-9">
+                <span className="text-xs font-semibold text-foreground">Active in Store</span>
+                <Switch
+                  checked={attrFormIsActive}
+                  onCheckedChange={setAttrFormIsActive}
                 />
               </div>
+            </div>
 
-              {/* Initial Values (Only in create mode) */}
-              {attrModalMode === "create" && (
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-300">
-                    Initial Values (Comma-separated)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Small, Medium, Large, Extra Large"
-                    value={attrFormInitialValues}
-                    onChange={(e) => setAttrFormInitialValues(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg border border-slate-800 bg-slate-950 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand"
-                  />
-                  <p className="text-[11px] text-slate-500">
-                    You can also add or customize individual values after creating the attribute.
-                  </p>
-                </div>
-              )}
-
-              {/* Display Order & Active */}
-              <div className="grid grid-cols-2 gap-3 pt-1">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-300">
-                    Display Order
-                  </label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={attrFormDisplayOrder}
-                    onChange={(e) => setAttrFormDisplayOrder(Number(e.target.value))}
-                    className="w-full h-9 px-3 rounded-lg border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand"
-                  />
-                </div>
-
-                <div className="flex items-center gap-2 pt-6">
-                  <input
-                    type="checkbox"
-                    id="attrActiveCheckbox"
-                    checked={attrFormIsActive}
-                    onChange={(e) => setAttrFormIsActive(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-brand focus:ring-brand"
-                  />
-                  <label htmlFor="attrActiveCheckbox" className="text-xs text-slate-300 cursor-pointer select-none">
-                    Active in Storefront
-                  </label>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsAttrModalOpen(false)}
-                  className="text-xs"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="brand"
-                  size="sm"
-                  disabled={attrSubmitting}
-                  className="text-xs gap-1.5 font-bold"
-                >
-                  {attrSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                  <span>{attrModalMode === "create" ? "Create Attribute" : "Save Changes"}</span>
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            {/* Action Buttons */}
+            <DialogFooter className="pt-3 border-t border-border gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsAttrModalOpen(false)}
+                className="text-xs"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="brand"
+                size="sm"
+                disabled={attrSubmitting}
+                className="text-xs gap-1.5 font-bold"
+              >
+                {attrSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                <span>{attrModalMode === "create" ? "Create Attribute" : "Save Changes"}</span>
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* ================================================================= */}
       {/* MODAL 2: Create / Edit Attribute Value                           */}
       {/* ================================================================= */}
-      {isValueModalOpen && selectedAttribute && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4 text-emerald-400" />
-                <h3 className="text-sm font-bold text-white">
-                  {valueModalMode === "create"
-                    ? `Add Value to "${selectedAttribute.name}"`
-                    : "Edit Attribute Value"}
-                </h3>
-              </div>
-              <button
-                onClick={() => setIsValueModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-              >
-                <X className="h-4 w-4" />
-              </button>
+      <Dialog open={isValueModalOpen && Boolean(selectedAttribute)} onOpenChange={setIsValueModalOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Tag className="h-4 w-4 text-emerald-500" />
+              <span>
+                {valueModalMode === "create"
+                  ? `Add Value to "${selectedAttribute?.name}"`
+                  : "Edit Attribute Value"}
+              </span>
+            </DialogTitle>
+            <DialogDescription>
+              Define item label, sort order, and optional color swatch hex code.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveValue} className="space-y-4 py-1">
+            {/* Value Name */}
+            <div className="space-y-1.5">
+              <Label htmlFor="val-name">
+                Value Label / Text <span className="text-rose-500">*</span>
+              </Label>
+              <Input
+                id="val-name"
+                type="text"
+                required
+                placeholder={
+                  selectedAttribute?.type === "COLOR"
+                    ? "e.g. Midnight Blue, Crimson Red"
+                    : "e.g. XL, 256GB, Silicone"
+                }
+                value={valueFormText}
+                onChange={(e) => setValueFormText(e.target.value)}
+              />
             </div>
 
-            <form onSubmit={handleSaveValue} className="p-4 space-y-4">
-              {/* Value Name */}
+            {/* Color Code Picker (if COLOR type) */}
+            {selectedAttribute?.type === "COLOR" && (
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-300">
-                  Value Label / Text <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder={
-                    selectedAttribute.type === "COLOR"
-                      ? "e.g. Midnight Blue, Crimson Red"
-                      : "e.g. XL, 256GB, Silicone"
-                  }
-                  value={valueFormText}
-                  onChange={(e) => setValueFormText(e.target.value)}
-                  className="w-full h-9 px-3 rounded-lg border border-slate-800 bg-slate-950 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-brand"
-                />
-              </div>
-
-              {/* Color Code Picker (if COLOR type) */}
-              {selectedAttribute.type === "COLOR" && (
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-300">
-                    Hex Color Code Swatch
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={valueFormColor}
-                      onChange={(e) => setValueFormColor(e.target.value)}
-                      className="h-9 w-12 rounded border border-slate-800 bg-slate-950 p-1 cursor-pointer"
-                    />
-                    <input
-                      type="text"
-                      placeholder="#000000"
-                      value={valueFormColor}
-                      onChange={(e) => setValueFormColor(e.target.value)}
-                      className="flex-1 h-9 px-3 rounded-lg border border-slate-800 bg-slate-950 text-xs text-white font-mono uppercase focus:outline-none focus:ring-1 focus:ring-brand"
-                    />
-                  </div>
+                <Label htmlFor="val-color">Hex Color Code Swatch</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    id="val-color"
+                    value={valueFormColor}
+                    onChange={(e) => setValueFormColor(e.target.value)}
+                    className="h-9 w-12 rounded border border-border bg-card p-1 cursor-pointer"
+                  />
+                  <Input
+                    type="text"
+                    placeholder="#000000"
+                    value={valueFormColor}
+                    onChange={(e) => setValueFormColor(e.target.value)}
+                    className="flex-1 font-mono uppercase"
+                  />
                 </div>
-              )}
-
-              {/* Display Order */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-300">
-                  Sort / Display Order
-                </label>
-                <input
-                  type="number"
-                  min={0}
-                  value={valueFormDisplayOrder}
-                  onChange={(e) => setValueFormDisplayOrder(Number(e.target.value))}
-                  className="w-full h-9 px-3 rounded-lg border border-slate-800 bg-slate-950 text-xs text-white focus:outline-none focus:ring-1 focus:ring-brand"
-                />
               </div>
+            )}
 
-              {/* Action Buttons */}
-              <div className="pt-2 border-t border-slate-800 flex items-center justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsValueModalOpen(false)}
-                  className="text-xs"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="brand"
-                  size="sm"
-                  disabled={valueSubmitting}
-                  className="text-xs gap-1.5 font-bold"
-                >
-                  {valueSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                  <span>{valueModalMode === "create" ? "Add Value" : "Update Value"}</span>
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            {/* Display Order */}
+            <div className="space-y-1.5">
+              <Label htmlFor="val-order">Sort / Display Order</Label>
+              <Input
+                id="val-order"
+                type="number"
+                min={0}
+                value={valueFormDisplayOrder}
+                onChange={(e) => setValueFormDisplayOrder(Number(e.target.value))}
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <DialogFooter className="pt-2 border-t border-border gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsValueModalOpen(false)}
+                className="text-xs"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="brand"
+                size="sm"
+                disabled={valueSubmitting}
+                className="text-xs gap-1.5 font-bold"
+              >
+                {valueSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                <span>{valueModalMode === "create" ? "Add Value" : "Update Value"}</span>
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Attribute Confirmation Dialog */}
       <ConfirmDialog
