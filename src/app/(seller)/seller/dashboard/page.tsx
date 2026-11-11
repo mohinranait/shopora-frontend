@@ -18,9 +18,27 @@ import {
   ShieldAlert,
   Boxes,
   DollarSign,
+  ArrowUpRight,
+  BadgeAlert,
+  Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table";
 import {
   useGetSellerDashboardStatsQuery,
   useUpdateSellerProfileMutation,
@@ -64,13 +82,13 @@ export default function SellerDashboardPage() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-28 bg-slate-900 rounded-2xl border border-slate-800" />
+        <div className="h-28 bg-card rounded-2xl border border-border" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-32 bg-slate-900 rounded-2xl border border-slate-800" />
+            <div key={i} className="h-32 bg-card rounded-2xl border border-border" />
           ))}
         </div>
-        <div className="h-64 bg-slate-900 rounded-2xl border border-slate-800" />
+        <div className="h-64 bg-card rounded-2xl border border-border" />
       </div>
     );
   }
@@ -81,456 +99,511 @@ export default function SellerDashboardPage() {
       {adminNotices.length > 0 && (
         <div className="space-y-3">
           {adminNotices.map((notice) => (
-            <div
+            <Card
               key={notice.id}
-              className="p-4 sm:p-5 rounded-2xl bg-amber-500/15 border-2 border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg shadow-amber-500/5 animate-in fade-in"
+              className="border-2 border-amber-500/40 bg-amber-500/10 shadow-lg shadow-amber-500/5 animate-in fade-in"
             >
-              <div className="flex items-start gap-3.5 min-w-0">
-                <div className="p-2.5 rounded-xl bg-amber-500/25 text-amber-400 shrink-0 mt-0.5">
-                  <ShieldAlert className="h-5 w-5" />
-                </div>
-                <div className="space-y-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="outline" className="bg-amber-500/20 border-amber-500/40 text-amber-300 text-[10px] font-bold uppercase tracking-wider">
-                      ⚠️ Official Admin Notice / Warning
-                    </Badge>
-                    <span className="text-[11px] text-amber-200/70">
-                      {new Date(notice.createdAt).toLocaleDateString()}
-                    </span>
+              <CardContent className="p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-3.5 min-w-0">
+                  <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-500 shrink-0 mt-0.5">
+                    <ShieldAlert className="h-5 w-5" />
                   </div>
-                  <h4 className="text-sm font-bold text-white">{notice.title}</h4>
-                  <p className="text-xs text-amber-200/90 leading-relaxed whitespace-pre-wrap">
-                    {notice.message}
-                  </p>
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className="bg-amber-500/20 border-amber-500/40 text-amber-700 dark:text-amber-300 text-[10px] font-bold uppercase tracking-wider"
+                      >
+                        ⚠️ Official Admin Notice / Warning
+                      </Badge>
+                      <span className="text-[11px] text-muted-foreground">
+                        {new Date(notice.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <h4 className="text-sm font-bold text-foreground">{notice.title}</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                      {notice.message}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                <Link href="/seller/notifications">
-                  <Button size="sm" variant="brand" className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs h-8">
-                    View In Notices
-                  </Button>
-                </Link>
-              </div>
-            </div>
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                  <Link href="/seller/notifications">
+                    <Button size="sm" variant="brand" className="text-xs h-8">
+                      View In Notices
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}
 
       {/* Account Pending Approval Notice Banner */}
       {profile && profile.status === "PENDING" && (
-        <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-400 shrink-0">
-              <Clock className="h-5 w-5" />
+        <Card className="border-amber-500/30 bg-amber-500/5">
+          <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-500 shrink-0">
+                <Clock className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-amber-600 dark:text-amber-300">
+                  Seller Account Pending Approval
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Your store registration has been submitted and is currently pending review by platform administrators.
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-amber-300">Seller Account Pending Approval</h3>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Your store registration has been submitted and is currently pending review by platform administrators.
-              </p>
-            </div>
-          </div>
-          <Badge variant="outline" className="text-amber-400 border-amber-500/30 bg-amber-500/10 text-xs px-2.5 py-1 shrink-0">
-            Under Review
-          </Badge>
-        </div>
+            <Badge
+              variant="outline"
+              className="text-amber-600 dark:text-amber-400 border-amber-500/30 bg-amber-500/10 text-xs px-2.5 py-1 shrink-0"
+            >
+              Under Review
+            </Badge>
+          </CardContent>
+        </Card>
       )}
 
       {/* Holiday Mode Notice Banner (if active) */}
       {profile?.isHolidayMode && (
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-transparent border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400 shrink-0">
-              <Palmtree className="h-6 w-6" />
+        <Card className="border-amber-500/30 bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent">
+          <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-500 shrink-0">
+                <Palmtree className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-amber-600 dark:text-amber-300">
+                  Vacation Mode is Active
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {profile.holidayMessage || "Your products are temporarily paused from storefront searches and new orders."}
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-amber-300">Vacation Mode is Active</h3>
-              <p className="text-xs text-amber-200/80 mt-0.5">
-                {profile.holidayMessage || "Your products are temporarily paused from storefront searches and new orders."}
-              </p>
-            </div>
-          </div>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleToggleHolidayMode}
-            disabled={isUpdatingProfile}
-            className="border-amber-500/40 text-amber-300 hover:bg-amber-500/20 text-xs font-semibold shrink-0"
-          >
-            End Vacation Mode
-          </Button>
-        </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleToggleHolidayMode}
+              disabled={isUpdatingProfile}
+              className="border-amber-500/40 text-amber-600 dark:text-amber-300 hover:bg-amber-500/20 text-xs font-semibold shrink-0"
+            >
+              End Vacation Mode
+            </Button>
+          </CardContent>
+        </Card>
       )}
 
       {/* Hero Welcome & Quick Actions */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-white tracking-tight">
-              {profile?.storeName || "My Store"}
-            </h1>
-            {profile?.status === "APPROVED" ? (
-              <Badge variant="outline" className="text-emerald-400 border-emerald-500/30 bg-emerald-500/10 text-[10px]">
-                Active Merchant
-              </Badge>
-            ) : profile?.status === "PENDING" ? (
-              <Badge variant="outline" className="text-amber-400 border-amber-500/30 bg-amber-500/10 text-[10px]">
-                Pending Approval
-              </Badge>
-            ) : profile?.status === "REJECTED" ? (
-              <Badge variant="destructive" className="text-[10px]">
-                Application Rejected
-              </Badge>
-            ) : (
-              <Badge variant="outline" className="text-slate-400 border-slate-700 bg-slate-800 text-[10px]">
-                {profile?.status || "Partner"}
-              </Badge>
-            )}
+      <Card className="border-border bg-card shadow-xs overflow-hidden">
+        <CardContent className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-black text-foreground tracking-tight">
+                {profile?.storeName || "My Store"}
+              </h1>
+              {profile?.status === "APPROVED" ? (
+                <Badge
+                  variant="outline"
+                  className="text-emerald-600 dark:text-emerald-400 border-emerald-500/30 bg-emerald-500/10 text-[10px]"
+                >
+                  Active Merchant
+                </Badge>
+              ) : profile?.status === "PENDING" ? (
+                <Badge
+                  variant="outline"
+                  className="text-amber-600 dark:text-amber-400 border-amber-500/30 bg-amber-500/10 text-[10px]"
+                >
+                  Pending Approval
+                </Badge>
+              ) : profile?.status === "REJECTED" ? (
+                <Badge variant="destructive" className="text-[10px]">
+                  Application Rejected
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="text-muted-foreground border-border bg-muted text-[10px]">
+                  {profile?.status || "Partner"}
+                </Badge>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Manage your inventory, fulfill customer orders, and track your escrow earnings.
+            </p>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Manage your inventory, fulfill customer orders, and track your escrow earnings.
-          </p>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
-          <Link href="/seller/products/new">
-            <Button size="sm" variant="brand" className="gap-1.5 text-xs font-bold">
-              <Plus className="h-4 w-4" />
-              Add Product
-            </Button>
-          </Link>
-          <Link href="/seller/orders">
-            <Button size="sm" variant="outline" className="border-slate-700 text-xs">
-              View Orders
-            </Button>
-          </Link>
-          {profile?.storeSlug && (
-            <Link href={`/stores/${profile.storeSlug}`} target="_blank">
-              <Button size="sm" variant="ghost" className="text-xs text-slate-400 hover:text-white gap-1">
-                Storefront
-                <ExternalLink className="h-3.5 w-3.5" />
+          <div className="flex flex-wrap items-center gap-2.5">
+            <Link href="/seller/products/new">
+              <Button size="sm" variant="brand" className="gap-1.5 text-xs font-bold shadow-xs">
+                <Plus className="h-4 w-4" />
+                Add Product
               </Button>
             </Link>
-          )}
-        </div>
-      </div>
+            <Link href="/seller/orders">
+              <Button size="sm" variant="outline" className="border-border text-xs">
+                View Orders
+              </Button>
+            </Link>
+            {profile?.storeSlug && (
+              <Link href={`/stores/${profile.storeSlug}`} target="_blank">
+                <Button size="sm" variant="ghost" className="text-xs text-muted-foreground hover:text-foreground gap-1">
+                  Storefront
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </Button>
+              </Link>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Financial Investment & Profit Intelligence */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Active Stock Investment */}
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 shadow-sm relative overflow-hidden group hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Active Stock Investment</span>
-            <div className="p-2 rounded-xl bg-sky-500/10 text-sky-400">
-              <Boxes className="h-5 w-5" />
+        <Card className="border-border bg-card shadow-xs hover:border-brand/40 transition-colors">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Active Stock Investment
+              </span>
+              <div className="p-2 rounded-xl bg-sky-500/10 text-sky-500">
+                <Boxes className="h-5 w-5" />
+              </div>
             </div>
-          </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black text-white">
-              ৳{metrics?.activeStockInvestment ? metrics.activeStockInvestment.toLocaleString() : 0}
+            <div className="mt-3">
+              <div className="text-2xl font-black text-foreground">
+                ৳{metrics?.activeStockInvestment ? metrics.activeStockInvestment.toLocaleString() : 0}
+              </div>
+              <div className="flex items-center justify-between mt-2 pt-2 border-t border-border text-[11px]">
+                <span className="text-muted-foreground">Capital tied in inventory</span>
+                <span className="font-semibold text-sky-600 dark:text-sky-400">Asset Value</span>
+              </div>
             </div>
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800/80 text-[11px]">
-              <span className="text-slate-400">Capital tied in unsold inventory</span>
-              <span className="font-semibold text-sky-400">Asset Value</span>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Gross Sales Revenue */}
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 shadow-sm relative overflow-hidden group hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Gross Sales Revenue</span>
-            <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400">
-              <DollarSign className="h-5 w-5" />
+        <Card className="border-border bg-card shadow-xs hover:border-purple-500/40 transition-colors">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Gross Sales Revenue
+              </span>
+              <div className="p-2 rounded-xl bg-purple-500/10 text-purple-500">
+                <DollarSign className="h-5 w-5" />
+              </div>
             </div>
-          </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black text-white">
-              ৳{metrics?.grossSales ? metrics.grossSales.toLocaleString() : 0}
+            <div className="mt-3">
+              <div className="text-2xl font-black text-foreground">
+                ৳{metrics?.grossSales ? metrics.grossSales.toLocaleString() : 0}
+              </div>
+              <div className="flex items-center justify-between mt-2 pt-2 border-t border-border text-[11px]">
+                <span className="text-muted-foreground">COGS (মালের কেনা দাম):</span>
+                <span className="font-bold text-foreground">
+                  ৳{metrics?.costOfGoodsSold ? metrics.costOfGoodsSold.toLocaleString() : 0}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800/80 text-[11px]">
-              <span className="text-slate-400">COGS (মালের কেনা দাম):</span>
-              <span className="font-bold text-slate-300">৳{metrics?.costOfGoodsSold ? metrics.costOfGoodsSold.toLocaleString() : 0}</span>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Realized Net Profit */}
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-950 border border-emerald-500/30 shadow-sm relative overflow-hidden group hover:border-emerald-500/50 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">Shop Net Profit (আসল লাভ)</span>
-            <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400">
-              <TrendingUp className="h-5 w-5" />
-            </div>
-          </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black text-emerald-300">
-              ৳{metrics?.netProfit ? metrics.netProfit.toLocaleString() : 0}
-            </div>
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-emerald-500/20 text-[11px]">
-              <span className="text-slate-400">Net Profit Margin:</span>
-              <span className="font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                {metrics?.profitMarginPercent ? `${metrics.profitMarginPercent}% Margin` : "0% Margin"}
+        <Card className="border-emerald-500/30 bg-emerald-500/5 shadow-xs hover:border-emerald-500/50 transition-colors">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                Shop Net Profit (আসল লাভ)
               </span>
+              <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                <TrendingUp className="h-5 w-5" />
+              </div>
             </div>
-          </div>
-        </div>
+            <div className="mt-3">
+              <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+                ৳{metrics?.netProfit ? metrics.netProfit.toLocaleString() : 0}
+              </div>
+              <div className="flex items-center justify-between mt-2 pt-2 border-t border-emerald-500/20 text-[11px]">
+                <span className="text-muted-foreground">Net Profit Margin:</span>
+                <span className="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                  {metrics?.profitMarginPercent ? `${metrics.profitMarginPercent}% Margin` : "0% Margin"}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Available Balance */}
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-sm relative overflow-hidden group hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400">Available Balance</span>
-            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
-              <Wallet className="h-5 w-5" />
+        <Card className="border-border bg-card shadow-xs hover:border-border/80 transition-colors">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-muted-foreground">Available Balance</span>
+              <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
+                <Wallet className="h-5 w-5" />
+              </div>
             </div>
-          </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black text-white">
-              ৳{metrics?.availableBalance ? metrics.availableBalance.toLocaleString() : 0}
+            <div className="mt-3">
+              <div className="text-2xl font-black text-foreground">
+                ৳{metrics?.availableBalance ? metrics.availableBalance.toLocaleString() : 0}
+              </div>
+              <div className="flex items-center justify-between mt-2 pt-2 border-t border-border">
+                <span className="text-[11px] text-muted-foreground">Ready for payout</span>
+                <Link
+                  href="/seller/wallet"
+                  className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold hover:underline flex items-center gap-1"
+                >
+                  Withdraw <ArrowRight className="h-3 w-3" />
+                </Link>
+              </div>
             </div>
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800/80">
-              <span className="text-[11px] text-slate-500">Ready for withdrawal</span>
-              <Link
-                href="/seller/wallet"
-                className="text-[11px] text-emerald-400 font-bold hover:underline flex items-center gap-1"
-              >
-                Withdraw <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* 7-Day Escrow Balance */}
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-sm relative overflow-hidden group hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400">7-Day Escrow Hold</span>
-            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
-              <Clock className="h-5 w-5" />
+        <Card className="border-border bg-card shadow-xs hover:border-border/80 transition-colors">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-muted-foreground">7-Day Escrow Hold</span>
+              <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
+                <Clock className="h-5 w-5" />
+              </div>
             </div>
-          </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black text-amber-300">
-              ৳{metrics?.pendingBalance ? metrics.pendingBalance.toLocaleString() : 0}
+            <div className="mt-3">
+              <div className="text-2xl font-black text-amber-600 dark:text-amber-400">
+                ৳{metrics?.pendingBalance ? metrics.pendingBalance.toLocaleString() : 0}
+              </div>
+              <div className="flex items-center justify-between mt-2 pt-2 border-t border-border">
+                <span className="text-[11px] text-muted-foreground">Maturing orders</span>
+                <Link
+                  href="/seller/wallet"
+                  className="text-[11px] text-amber-600 dark:text-amber-400 font-bold hover:underline flex items-center gap-1"
+                >
+                  Details <ArrowRight className="h-3 w-3" />
+                </Link>
+              </div>
             </div>
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800/80">
-              <span className="text-[11px] text-slate-500">Delivered & maturing</span>
-              <Link
-                href="/seller/wallet"
-                className="text-[11px] text-amber-400 font-bold hover:underline flex items-center gap-1"
-              >
-                Details <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Total Orders */}
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-sm relative overflow-hidden group hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400">Shipments & Orders</span>
-            <div className="p-2 rounded-xl bg-brand-500/10 text-brand-400">
-              <ShoppingBag className="h-5 w-5" />
+        <Card className="border-border bg-card shadow-xs hover:border-border/80 transition-colors">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-muted-foreground">Shipments & Orders</span>
+              <div className="p-2 rounded-xl bg-brand/10 text-brand">
+                <ShoppingBag className="h-5 w-5" />
+              </div>
             </div>
-          </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black text-white">
-              {metrics?.totalOrders || 0}
+            <div className="mt-3">
+              <div className="text-2xl font-black text-foreground">
+                {metrics?.totalOrders || 0}
+              </div>
+              <div className="flex items-center justify-between mt-2 pt-2 border-t border-border">
+                <span className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold">
+                  {metrics?.pendingOrders || 0} pending fulfillment
+                </span>
+                <Link
+                  href="/seller/orders"
+                  className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1"
+                >
+                  Manage <ArrowRight className="h-3 w-3" />
+                </Link>
+              </div>
             </div>
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800/80">
-              <span className="text-[11px] text-amber-400 font-semibold">
-                {metrics?.pendingOrders || 0} requiring fulfillment
-              </span>
-              <Link
-                href="/seller/orders"
-                className="text-[11px] text-slate-400 hover:text-white flex items-center gap-1"
-              >
-                Manage <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Active Products */}
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-sm relative overflow-hidden group hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400">Catalog Products</span>
-            <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400">
-              <Package className="h-5 w-5" />
+        <Card className="border-border bg-card shadow-xs hover:border-border/80 transition-colors">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-muted-foreground">Catalog Products</span>
+              <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-500">
+                <Package className="h-5 w-5" />
+              </div>
             </div>
-          </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black text-white">
-              {metrics?.totalProducts || 0}
+            <div className="mt-3">
+              <div className="text-2xl font-black text-foreground">
+                {metrics?.totalProducts || 0}
+              </div>
+              <div className="flex items-center justify-between mt-2 pt-2 border-t border-border">
+                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                  {metrics?.approvedProducts || 0} live approved
+                </span>
+                <Link
+                  href="/seller/products"
+                  className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1"
+                >
+                  Catalog <ArrowRight className="h-3 w-3" />
+                </Link>
+              </div>
             </div>
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800/80">
-              <span className="text-[11px] text-emerald-400">
-                {metrics?.approvedProducts || 0} live approved
-              </span>
-              <Link
-                href="/seller/products"
-                className="text-[11px] text-slate-400 hover:text-white flex items-center gap-1"
-              >
-                Catalog <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Operational Highlights: Courier Logistics & Vacation Quick Switch */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Logistics Automation Card */}
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 md:col-span-2 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-sky-500/10 text-sky-400">
-                <Truck className="h-5 w-5" />
+        <Card className="border-border bg-card shadow-xs md:col-span-2 flex flex-col justify-between">
+          <CardContent className="p-5">
+            <div>
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-sky-500/10 text-sky-500">
+                  <Truck className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-foreground">Automated Courier Dispatch</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Direct consignment booking with Steadfast & Pathao. Generate shipping labels and tracking codes in 1 click.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-sm font-bold text-white">Automated Courier Dispatch</h3>
-                <p className="text-xs text-slate-400">
-                  Direct consignment booking with Steadfast & Pathao. Generate shipping labels and tracking codes in 1 click.
-                </p>
+
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="p-3 rounded-xl bg-muted/40 border border-border">
+                  <div className="font-semibold text-foreground">Daraz-Style Split Shipping</div>
+                  <div className="text-muted-foreground text-[11px] mt-1">
+                    Customers pay shipping per vendor package. Your packages are tracked independently.
+                  </div>
+                </div>
+                <div className="p-3 rounded-xl bg-muted/40 border border-border">
+                  <div className="font-semibold text-foreground">Thermal Packaging Slips</div>
+                  <div className="text-muted-foreground text-[11px] mt-1">
+                    Ready-to-print 4x6" thermal labels with barcode, customer address, and vendor manifest.
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-                <div className="font-semibold text-slate-300">Daraz-Style Split Shipping</div>
-                <div className="text-slate-500 text-[11px] mt-1">
-                  Customers pay shipping per vendor package. Your packages are tracked independently.
-                </div>
-              </div>
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-                <div className="font-semibold text-slate-300">Thermal Packaging Slips</div>
-                <div className="text-slate-500 text-[11px] mt-1">
-                  Ready-to-print 4x6" thermal labels with barcode, customer address, and vendor manifest.
-                </div>
-              </div>
+            <div className="mt-4 pt-3 border-t border-border flex justify-end">
+              <Link href="/seller/orders">
+                <Button size="sm" variant="outline" className="text-xs border-border">
+                  Process Shipments
+                </Button>
+              </Link>
             </div>
-          </div>
-
-          <div className="mt-4 pt-3 border-t border-slate-800 flex justify-end">
-            <Link href="/seller/orders">
-              <Button size="sm" variant="outline" className="text-xs border-slate-700">
-                Process Shipments
-              </Button>
-            </Link>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Store Autonomy & Holiday Mode */}
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
-                <Palmtree className="h-5 w-5" />
+        <Card className="border-border bg-card shadow-xs flex flex-col justify-between">
+          <CardContent className="p-5">
+            <div>
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
+                  <Palmtree className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-foreground">Vacation Mode</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Planning a holiday or temporary break?
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-sm font-bold text-white">Vacation Mode</h3>
-                <p className="text-xs text-slate-400">
-                  Planning a holiday or temporary break?
-                </p>
-              </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                Enabling vacation mode temporarily removes your listings from search so your fulfillment score isn&apos;t penalized.
+              </p>
             </div>
-            <p className="text-xs text-slate-400 mt-3">
-              Enabling vacation mode temporarily removes your listings from search so your fulfillment score isn&apos;t penalized.
-            </p>
-          </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-300">
-              {profile?.isHolidayMode ? "Active" : "Disabled"}
-            </span>
-            <Button
-              size="sm"
-              variant={profile?.isHolidayMode ? "destructive" : "outline"}
-              onClick={handleToggleHolidayMode}
-              disabled={isUpdatingProfile}
-              className="text-xs"
-            >
-              {profile?.isHolidayMode ? "Deactivate" : "Activate"}
-            </Button>
-          </div>
-        </div>
+            <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
+              <span className="text-xs font-semibold text-foreground">
+                Status: {profile?.isHolidayMode ? "Active" : "Disabled"}
+              </span>
+              <Button
+                size="sm"
+                variant={profile?.isHolidayMode ? "destructive" : "outline"}
+                onClick={handleToggleHolidayMode}
+                disabled={isUpdatingProfile}
+                className="text-xs"
+              >
+                {profile?.isHolidayMode ? "Deactivate" : "Activate"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Recent SubOrders Table */}
-      <div className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden shadow-sm">
-        <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+      <Card className="border-border bg-card shadow-xs overflow-hidden">
+        <CardHeader className="p-5 border-b border-border flex flex-row items-center justify-between space-y-0 bg-muted/20">
           <div>
-            <h2 className="text-sm font-bold text-white">Recent Orders</h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <CardTitle className="text-base font-bold text-foreground">Recent Orders</CardTitle>
+            <CardDescription className="text-xs text-muted-foreground mt-0.5">
               SubOrders assigned to your shop
-            </p>
+            </CardDescription>
           </div>
           <Link href="/seller/orders">
-            <Button size="sm" variant="ghost" className="text-xs text-slate-400 hover:text-white">
+            <Button size="sm" variant="ghost" className="text-xs text-muted-foreground hover:text-foreground">
               View All Orders
             </Button>
           </Link>
-        </div>
+        </CardHeader>
 
-        {recentOrders.length === 0 ? (
-          <div className="p-12 text-center text-slate-400 text-xs">
-            <ShoppingBag className="h-8 w-8 text-slate-600 mx-auto mb-2" />
-            No customer orders received yet. Keep your catalog updated to drive sales!
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left">
-              <thead className="bg-slate-950/60 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
-                <tr>
-                  <th className="px-5 py-3">Order Number</th>
-                  <th className="px-5 py-3">Customer</th>
-                  <th className="px-5 py-3">Net Earnings</th>
-                  <th className="px-5 py-3">Status</th>
-                  <th className="px-5 py-3 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800 text-slate-300">
-                {recentOrders.map((order: any) => (
-                  <tr key={order.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="px-5 py-3.5 font-bold text-white">
-                      {order.subOrderNumber || order.orderNumber || order.id.slice(0, 8)}
-                    </td>
-                    <td className="px-5 py-3.5 text-slate-300">
-                      {order.customerName || "Customer"}
-                    </td>
-                    <td className="px-5 py-3.5 font-bold text-emerald-400">
-                      ৳{order.sellerEarnings ? order.sellerEarnings.toLocaleString() : 0}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <Badge
-                        variant={
-                          order.status === "DELIVERED"
-                            ? "success"
-                            : order.status === "CANCELLED"
-                            ? "destructive"
-                            : "outline"
-                        }
-                        className="text-[10px]"
-                      >
-                        {order.status}
-                      </Badge>
-                    </td>
-                    <td className="px-5 py-3.5 text-right">
-                      <Link href={`/seller/orders/${order.id}`}>
-                        <Button size="sm" variant="outline" className="h-7 text-[11px] border-slate-700">
-                          Manage
-                        </Button>
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+        <CardContent className="p-0">
+          {recentOrders.length === 0 ? (
+            <div className="p-12 text-center text-muted-foreground text-xs space-y-2">
+              <ShoppingBag className="h-8 w-8 mx-auto text-muted-foreground/60" />
+              <p className="font-semibold text-foreground">No customer orders received yet</p>
+              <p className="text-[11px]">Keep your catalog updated to drive sales and visibility!</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-muted/40">
+                  <TableRow className="border-border">
+                    <TableHead className="text-xs font-semibold">Order Number</TableHead>
+                    <TableHead className="text-xs font-semibold">Customer</TableHead>
+                    <TableHead className="text-xs font-semibold">Net Earnings</TableHead>
+                    <TableHead className="text-xs font-semibold">Status</TableHead>
+                    <TableHead className="text-xs font-semibold text-right">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentOrders.map((order: any) => (
+                    <TableRow key={order.id} className="border-border hover:bg-muted/40 transition-colors">
+                      <TableCell className="font-bold text-foreground">
+                        {order.subOrderNumber || order.orderNumber || order.id.slice(0, 8)}
+                      </TableCell>
+                      <TableCell className="text-foreground">
+                        {order.customerName || "Customer"}
+                      </TableCell>
+                      <TableCell className="font-bold text-emerald-600 dark:text-emerald-400">
+                        ৳{order.sellerEarnings ? order.sellerEarnings.toLocaleString() : 0}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            order.status === "DELIVERED"
+                              ? "success"
+                              : order.status === "CANCELLED"
+                              ? "destructive"
+                              : order.status === "SHIPPED"
+                              ? "brand"
+                              : "outline"
+                          }
+                          className="text-[10px]"
+                        >
+                          {order.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Link href={`/seller/orders/${order.id}`}>
+                          <Button size="sm" variant="outline" className="h-7 text-[11px] border-border hover:bg-muted">
+                            Manage
+                          </Button>
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

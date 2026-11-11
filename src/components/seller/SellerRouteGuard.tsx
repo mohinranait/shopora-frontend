@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -32,9 +32,9 @@ export function SellerRouteGuard({ children }: { children: React.ReactNode }) {
 
   if (isAuthorized === null) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white">
-        <Loader2 className="h-8 w-8 animate-spin text-brand-500 mb-3" />
-        <p className="text-sm text-slate-400 font-medium">Verifying seller access...</p>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center text-foreground">
+        <Loader2 className="h-8 w-8 animate-spin text-brand mb-3" />
+        <p className="text-sm text-muted-foreground font-medium">Verifying seller access...</p>
       </div>
     );
   }

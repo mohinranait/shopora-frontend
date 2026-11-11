@@ -103,13 +103,13 @@ export default function SellerProductsPage() {
   return (
     <div className="space-y-6">
       {/* Page Title & Add Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
+          <h1 className="text-xl sm:text-2xl font-black text-foreground tracking-tight flex items-center gap-2.5">
             <Package className="h-6 w-6 text-brand-500" />
             Product Catalog
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Manage your store inventory, stock levels, dynamic variants, and listing approval status.
           </p>
         </div>
@@ -120,7 +120,7 @@ export default function SellerProductsPage() {
             variant="outline"
             onClick={() => refetch()}
             disabled={isFetching}
-            className="border-slate-800 text-xs h-9"
+            className="border-border text-xs h-9"
           >
             <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isFetching ? "animate-spin" : ""}`} />
             Refresh
@@ -150,7 +150,7 @@ export default function SellerProductsPage() {
 
       {/* Filter Tabs & Search Bar */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-        <div className="flex flex-wrap items-center gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800">
+        <div className="flex flex-wrap items-center gap-1.5 bg-card p-1 rounded-xl border border-border">
           {[
             { id: "ALL", label: "All Items", count: counts?.all ?? totalItems },
             {
@@ -179,12 +179,12 @@ export default function SellerProductsPage() {
               onClick={() => handleFilterStatusChange(tab.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
                 filterStatus === tab.id
-                  ? "bg-brand-600 text-white"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800/60"
+                  ? "bg-brand-600 text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >
               <span>{tab.label}</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800/80 text-slate-300">
+              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-muted border border-border text-foreground">
                 {tab.count}
               </span>
             </button>
@@ -192,29 +192,29 @@ export default function SellerProductsPage() {
         </div>
 
         <div className="relative min-w-[220px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search by title, SKU..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+            className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-brand-500"
           />
         </div>
       </div>
 
       {/* Products Table */}
-      <div className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden shadow-sm">
+      <div className="rounded-2xl bg-card border border-border overflow-hidden shadow-sm">
         {isLoading ? (
-          <div className="p-12 text-center text-slate-400 text-xs">
+          <div className="p-12 text-center text-muted-foreground text-xs">
             <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2 text-brand-500" />
             Loading catalog products...
           </div>
         ) : products.length === 0 ? (
-          <div className="p-16 text-center text-slate-400 text-xs">
-            <Package className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-            <p className="font-semibold text-slate-300">No products found matching criteria</p>
-            <p className="text-slate-500 mt-1">Add your first product to start selling on Shopora.</p>
+          <div className="p-16 text-center text-muted-foreground text-xs">
+            <Package className="h-10 w-10 text-muted-foreground/60 mx-auto mb-3" />
+            <p className="font-semibold text-foreground">No products found matching criteria</p>
+            <p className="text-muted-foreground mt-1">Add your first product to start selling on Shopora.</p>
             <Link href="/seller/products/new" className="inline-block mt-4">
               <Button size="sm" variant="brand" className="text-xs">
                 <Plus className="h-4 w-4 mr-1" /> Add Product Now
@@ -225,7 +225,7 @@ export default function SellerProductsPage() {
           <>
             <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
-              <thead className="bg-slate-950/60 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
+              <thead className="bg-muted/40 text-muted-foreground uppercase tracking-wider text-[10px] border-b border-border">
                 <tr>
                   <th className="px-5 py-3">Product</th>
                   <th className="px-5 py-3">Price</th>
@@ -235,17 +235,17 @@ export default function SellerProductsPage() {
                   <th className="px-5 py-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800 text-slate-300">
+              <tbody className="divide-y divide-slate-800 text-foreground">
                 {products.map((p: IProductItem) => {
                   const isLow = p.stock <= (p.lowStockThreshold || 5);
                   const isOut = p.stock === 0;
 
                   return (
-                    <tr key={p.id} className="hover:bg-slate-800/40 transition-colors">
+                    <tr key={p.id} className="hover:bg-muted/40 transition-colors">
                       {/* Product Thumbnail & Title */}
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
-                          <div className="h-11 w-11 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden shrink-0 relative flex items-center justify-center">
+                          <div className="h-11 w-11 rounded-lg bg-muted border border-border overflow-hidden shrink-0 relative flex items-center justify-center">
                             {(typeof p.mainImage === "string" ? p.mainImage : p.mainImage?.media?.url) ? (
                               <Image
                                 src={typeof p.mainImage === "string" ? p.mainImage : p.mainImage?.media?.url || ""}
@@ -255,14 +255,14 @@ export default function SellerProductsPage() {
                                 className="object-cover"
                               />
                             ) : (
-                              <Package className="h-5 w-5 text-slate-600" />
+                              <Package className="h-5 w-5 text-muted-foreground/60" />
                             )}
                           </div>
                           <div className="min-w-0 max-w-xs">
-                            <h3 className="font-bold text-white truncate hover:text-brand-400">
+                            <h3 className="font-bold text-foreground truncate hover:text-brand-400">
                               {p.name}
                             </h3>
-                            <div className="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5">
+                            <div className="text-[11px] text-muted-foreground flex items-center gap-2 mt-0.5">
                               <span>SKU: {p.sku || "N/A"}</span>
                               {p.productType === "VARIABLE" && (
                                 <Badge variant="outline" className="text-[9px] px-1 py-0 h-4 border-indigo-500/40 text-indigo-300">
@@ -275,10 +275,10 @@ export default function SellerProductsPage() {
                       </td>
 
                       {/* Price */}
-                      <td className="px-5 py-3.5 font-bold text-white">
+                      <td className="px-5 py-3.5 font-bold text-foreground">
                         ৳{p.basePrice.toLocaleString()}
                         {p.comparePrice && p.comparePrice > p.basePrice && (
-                          <span className="block text-[10px] text-slate-500 line-through font-normal">
+                          <span className="block text-[10px] text-muted-foreground line-through font-normal">
                             ৳{p.comparePrice.toLocaleString()}
                           </span>
                         )}
@@ -341,7 +341,7 @@ export default function SellerProductsPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="h-7 w-7 p-0 border-slate-700 text-slate-300 hover:text-white"
+                              className="h-7 w-7 p-0 border-border text-foreground hover:text-foreground"
                               title="Edit product"
                             >
                               <Edit className="h-3.5 w-3.5" />
@@ -353,7 +353,7 @@ export default function SellerProductsPage() {
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                className="h-7 w-7 p-0 text-slate-400 hover:text-white"
+                                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
                                 title="View on storefront"
                               >
                                 <ExternalLink className="h-3.5 w-3.5" />

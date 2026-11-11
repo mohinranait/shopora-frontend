@@ -102,8 +102,8 @@ export default function SellerSettingsPage() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-20 bg-slate-900 rounded-2xl border border-slate-800" />
-        <div className="h-96 bg-slate-900 rounded-2xl border border-slate-800" />
+        <div className="h-20 bg-card rounded-2xl border border-border" />
+        <div className="h-96 bg-card rounded-2xl border border-border" />
       </div>
     );
   }
@@ -111,13 +111,13 @@ export default function SellerSettingsPage() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 pb-12">
       {/* Title & Save */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
+          <h1 className="text-xl sm:text-2xl font-black text-foreground tracking-tight flex items-center gap-2.5">
             <Settings className="h-6 w-6 text-brand-500" />
             Store Settings & Autonomy
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Configure your storefront branding, vacation / holiday mode, contact info, and payout credentials.
           </p>
         </div>
@@ -134,7 +134,7 @@ export default function SellerSettingsPage() {
       </div>
 
       {/* Vacation / Holiday Mode Card */}
-      <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-amber-950/20 border border-slate-800 shadow-sm space-y-4">
+      <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-amber-950/20 border border-border shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
             <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 shrink-0">
@@ -142,18 +142,18 @@ export default function SellerSettingsPage() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-white">Store Vacation / Holiday Mode</h3>
+                <h3 className="text-sm font-bold text-foreground">Store Vacation / Holiday Mode</h3>
                 {isHolidayMode ? (
                   <Badge variant="outline" className="border-amber-500/40 bg-amber-500/10 text-amber-300 text-[10px]">
                     Active
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="border-slate-700 text-slate-400 text-[10px]">
+                  <Badge variant="outline" className="border-border text-muted-foreground text-[10px]">
                     Disabled
                   </Badge>
                 )}
               </div>
-              <p className="text-xs text-slate-400 mt-1 max-w-xl">
+              <p className="text-xs text-muted-foreground mt-1 max-w-xl">
                 When activated, your catalog items will be temporarily hidden from storefront searches and new orders will be paused. Existing pending orders must still be fulfilled.
               </p>
             </div>
@@ -166,12 +166,12 @@ export default function SellerSettingsPage() {
               onChange={(e) => setIsHolidayMode(e.target.checked)}
               className="sr-only peer"
             />
-            <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+            <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
           </label>
         </div>
 
         {isHolidayMode && (
-          <div className="pt-3 border-t border-slate-800/80 space-y-2">
+          <div className="pt-3 border-t border-border space-y-2">
             <label className="block text-xs font-semibold text-amber-300">
               Vacation Announcement Notice for Customers
             </label>
@@ -180,7 +180,7 @@ export default function SellerSettingsPage() {
               value={holidayMessage}
               onChange={(e) => setHolidayMessage(e.target.value)}
               placeholder="e.g. We are on holiday for Eid until May 5. All new orders will be dispatched immediately upon reopening."
-              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+              className="w-full px-3 py-2 rounded-xl bg-background border border-border text-xs text-foreground placeholder-slate-500 focus:outline-none focus:border-amber-500"
             />
           </div>
         )}
@@ -189,15 +189,15 @@ export default function SellerSettingsPage() {
       {/* Store Profile & Branding */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Basic Store Info */}
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-          <div className="flex items-center gap-2 text-sm font-bold text-white border-b border-slate-800 pb-3">
+        <div className="p-5 rounded-2xl bg-card border border-border space-y-4">
+          <div className="flex items-center gap-2 text-sm font-bold text-foreground border-b border-border pb-3">
             <Store className="h-4 w-4 text-brand-500" />
             <span>Store Profile & Identification</span>
           </div>
 
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 Store Name *
               </label>
               <input
@@ -205,24 +205,24 @@ export default function SellerSettingsPage() {
                 value={storeName}
                 onChange={(e) => setStoreName(e.target.value)}
                 required
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-brand-500"
+                className="w-full px-3 py-2 rounded-xl bg-background border border-border text-xs text-foreground focus:outline-none focus:border-brand-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 Store URL Slug (shopora.com/stores/slug)
               </label>
               <input
                 type="text"
                 value={storeSlug}
                 onChange={(e) => setStoreSlug(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-brand-500"
+                className="w-full px-3 py-2 rounded-xl bg-background border border-border text-xs text-foreground focus:outline-none focus:border-brand-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 Store Contact Phone
               </label>
               <input
@@ -230,12 +230,12 @@ export default function SellerSettingsPage() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="017XXXXXXXX"
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-brand-500"
+                className="w-full px-3 py-2 rounded-xl bg-background border border-border text-xs text-foreground focus:outline-none focus:border-brand-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 Business / Warehouse Address
               </label>
               <textarea
@@ -243,15 +243,15 @@ export default function SellerSettingsPage() {
                 value={businessAddress}
                 onChange={(e) => setBusinessAddress(e.target.value)}
                 placeholder="Warehouse pickup address for couriers"
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-brand-500"
+                className="w-full px-3 py-2 rounded-xl bg-background border border-border text-xs text-foreground focus:outline-none focus:border-brand-500"
               />
             </div>
           </div>
         </div>
 
         {/* Branding & Media */}
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-          <div className="flex items-center gap-2 text-sm font-bold text-white border-b border-slate-800 pb-3">
+        <div className="p-5 rounded-2xl bg-card border border-border space-y-4">
+          <div className="flex items-center gap-2 text-sm font-bold text-foreground border-b border-border pb-3">
             <ImageIcon className="h-4 w-4 text-brand-500" />
             <span>Store Logo & Banner</span>
           </div>
@@ -259,11 +259,11 @@ export default function SellerSettingsPage() {
           <div className="space-y-4">
             {/* Logo Picker */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-foreground mb-1.5">
                 Store Logo
               </label>
               <div className="flex items-center gap-4">
-                <div className="h-16 w-16 rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden relative flex items-center justify-center shrink-0">
+                <div className="h-16 w-16 rounded-2xl bg-background border border-border overflow-hidden relative flex items-center justify-center shrink-0">
                   {storeLogo ? (
                     <Image
                       src={storeLogo}
@@ -273,7 +273,7 @@ export default function SellerSettingsPage() {
                       className="object-cover"
                     />
                   ) : (
-                    <Store className="h-8 w-8 text-slate-700" />
+                    <Store className="h-8 w-8 text-muted-foreground/70" />
                   )}
                 </div>
                 <Button
@@ -281,7 +281,7 @@ export default function SellerSettingsPage() {
                   size="sm"
                   variant="outline"
                   onClick={() => setMediaTarget("logo")}
-                  className="text-xs border-slate-700 gap-1.5"
+                  className="text-xs border-border gap-1.5"
                 >
                   <Upload className="h-3.5 w-3.5" />
                   {storeLogo ? "Change Logo" : "Upload Logo"}
@@ -291,10 +291,10 @@ export default function SellerSettingsPage() {
 
             {/* Banner Picker */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-foreground mb-1.5">
                 Store Banner
               </label>
-              <div className="h-28 rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden relative flex items-center justify-center">
+              <div className="h-28 rounded-2xl bg-background border border-border overflow-hidden relative flex items-center justify-center">
                 {storeBanner ? (
                   <Image
                     src={storeBanner}
@@ -304,7 +304,7 @@ export default function SellerSettingsPage() {
                     className="object-cover"
                   />
                 ) : (
-                  <div className="text-center text-slate-600 text-xs">
+                  <div className="text-center text-muted-foreground/60 text-xs">
                     <ImageIcon className="h-6 w-6 mx-auto mb-1" />
                     No banner set
                   </div>
@@ -316,7 +316,7 @@ export default function SellerSettingsPage() {
                   size="sm"
                   variant="outline"
                   onClick={() => setMediaTarget("banner")}
-                  className="text-xs border-slate-700 gap-1.5"
+                  className="text-xs border-border gap-1.5"
                 >
                   <Upload className="h-3.5 w-3.5" />
                   {storeBanner ? "Change Banner" : "Upload Banner"}
@@ -328,14 +328,14 @@ export default function SellerSettingsPage() {
       </div>
 
       {/* Payout & Financial Account Details */}
-      <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-        <div className="flex items-center gap-2 text-sm font-bold text-white border-b border-slate-800 pb-3">
+      <div className="p-5 rounded-2xl bg-card border border-border space-y-4">
+        <div className="flex items-center gap-2 text-sm font-bold text-foreground border-b border-border pb-3">
           <Building2 className="h-4 w-4 text-emerald-400" />
           <span>Default Payout Account Information</span>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-foreground mb-1">
             Bank Account or Mobile Financial Service (bKash/Nagad) Details
           </label>
           <textarea
@@ -343,9 +343,9 @@ export default function SellerSettingsPage() {
             value={bankAccountDetails}
             onChange={(e) => setBankAccountDetails(e.target.value)}
             placeholder="e.g. Dutch-Bangla Bank Ltd, Account Name: John Doe, Account: 123.456.789, Branch: Gulshan OR bKash Personal: 017XXXXXXXX"
-            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-brand-500"
+            className="w-full px-3 py-2 rounded-xl bg-background border border-border text-xs text-foreground focus:outline-none focus:border-brand-500"
           />
-          <p className="text-[11px] text-slate-500 mt-1">
+          <p className="text-[11px] text-muted-foreground mt-1">
             These payout details will be pre-filled when you request wallet withdrawals.
           </p>
         </div>

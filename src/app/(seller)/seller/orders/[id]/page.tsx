@@ -113,17 +113,17 @@ function SellerSubOrderDetailInner() {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-3">
         <Loader2 className="h-8 w-8 text-brand-500 animate-spin" />
-        <p className="text-xs text-slate-400">Loading sub-order details...</p>
+        <p className="text-xs text-muted-foreground">Loading sub-order details...</p>
       </div>
     );
   }
 
   if (!subOrder) {
     return (
-      <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl space-y-3">
+      <div className="p-8 text-center bg-card border border-border rounded-2xl space-y-3">
         <AlertCircle className="h-10 w-10 text-rose-500 mx-auto" />
-        <h2 className="text-base font-bold text-white">SubOrder Not Found</h2>
-        <p className="text-xs text-slate-400">
+        <h2 className="text-base font-bold text-foreground">SubOrder Not Found</h2>
+        <p className="text-xs text-muted-foreground">
           The requested package ID does not exist or belongs to another vendor.
         </p>
         <Link href="/seller/orders">
@@ -143,16 +143,16 @@ function SellerSubOrderDetailInner() {
   return (
     <div className="space-y-6">
       {/* Header bar with Back button and Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
         <div className="flex items-center gap-3">
           <Link href="/seller/orders">
-            <Button size="sm" variant="outline" className="h-9 w-9 p-0 border-slate-700">
+            <Button size="sm" variant="outline" className="h-9 w-9 p-0 border-border">
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
                 Package #{subOrder.subOrderNumber || subOrder.id.slice(0, 8)}
               </h1>
               <Badge
@@ -170,9 +170,9 @@ function SellerSubOrderDetailInner() {
                 {subOrder.status}
               </Badge>
             </div>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400 mt-0.5">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground mt-0.5">
               <span>
-                Master Order: <strong className="text-white font-mono">{subOrder.orderNumber || subOrder.order?.orderNumber || `#${subOrder.orderId.slice(0, 8)}`}</strong>
+                Master Order: <strong className="text-foreground font-mono">{subOrder.orderNumber || subOrder.order?.orderNumber || `#${subOrder.orderId.slice(0, 8)}`}</strong>
               </span>
               <span>•</span>
               <span>
@@ -196,7 +196,7 @@ function SellerSubOrderDetailInner() {
             variant="outline"
             onClick={handleFetchAndPrintSlip}
             disabled={isLoadingSlip}
-            className="text-xs border-slate-700 gap-1.5"
+            className="text-xs border-border gap-1.5"
           >
             <Printer className="h-3.5 w-3.5 text-sky-400" />
             {isLoadingSlip ? "Generating Slip..." : "Thermal Packaging Slip"}
@@ -208,15 +208,15 @@ function SellerSubOrderDetailInner() {
         {/* Left 2 Cols: Items & Logistics */}
         <div className="lg:col-span-2 space-y-6">
           {/* Logistics & Courier Automation Box */}
-          <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-indigo-950/30 border border-slate-800 shadow-sm space-y-4">
+          <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-indigo-950/30 border border-border shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-2.5 rounded-xl bg-sky-500/10 text-sky-400">
                   <Truck className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white">Courier Logistics & Booking</h3>
-                  <p className="text-xs text-slate-400">
+                  <h3 className="text-sm font-bold text-foreground">Courier Logistics & Booking</h3>
+                  <p className="text-xs text-muted-foreground">
                     Direct automated consignment dispatch (Steadfast Courier / Pathao)
                   </p>
                 </div>
@@ -235,22 +235,22 @@ function SellerSubOrderDetailInner() {
 
             {subOrder.consignmentId ? (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800/80">
-                  <span className="text-[10px] uppercase font-semibold text-slate-400">Courier Partner</span>
-                  <div className="text-xs font-bold text-white mt-1">{subOrder.courierName || "Steadfast Courier"}</div>
+                <div className="p-3 rounded-xl bg-muted/40 border border-border">
+                  <span className="text-[10px] uppercase font-semibold text-muted-foreground">Courier Partner</span>
+                  <div className="text-xs font-bold text-foreground mt-1">{subOrder.courierName || "Steadfast Courier"}</div>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800/80">
-                  <span className="text-[10px] uppercase font-semibold text-slate-400">Consignment ID</span>
+                <div className="p-3 rounded-xl bg-muted/40 border border-border">
+                  <span className="text-[10px] uppercase font-semibold text-muted-foreground">Consignment ID</span>
                   <div className="text-xs font-mono font-bold text-sky-400 mt-1">{subOrder.consignmentId}</div>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800/80">
-                  <span className="text-[10px] uppercase font-semibold text-slate-400">Tracking Code</span>
+                <div className="p-3 rounded-xl bg-muted/40 border border-border">
+                  <span className="text-[10px] uppercase font-semibold text-muted-foreground">Tracking Code</span>
                   <div className="text-xs font-mono font-bold text-emerald-400 mt-1">{subOrder.trackingNumber || "N/A"}</div>
                 </div>
               </div>
             ) : (
-              <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-950/50 border border-slate-800">
-                <div className="text-xs text-slate-300">
+              <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-muted/30 border border-border">
+                <div className="text-xs text-foreground">
                   Ready to dispatch this vendor package? Book a courier pickup with Steadfast in 1 click.
                 </div>
                 <Button
@@ -268,13 +268,13 @@ function SellerSubOrderDetailInner() {
           </div>
 
           {/* Line Items Table */}
-          <div className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-              <h2 className="text-sm font-bold text-white flex items-center gap-2">
+          <div className="rounded-2xl bg-card border border-border overflow-hidden">
+            <div className="p-4 border-b border-border flex items-center justify-between">
+              <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
                 <Package className="h-4 w-4 text-brand-500" />
                 Package Items ({subOrder.items?.length || 0})
               </h2>
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-muted-foreground">
                 Package Subtotal: ৳{packageTotal.toLocaleString()}
               </span>
             </div>
@@ -292,7 +292,7 @@ function SellerSubOrderDetailInner() {
                 return (
                   <div key={item.id} className="p-4 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="h-12 w-12 rounded-xl bg-slate-800 border border-slate-700 overflow-hidden shrink-0 relative flex items-center justify-center">
+                      <div className="h-12 w-12 rounded-xl bg-muted border border-border overflow-hidden shrink-0 relative flex items-center justify-center">
                         {itemImg ? (
                           <Image
                             src={itemImg}
@@ -302,27 +302,27 @@ function SellerSubOrderDetailInner() {
                             className="object-cover"
                           />
                         ) : (
-                          <Package className="h-6 w-6 text-slate-600" />
+                          <Package className="h-6 w-6 text-muted-foreground/60" />
                         )}
                       </div>
                       <div className="min-w-0">
-                        <h4 className="font-bold text-white text-xs truncate">
+                        <h4 className="font-bold text-foreground text-xs truncate">
                           {itemName}
                         </h4>
                         {(variantLabel || itemSku) && (
-                          <p className="text-[11px] text-slate-400 mt-0.5">
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
                             {variantLabel ? `Variant: ${variantLabel} ` : ""}
                             {itemSku ? `(SKU: ${itemSku})` : ""}
                           </p>
                         )}
-                        <div className="text-[11px] text-slate-400 mt-0.5">
+                        <div className="text-[11px] text-muted-foreground mt-0.5">
                           ৳{itemPrice.toLocaleString()} × {itemQty} qty
                         </div>
                       </div>
                     </div>
 
                     <div className="text-right shrink-0">
-                      <div className="font-bold text-white text-xs">
+                      <div className="font-bold text-foreground text-xs">
                         ৳{lineTotal.toLocaleString()}
                       </div>
                     </div>
@@ -333,11 +333,11 @@ function SellerSubOrderDetailInner() {
           </div>
 
           {/* 7-Day Escrow Financial Information Box */}
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+          <div className="p-5 rounded-2xl bg-card border border-border space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5 text-emerald-400" />
-                <h3 className="text-sm font-bold text-white">7-Day Escrow Protection</h3>
+                <h3 className="text-sm font-bold text-foreground">7-Day Escrow Protection</h3>
               </div>
               <Badge
                 variant={
@@ -353,7 +353,7 @@ function SellerSubOrderDetailInner() {
               </Badge>
             </div>
 
-            <div className="text-xs text-slate-300 leading-relaxed">
+            <div className="text-xs text-foreground leading-relaxed">
               Upon successful customer delivery, earnings are held in escrow for a 7-day return/dispute window before being automatically released into your withdrawable wallet balance.
             </div>
 
@@ -381,10 +381,10 @@ function SellerSubOrderDetailInner() {
         {/* Right 1 Col: Delivery Info, Financial Summary & Status Control */}
         <div className="space-y-6">
           {/* Fulfillment Status Control */}
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+          <div className="p-5 rounded-2xl bg-card border border-border space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-white">Update Shipment Status</h3>
-              <span className="text-[10px] text-slate-400">Step-by-Step</span>
+              <h3 className="text-sm font-bold text-foreground">Update Shipment Status</h3>
+              <span className="text-[10px] text-muted-foreground">Step-by-Step</span>
             </div>
             <div className="space-y-2">
               {(() => {
@@ -419,13 +419,13 @@ function SellerSubOrderDetailInner() {
                     return (
                       <div
                         key={step.status}
-                        className="w-full py-2 px-3 rounded-xl text-xs flex items-center justify-between bg-brand-600 text-white font-bold shadow-sm"
+                        className="w-full py-2 px-3 rounded-xl text-xs flex items-center justify-between bg-brand-600 text-foreground font-bold shadow-sm"
                       >
                         <span className="flex items-center gap-1.5">
                           <Clock className="h-3.5 w-3.5 text-brand-200" />
                           Current: {step.label}
                         </span>
-                        <Badge variant="outline" className="border-white/40 text-white text-[10px]">
+                        <Badge variant="outline" className="border-white/40 text-foreground text-[10px]">
                           Active
                         </Badge>
                       </div>
@@ -438,11 +438,11 @@ function SellerSubOrderDetailInner() {
                         key={step.status}
                         onClick={() => handleStatusChange(step.status)}
                         disabled={isUpdatingStatus}
-                        className="w-full py-2.5 px-3 rounded-xl text-xs font-bold text-left transition-all flex items-center justify-between bg-gradient-to-r from-brand-600 to-indigo-600 text-white hover:brightness-110 shadow-md ring-1 ring-brand-400/30"
+                        className="w-full py-2.5 px-3 rounded-xl text-xs font-bold text-left transition-all flex items-center justify-between bg-gradient-to-r from-brand-600 to-indigo-600 text-foreground hover:brightness-110 shadow-md ring-1 ring-brand-400/30"
                       >
                         <div className="flex flex-col">
                           <span>{step.action}</span>
-                          <span className="text-[10px] font-normal text-white/80">{step.description}</span>
+                          <span className="text-[10px] font-normal text-foreground/80">{step.description}</span>
                         </div>
                         <ArrowLeft className="h-4 w-4 rotate-180" />
                       </button>
@@ -452,10 +452,10 @@ function SellerSubOrderDetailInner() {
                   return (
                     <div
                       key={step.status}
-                      className="w-full py-2 px-3 rounded-xl text-xs flex items-center justify-between bg-slate-800/40 text-slate-500 cursor-not-allowed"
+                      className="w-full py-2 px-3 rounded-xl text-xs flex items-center justify-between bg-muted/40 text-muted-foreground cursor-not-allowed"
                     >
                       <span>{step.label}</span>
-                      <span className="text-[10px] text-slate-600">Locked</span>
+                      <span className="text-[10px] text-muted-foreground/60">Locked</span>
                     </div>
                   );
                 });
@@ -464,29 +464,29 @@ function SellerSubOrderDetailInner() {
           </div>
 
           {/* Delivery Information (Customer Privacy Protected) */}
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+          <div className="p-5 rounded-2xl bg-card border border-border space-y-3">
+            <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-emerald-400" />
               Delivery Destination
             </h3>
-            <div className="space-y-2 pt-1 text-xs text-slate-300">
-              <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-2.5">
+            <div className="space-y-2 pt-1 text-xs text-foreground">
+              <div className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Customer Details:</span>
+                  <span className="text-muted-foreground">Customer Details:</span>
                   <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-[10px]">
                     Privacy Protected
                   </Badge>
                 </div>
                 {subOrder.destinationCity && (
-                  <div className="flex justify-between text-slate-300">
-                    <span className="text-slate-400">Destination City:</span>
-                    <span className="font-semibold text-white">
+                  <div className="flex justify-between text-foreground">
+                    <span className="text-muted-foreground">Destination City:</span>
+                    <span className="font-semibold text-foreground">
                       {subOrder.destinationCity}
                       {subOrder.destinationState ? `, ${subOrder.destinationState}` : ""}
                     </span>
                   </div>
                 )}
-                <p className="text-[11px] text-slate-400 leading-relaxed pt-2 border-t border-slate-800/80">
+                <p className="text-[11px] text-muted-foreground leading-relaxed pt-2 border-t border-border">
                   Customer phone number and street address are hidden from sellers. All delivery coordinates are securely transmitted directly to courier partner upon parcel dispatch.
                 </p>
               </div>
@@ -494,30 +494,30 @@ function SellerSubOrderDetailInner() {
           </div>
 
           {/* Financials & Payout Breakdown */}
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+          <div className="p-5 rounded-2xl bg-card border border-border space-y-3">
+            <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-emerald-400" />
               Financial Breakdown
             </h3>
             <div className="space-y-2 text-xs pt-1">
-              <div className="flex justify-between text-slate-400">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Items Subtotal:</span>
-                <span className="text-white font-medium">৳{packageTotal.toLocaleString()}</span>
+                <span className="text-foreground font-medium">৳{packageTotal.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between text-slate-400">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Package Shipping Fee:</span>
-                <span className="text-white font-medium">
+                <span className="text-foreground font-medium">
                   ৳{packageShipping.toLocaleString()}
                 </span>
               </div>
-              <div className="flex justify-between text-slate-400">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Platform Commission:</span>
                 <span className="text-rose-400 font-medium">
                   -৳{commission.toLocaleString()}
                 </span>
               </div>
-              <div className="pt-2 border-t border-slate-800 flex justify-between text-sm font-bold">
-                <span className="text-white">Net Seller Payout:</span>
+              <div className="pt-2 border-t border-border flex justify-between text-sm font-bold">
+                <span className="text-foreground">Net Seller Payout:</span>
                 <span className="text-emerald-400">৳{netEarnings.toLocaleString()}</span>
               </div>
             </div>

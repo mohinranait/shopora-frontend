@@ -86,13 +86,13 @@ export default function SellerWalletPage() {
   return (
     <div className="space-y-6">
       {/* Title & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
+          <h1 className="text-xl sm:text-2xl font-black text-foreground tracking-tight flex items-center gap-2.5">
             <Wallet className="h-6 w-6 text-brand-500" />
             Wallet & Escrow Settlement
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Manage your earnings, 7-day post-delivery escrow holdings, and withdrawal payout requests.
           </p>
         </div>
@@ -106,7 +106,7 @@ export default function SellerWalletPage() {
               refetchWallet();
             }}
             disabled={isLoading}
-            className="border-slate-800 text-xs h-9"
+            className="border-border text-xs h-9"
           >
             <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isLoading ? "animate-spin" : ""}`} />
             Refresh
@@ -128,23 +128,23 @@ export default function SellerWalletPage() {
       {/* Financial Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Available for Withdrawal */}
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-sm relative overflow-hidden">
+        <div className="p-5 rounded-2xl bg-card border border-border shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400">Available to Withdraw</span>
+            <span className="text-xs font-semibold text-muted-foreground">Available to Withdraw</span>
             <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
               <Wallet className="h-5 w-5" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-black text-white">
+            <div className="text-2xl sm:text-3xl font-black text-foreground">
               ৳{availableBalance.toLocaleString()}
             </div>
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800 text-[11px] text-slate-400">
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-border text-[11px] text-muted-foreground">
               <span>Min. payout: ৳500</span>
               <button
                 onClick={() => setShowPayoutModal(true)}
                 disabled={availableBalance < 500}
-                className="text-emerald-400 font-bold hover:underline disabled:text-slate-600 disabled:no-underline"
+                className="text-emerald-400 font-bold hover:underline disabled:text-muted-foreground/60 disabled:no-underline"
               >
                 Withdraw Funds
               </button>
@@ -153,9 +153,9 @@ export default function SellerWalletPage() {
         </div>
 
         {/* 7-Day Escrow Hold */}
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-sm relative overflow-hidden">
+        <div className="p-5 rounded-2xl bg-card border border-border shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400">7-Day Escrow Protection</span>
+            <span className="text-xs font-semibold text-muted-foreground">7-Day Escrow Protection</span>
             <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
               <Clock className="h-5 w-5" />
             </div>
@@ -164,7 +164,7 @@ export default function SellerWalletPage() {
             <div className="text-2xl sm:text-3xl font-black text-amber-300">
               ৳{pendingBalance.toLocaleString()}
             </div>
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800 text-[11px] text-slate-400">
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-border text-[11px] text-muted-foreground">
               <span>{heldShipments.length} delivered shipment(s)</span>
               <span className="text-amber-400/90 font-medium">Releases automatically</span>
             </div>
@@ -172,45 +172,45 @@ export default function SellerWalletPage() {
         </div>
 
         {/* Escrow Policy Summary */}
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-sm flex flex-col justify-between sm:col-span-2 lg:col-span-1">
+        <div className="p-5 rounded-2xl bg-card border border-border shadow-sm flex flex-col justify-between sm:col-span-2 lg:col-span-1">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-white">
+            <div className="flex items-center gap-2 text-xs font-bold text-foreground">
               <ShieldCheck className="h-4 w-4 text-emerald-400" />
               <span>How Escrow Works</span>
             </div>
-            <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">
+            <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed">
               When a package is marked delivered, earnings enter escrow for 7 days. This allows customers to inspect their items and protects your store against fraudulent chargebacks.
             </p>
           </div>
-          <div className="text-[10px] text-slate-500 pt-2 border-t border-slate-800">
+          <div className="text-[10px] text-muted-foreground pt-2 border-t border-border">
             Automated settlement occurs daily at midnight BST.
           </div>
         </div>
       </div>
 
       {/* Active Escrow Holdings Table */}
-      <div className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden shadow-sm">
-        <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+      <div className="rounded-2xl bg-card border border-border overflow-hidden shadow-sm">
+        <div className="p-5 border-b border-border flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-bold text-white flex items-center gap-2">
+            <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
               <Clock className="h-4 w-4 text-amber-400" />
               Active Escrow Holdings ({heldShipments.length})
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               Delivered packages awaiting maturity and release into your wallet
             </p>
           </div>
         </div>
 
         {heldShipments.length === 0 ? (
-          <div className="p-12 text-center text-slate-400 text-xs">
-            <ShieldCheck className="h-8 w-8 text-slate-600 mx-auto mb-2" />
+          <div className="p-12 text-center text-muted-foreground text-xs">
+            <ShieldCheck className="h-8 w-8 text-muted-foreground/60 mx-auto mb-2" />
             No shipments currently held in escrow. All delivered orders have matured!
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
-              <thead className="bg-slate-950/60 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
+              <thead className="bg-muted/40 text-muted-foreground uppercase tracking-wider text-[10px] border-b border-border">
                 <tr>
                   <th className="px-5 py-3">SubOrder</th>
                   <th className="px-5 py-3">Delivered Date</th>
@@ -219,13 +219,13 @@ export default function SellerWalletPage() {
                   <th className="px-5 py-3">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800 text-slate-300">
+              <tbody className="divide-y divide-slate-800 text-foreground">
                 {heldShipments.map((h: any) => (
-                  <tr key={h.subOrderId} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="px-5 py-3.5 font-bold text-white">
+                  <tr key={h.subOrderId} className="hover:bg-muted/40 transition-colors">
+                    <td className="px-5 py-3.5 font-bold text-foreground">
                       {h.subOrderNumber || h.subOrderId.slice(0, 8)}
                     </td>
-                    <td className="px-5 py-3.5 text-slate-400">
+                    <td className="px-5 py-3.5 text-muted-foreground">
                       {new Date(h.deliveredAt).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
@@ -260,27 +260,27 @@ export default function SellerWalletPage() {
       </div>
 
       {/* Payout History Table */}
-      <div className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden shadow-sm">
-        <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+      <div className="rounded-2xl bg-card border border-border overflow-hidden shadow-sm">
+        <div className="p-5 border-b border-border flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-bold text-white flex items-center gap-2">
+            <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
               <ArrowUpRight className="h-4 w-4 text-emerald-400" />
               Payout Request History
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               Withdrawal transfers processed to your bank or mobile wallet
             </p>
           </div>
         </div>
 
         {payouts.length === 0 ? (
-          <div className="p-12 text-center text-slate-400 text-xs">
+          <div className="p-12 text-center text-muted-foreground text-xs">
             No payout requests made yet.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
-              <thead className="bg-slate-950/60 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
+              <thead className="bg-muted/40 text-muted-foreground uppercase tracking-wider text-[10px] border-b border-border">
                 <tr>
                   <th className="px-5 py-3">Date</th>
                   <th className="px-5 py-3">Amount</th>
@@ -289,20 +289,20 @@ export default function SellerWalletPage() {
                   <th className="px-5 py-3">Reference</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800 text-slate-300">
+              <tbody className="divide-y divide-slate-800 text-foreground">
                 {payouts.map((p: any) => (
-                  <tr key={p.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="px-5 py-3.5 text-slate-400">
+                  <tr key={p.id} className="hover:bg-muted/40 transition-colors">
+                    <td className="px-5 py-3.5 text-muted-foreground">
                       {new Date(p.createdAt).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
                         year: "numeric",
                       })}
                     </td>
-                    <td className="px-5 py-3.5 font-bold text-white">
+                    <td className="px-5 py-3.5 font-bold text-foreground">
                       ৳{p.amount.toLocaleString()}
                     </td>
-                    <td className="px-5 py-3.5 font-semibold text-slate-300">
+                    <td className="px-5 py-3.5 font-semibold text-foreground">
                       {p.paymentMethod}
                     </td>
                     <td className="px-5 py-3.5">
@@ -319,7 +319,7 @@ export default function SellerWalletPage() {
                         {p.status}
                       </Badge>
                     </td>
-                    <td className="px-5 py-3.5 text-slate-400 font-mono text-[11px]">
+                    <td className="px-5 py-3.5 text-muted-foreground font-mono text-[11px]">
                       {p.transactionReference || p.id.slice(0, 10)}
                     </td>
                   </tr>
@@ -333,27 +333,27 @@ export default function SellerWalletPage() {
       {/* Payout Request Modal */}
       {showPayoutModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 text-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div className="font-bold text-base text-white">Request Wallet Payout</div>
+          <div className="bg-card border border-border text-foreground rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div className="font-bold text-base text-foreground">Request Wallet Payout</div>
               <button
                 onClick={() => setShowPayoutModal(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-muted-foreground hover:text-foreground"
               >
                 ✕
               </button>
             </div>
 
             <form onSubmit={handlePayoutSubmit} className="space-y-4">
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1">
-                <div className="text-slate-400">Current Available Balance:</div>
+              <div className="p-3 rounded-xl bg-background border border-border text-xs space-y-1">
+                <div className="text-muted-foreground">Current Available Balance:</div>
                 <div className="text-xl font-bold text-emerald-400">
                   ৳{availableBalance.toLocaleString()}
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-foreground mb-1.5">
                   Payout Amount (BDT)
                 </label>
                 <input
@@ -364,12 +364,12 @@ export default function SellerWalletPage() {
                   onChange={(e) => setAmount(e.target.value ? Number(e.target.value) : "")}
                   placeholder="e.g. 2500"
                   required
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:outline-none focus:border-brand-500"
+                  className="w-full px-3 py-2 rounded-xl bg-background border border-border text-sm text-foreground focus:outline-none focus:border-brand-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-foreground mb-1.5">
                   Payment Method
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -384,8 +384,8 @@ export default function SellerWalletPage() {
                       onClick={() => setPaymentMethod(m.id)}
                       className={`py-2 rounded-xl text-xs font-bold border transition-colors ${
                         paymentMethod === m.id
-                          ? "bg-brand-600 border-brand-500 text-white"
-                          : "bg-slate-950 border-slate-800 text-slate-400 hover:text-white"
+                          ? "bg-brand-600 border-brand-500 text-foreground"
+                          : "bg-background border-border text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       {m.label}
@@ -395,7 +395,7 @@ export default function SellerWalletPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-foreground mb-1.5">
                   {paymentMethod === "BANK_TRANSFER"
                     ? "Bank Account Number & Routing Details"
                     : "Mobile Wallet Account Number (Personal/Agent)"}
@@ -410,16 +410,16 @@ export default function SellerWalletPage() {
                       : "017XXXXXXXX / 018XXXXXXXX"
                   }
                   required
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-brand-500"
+                  className="w-full px-3 py-2 rounded-xl bg-background border border-border text-xs text-foreground focus:outline-none focus:border-brand-500"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-border">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setShowPayoutModal(false)}
-                  className="text-xs border-slate-700"
+                  className="text-xs border-border"
                 >
                   Cancel
                 </Button>
