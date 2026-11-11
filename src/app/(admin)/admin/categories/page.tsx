@@ -227,7 +227,7 @@ export default function AdminCategoriesPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {treeCategories.map((cat) => {
-            const displayImage = cat.image?.media?.url;
+            const displayImage = getCategoryImageUrl(cat);
             return (
               <Card key={cat.id} className="overflow-hidden">
                 <div className="p-4 sm:p-5 bg-muted/40 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -293,7 +293,7 @@ export default function AdminCategoriesPage() {
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                       {cat.children.map((sub) => {
-                        const subImage = sub.image?.media?.url;
+                        const subImage = getCategoryImageUrl(sub);
                         return (
                           <div
                             key={sub.id}
