@@ -24,7 +24,7 @@ export default function SellerNewProductPage() {
   if (profile && profile.status !== "APPROVED") {
     return (
       <div className="max-w-2xl mx-auto py-12 px-4">
-        <div className="p-8 rounded-2xl bg-card border border-amber-500/30 text-center space-y-4 shadow-xl">
+        <div className="p-8 rounded-2xl bg-card border border-amber-500/30 text-center space-y-4">
           <div className="h-14 w-14 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-500">
             <Clock className="h-7 w-7" />
           </div>
@@ -44,7 +44,7 @@ export default function SellerNewProductPage() {
               </Button>
             </Link>
             <Link href="/seller/dashboard">
-              <Button size="sm" variant="brand" className="text-xs font-bold shadow-xs">
+              <Button size="sm" variant="brand" className="text-xs font-bold">
                 View Dashboard
               </Button>
             </Link>

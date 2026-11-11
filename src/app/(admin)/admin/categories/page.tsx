@@ -196,7 +196,7 @@ export default function AdminCategoriesPage() {
             variant="outline"
             onClick={handleRefresh}
             disabled={loading || isFetching}
-            className="text-xs gap-1.5 cursor-pointer shadow-xs"
+            className="text-xs gap-1.5 cursor-pointer"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin text-brand" : "text-muted-foreground"}`} />
             <span>Refresh</span>
@@ -206,7 +206,7 @@ export default function AdminCategoriesPage() {
             size="sm"
             variant="brand"
             onClick={() => handleOpenCreate()}
-            className="gap-1.5 text-xs font-bold cursor-pointer shadow-xs"
+            className="gap-1.5 text-xs font-bold cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             <span>Add Category</span>
@@ -259,7 +259,7 @@ export default function AdminCategoriesPage() {
                       size="xs"
                       variant="outline"
                       onClick={() => handleOpenEdit(cat)}
-                      className="text-xs cursor-pointer shadow-xs"
+                      className="text-xs cursor-pointer"
                     >
                       <Edit className="h-3.5 w-3.5 mr-1" />
                       Edit
@@ -268,7 +268,7 @@ export default function AdminCategoriesPage() {
                       size="xs"
                       variant="brand"
                       onClick={() => handleOpenCreate(cat.id)}
-                      className="text-xs font-semibold cursor-pointer shadow-xs"
+                      className="text-xs font-semibold cursor-pointer"
                     >
                       <Plus className="h-3.5 w-3.5 mr-1" />
                       Add Subcategory
@@ -277,7 +277,7 @@ export default function AdminCategoriesPage() {
                       size="xs"
                       variant="destructive"
                       onClick={() => setCategoryToDelete(cat)}
-                      className="text-xs p-1.5 cursor-pointer shadow-xs"
+                      className="text-xs p-1.5 cursor-pointer"
                       title="Delete category"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -297,7 +297,7 @@ export default function AdminCategoriesPage() {
                         return (
                           <div
                             key={sub.id}
-                            className="p-3 rounded-lg border border-border bg-card flex items-center justify-between hover:border-brand/40 hover:bg-muted/30 transition group shadow-xs"
+                            className="p-3 rounded-lg border border-border bg-card flex items-center justify-between hover:border-brand/40 hover:bg-muted/30 transition group"
                           >
                             <div className="flex items-center gap-2.5 min-w-0">
                               {subImage && (
@@ -453,7 +453,7 @@ export default function AdminCategoriesPage() {
               variant="outline"
               size="sm"
               onClick={() => setIsModalOpen(false)}
-              className="text-xs cursor-pointer shadow-xs"
+              className="text-xs cursor-pointer"
             >
               Cancel
             </Button>
@@ -462,7 +462,7 @@ export default function AdminCategoriesPage() {
               variant="brand"
               size="sm"
               disabled={formSubmitting}
-              className="text-xs font-bold cursor-pointer shadow-xs"
+              className="text-xs font-bold cursor-pointer"
             >
               {formSubmitting ? (
                 <>

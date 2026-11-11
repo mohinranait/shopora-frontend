@@ -21,20 +21,20 @@ const baseStyles =
 
 const variantStyles: Record<string, string> = {
   default:
-    "bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring shadow-xs",
+    "bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring",
   destructive:
-    "bg-rose-600 text-white hover:bg-rose-700 focus-visible:ring-rose-600 shadow-xs",
+    "bg-rose-600 text-white hover:bg-rose-700 focus-visible:ring-rose-600",
   outline:
-    "border border-border bg-card text-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring shadow-xs",
+    "border border-border bg-card text-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring",
   secondary:
-    "bg-secondary text-secondary-foreground hover:bg-secondary/80 focus-visible:ring-ring shadow-xs",
+    "bg-secondary text-secondary-foreground hover:bg-secondary/80 focus-visible:ring-ring",
   ghost:
     "text-foreground/80 hover:bg-muted hover:text-foreground focus-visible:ring-ring",
   link: "text-brand underline-offset-4 hover:underline",
   brand:
-    "bg-brand text-white hover:bg-brand-deep focus-visible:ring-brand shadow-xs",
+    "bg-brand text-white hover:bg-brand-deep focus-visible:ring-brand",
   brandDeep:
-    "bg-brand-deep text-white hover:bg-brand focus-visible:ring-brand-deep shadow-xs",
+    "bg-brand-deep text-white hover:bg-brand focus-visible:ring-brand-deep",
 };
 
 const sizeStyles: Record<string, string> = {

@@ -173,7 +173,7 @@ function SettingsFormContent({
   return (
     <form onSubmit={handleSave} className="space-y-6">
       {/* Top Action & Status Banner */}
-      <Card className="border-border bg-card ">
+      <Card className="border-border bg-card">
         <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand/20 text-brand ring-1 ring-brand/30">
@@ -239,7 +239,7 @@ function SettingsFormContent({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
         {/* Navigation Tabs (Sidebar style on lg screens) */}
         <div className="lg:col-span-1 space-y-3">
-          <Card className="border-border bg-card p-2 ">
+          <Card className="border-border bg-card p-2">
             <div className="space-y-1">
               {TABS.map((tab) => {
                 const isActive = activeTab === tab.id;
@@ -249,15 +249,15 @@ function SettingsFormContent({
                     type="button"
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex w-full items-start gap-3 rounded-xl p-3 text-left transition ${
-                      isActive
-                        ? "bg-brand/15 text-white ring-1 ring-brand/40 "
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
+ isActive
+ ? "bg-brand/15 text-white ring-1 ring-brand/40 "
+ : "text-muted-foreground hover:bg-muted hover:text-foreground"
+ }`}
                   >
                     <span
                       className={`mt-0.5 rounded-lg p-1.5 transition ${
-                        isActive ? "bg-brand text-white shadow-xs" : "bg-muted text-muted-foreground border border-border"
-                      }`}
+ isActive ? "bg-brand text-white " : "bg-muted text-muted-foreground border border-border"
+ }`}
                     >
                       {tab.icon}
                     </span>
@@ -286,7 +286,7 @@ function SettingsFormContent({
 
         {/* Tab Content Panels (Right 3 Columns) */}
         <div className="lg:col-span-3">
-          <Card className="border-border bg-card ">
+          <Card className="border-border bg-card">
             <CardContent className="p-6">
               {/* 1. GENERAL & BRAND TAB */}
               {activeTab === "general" && (

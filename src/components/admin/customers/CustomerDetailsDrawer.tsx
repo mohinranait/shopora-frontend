@@ -142,7 +142,7 @@ export function CustomerDetailsDrawer({
                 <Card className="p-5">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-brand-deep to-sky-600 text-lg font-black text-white shadow-xs">
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-brand-deep to-sky-600 text-lg font-black text-white">
                         {user.avatar ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
@@ -321,12 +321,12 @@ export function CustomerDetailsDrawer({
                                 </p>
                                 <span
                                   className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold ${
-                                    ord.orderStatus === "DELIVERED"
-                                      ? "bg-emerald-500/10 text-emerald-500"
-                                      : ord.orderStatus === "CANCELLED"
-                                      ? "bg-rose-500/10 text-rose-500"
-                                      : "bg-amber-500/10 text-amber-500"
-                                  }`}
+ ord.orderStatus === "DELIVERED"
+ ? "bg-emerald-500/10 text-emerald-500"
+ : ord.orderStatus === "CANCELLED"
+ ? "bg-rose-500/10 text-rose-500"
+ : "bg-amber-500/10 text-amber-500"
+ }`}
                                 >
                                   {ord.orderStatus}
                                 </span>

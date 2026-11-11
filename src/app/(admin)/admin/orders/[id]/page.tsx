@@ -248,7 +248,7 @@ function ShipmentPanel({
                 type="button"
                 onClick={() => handleBookCourier("Steadfast")}
                 disabled={isBookingCourier}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition shadow-xs disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition disabled:opacity-60"
               >
                 {isBookingCourier ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Truck className="h-3.5 w-3.5" />}
                 <span>Book Steadfast</span>

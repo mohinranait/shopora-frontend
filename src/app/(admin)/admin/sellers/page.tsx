@@ -359,10 +359,10 @@ export default function AdminSellersPage() {
               type="button"
               onClick={() => setActiveTab(tab)}
               className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition cursor-pointer ${
-                activeTab === tab
-                  ? "bg-brand text-white shadow-xs"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
+ activeTab === tab
+ ? "bg-brand text-white "
+ : "text-muted-foreground hover:bg-muted hover:text-foreground"
+ }`}
             >
               {tab === "ALL" && "All Sellers"}
               {tab === "APPROVED" && "Approved"}

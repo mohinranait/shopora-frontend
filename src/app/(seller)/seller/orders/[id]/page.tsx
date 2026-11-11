@@ -208,7 +208,7 @@ function SellerSubOrderDetailInner() {
         {/* Left 2 Cols: Items & Logistics */}
         <div className="lg:col-span-2 space-y-6">
           {/* Logistics & Courier Automation Box */}
-          <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-indigo-950/30 border border-border shadow-sm space-y-4">
+          <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-indigo-950/30 border border-border space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-2.5 rounded-xl bg-sky-500/10 text-sky-400">
@@ -419,7 +419,7 @@ function SellerSubOrderDetailInner() {
                     return (
                       <div
                         key={step.status}
-                        className="w-full py-2 px-3 rounded-xl text-xs flex items-center justify-between bg-brand-600 text-foreground font-bold shadow-sm"
+                        className="w-full py-2 px-3 rounded-xl text-xs flex items-center justify-between bg-brand-600 text-foreground font-bold"
                       >
                         <span className="flex items-center gap-1.5">
                           <Clock className="h-3.5 w-3.5 text-brand-200" />
@@ -438,7 +438,7 @@ function SellerSubOrderDetailInner() {
                         key={step.status}
                         onClick={() => handleStatusChange(step.status)}
                         disabled={isUpdatingStatus}
-                        className="w-full py-2.5 px-3 rounded-xl text-xs font-bold text-left transition-all flex items-center justify-between bg-gradient-to-r from-brand-600 to-indigo-600 text-foreground hover:brightness-110 shadow-md ring-1 ring-brand-400/30"
+                        className="w-full py-2.5 px-3 rounded-xl text-xs font-bold text-left transition-all flex items-center justify-between bg-gradient-to-r from-brand-600 to-indigo-600 text-foreground hover:brightness-110 ring-1 ring-brand-400/30"
                       >
                         <div className="flex flex-col">
                           <span>{step.action}</span>
@@ -528,7 +528,7 @@ function SellerSubOrderDetailInner() {
       {/* Thermal Packaging Slip Modal (4x6 format preview) */}
       {showSlipModal && packagingSlip && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-white text-slate-900 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+          <div className="bg-white text-slate-900 rounded-2xl p-6 max-w-md w-full space-y-4">
             <div className="flex items-center justify-between border-b pb-3 border-slate-200">
               <div className="font-black text-base text-slate-900 tracking-tight">
                 THERMAL PACKAGING SLIP (4x6)

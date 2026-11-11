@@ -203,7 +203,7 @@ export function SellerHeader({ onMobileToggle }: SellerHeaderProps = {}) {
         {/* Live Available Balance Chip */}
         <Link
           href="/seller/wallet"
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-card hover:bg-muted border border-border text-xs font-semibold text-foreground transition-all shadow-2xs"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-card hover:bg-muted border border-border text-xs font-semibold text-foreground transition-all"
           title="Click to view wallet & payout balance"
         >
           <Wallet className="h-3.5 w-3.5 text-emerald-500" />
@@ -241,14 +241,14 @@ export function SellerHeader({ onMobileToggle }: SellerHeaderProps = {}) {
           >
             <Bell className="h-4 w-4" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-xs">
+              <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white">
                 {unreadCount > 99 ? "99+" : unreadCount}
               </span>
             )}
           </Button>
 
           {notificationOpen && (
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-card border border-border text-card-foreground text-xs z-50 overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-100">
+            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-card border border-border text-card-foreground text-xs z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
               <div className="flex items-center justify-between p-3.5 border-b border-border bg-muted/40">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-foreground">Notifications & Notices</span>
@@ -293,19 +293,19 @@ export function SellerHeader({ onMobileToggle }: SellerHeaderProps = {}) {
                         key={item.id}
                         onClick={() => handleNotificationClick(item)}
                         className={`p-3 flex items-start gap-3 hover:bg-muted/50 transition cursor-pointer ${
-                          !item.isRead
-                            ? isSystemNotice
-                              ? "bg-amber-500/10 border-l-2 border-amber-500"
-                              : "bg-brand/10 border-l-2 border-brand"
-                            : "opacity-80"
-                        }`}
+ !item.isRead
+ ? isSystemNotice
+ ? "bg-amber-500/10 border-l-2 border-amber-500"
+ : "bg-brand/10 border-l-2 border-brand"
+ : "opacity-80"
+ }`}
                       >
                         <div
                           className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
-                            isSystemNotice
-                              ? "bg-amber-500/20 text-amber-500"
-                              : "bg-muted text-brand"
-                          }`}
+ isSystemNotice
+ ? "bg-amber-500/20 text-amber-500"
+ : "bg-muted text-brand"
+ }`}
                         >
                           <Icon className="h-4 w-4" />
                         </div>
@@ -313,10 +313,10 @@ export function SellerHeader({ onMobileToggle }: SellerHeaderProps = {}) {
                           <div className="flex items-center justify-between gap-1">
                             <p
                               className={`font-bold truncate ${
-                                isSystemNotice
-                                  ? "text-amber-600 dark:text-amber-300"
-                                  : "text-foreground"
-                              }`}
+ isSystemNotice
+ ? "text-amber-600 dark:text-amber-300"
+ : "text-foreground"
+ }`}
                             >
                               {item.title}
                             </p>
@@ -336,8 +336,8 @@ export function SellerHeader({ onMobileToggle }: SellerHeaderProps = {}) {
                         {!item.isRead && (
                           <span
                             className={`h-2 w-2 rounded-full shrink-0 mt-1.5 ${
-                              isSystemNotice ? "bg-amber-500" : "bg-brand"
-                            }`}
+ isSystemNotice ? "bg-amber-500" : "bg-brand"
+ }`}
                           />
                         )}
                       </div>
@@ -395,7 +395,7 @@ export function SellerHeader({ onMobileToggle }: SellerHeaderProps = {}) {
           </button>
 
           {profileOpen && (
-            <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-popover border border-border text-popover-foreground py-2 text-xs z-50 shadow-xl animate-in fade-in zoom-in-95 duration-100">
+            <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-popover border border-border text-popover-foreground py-2 text-xs z-50 animate-in fade-in zoom-in-95 duration-100">
               {/* Dynamic Seller Identity Header */}
               <div className="px-4 py-3 border-b border-border bg-muted/20">
                 <div className="flex items-center gap-3">

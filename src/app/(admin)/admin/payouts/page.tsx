@@ -108,10 +108,10 @@ function ProcessPayoutModal({
           <div className="flex items-center gap-2.5">
             <span
               className={`flex h-9 w-9 items-center justify-center rounded-lg ${
-                isPay
-                  ? "bg-emerald-500/15 text-emerald-500"
-                  : "bg-rose-500/15 text-rose-500"
-              }`}
+ isPay
+ ? "bg-emerald-500/15 text-emerald-500"
+ : "bg-rose-500/15 text-rose-500"
+ }`}
             >
               <CreditCard className="h-5 w-5" />
             </span>
@@ -344,10 +344,10 @@ export default function AdminPayoutsPage() {
               type="button"
               onClick={() => setFilterTab(tab)}
               className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition cursor-pointer ${
-                filterTab === tab
-                  ? "bg-brand text-white shadow-xs"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
+ filterTab === tab
+ ? "bg-brand text-white "
+ : "text-muted-foreground hover:bg-muted hover:text-foreground"
+ }`}
             >
               {tab === "ALL" && "All Payouts"}
               {tab === "PENDING" && `Pending (${metrics.pendingCount})`}

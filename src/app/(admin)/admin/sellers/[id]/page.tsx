@@ -115,7 +115,7 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
 
   if (isError || !data) {
     return (
-      <Card className="border-rose-500/20 bg-rose-500/10 p-8 text-center text-rose-400 shadow-xs">
+      <Card className="border-rose-500/20 bg-rose-500/10 p-8 text-center text-rose-400">
         <AlertCircle className="mx-auto mb-2 h-8 w-8" />
         <h3 className="text-base font-bold text-white">Vendor Not Found</h3>
         <p className="text-xs text-rose-300 mt-1">
@@ -277,12 +277,12 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
                 <Badge
                   variant="outline"
                   className={`text-[11px] font-bold uppercase ${
-                    seller.status === "APPROVED"
-                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                      : seller.status === "PENDING"
-                      ? "border-amber-500/30 bg-amber-500/10 text-amber-400"
-                      : "border-rose-500/30 bg-rose-500/10 text-rose-400"
-                  }`}
+ seller.status === "APPROVED"
+ ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+ : seller.status === "PENDING"
+ ? "border-amber-500/30 bg-amber-500/10 text-amber-400"
+ : "border-rose-500/30 bg-rose-500/10 text-rose-400"
+ }`}
                 >
                   {seller.status}
                 </Badge>
@@ -454,7 +454,7 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
             )}
 
             {/* Business & Legal Information */}
-            <Card className="border-slate-800 bg-slate-900 shadow-sm">
+            <Card className="border-slate-800 bg-slate-900">
               <CardHeader className="border-b border-slate-800 p-5 pb-3">
                 <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
                   <FileText className="h-4 w-4 text-brand" />
@@ -496,7 +496,7 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
           {/* Right Column: Owner & Banking Info (5 cols) */}
           <div className="lg:col-span-5 space-y-6">
             {/* Account Owner Card */}
-            <Card className="border-slate-800 bg-slate-900 shadow-sm">
+            <Card className="border-slate-800 bg-slate-900">
               <CardHeader className="border-b border-slate-800 p-5 pb-3">
                 <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
                   <Store className="h-4 w-4 text-brand" />
@@ -543,7 +543,7 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
             </Card>
 
             {/* Banking & Payout Credentials Card */}
-            <Card className="border-slate-800 bg-slate-900 shadow-sm">
+            <Card className="border-slate-800 bg-slate-900">
               <CardHeader className="border-b border-slate-800 p-5 pb-3">
                 <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
                   <CreditCard className="h-4 w-4 text-emerald-400" />
@@ -590,7 +590,7 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
           </div>
 
           {recentProducts.length > 0 ? (
-            <Card className="overflow-hidden border-slate-800 bg-slate-900 shadow-sm">
+            <Card className="overflow-hidden border-slate-800 bg-slate-900">
               <Table>
                 <TableHeader className="border-b border-slate-800 bg-slate-800/60">
                   <TableRow className="border-slate-800 hover:bg-transparent">
@@ -683,7 +683,7 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
           </div>
 
           {recentOrders.length > 0 ? (
-            <Card className="overflow-hidden border-slate-800 bg-slate-900 shadow-sm">
+            <Card className="overflow-hidden border-slate-800 bg-slate-900">
               <Table>
                 <TableHeader className="border-b border-slate-800 bg-slate-800/60">
                   <TableRow className="border-slate-800 hover:bg-transparent">
@@ -774,7 +774,7 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
           <div className="space-y-3">
             <h3 className="text-sm font-bold text-white">Recent Payout Requests</h3>
             {payouts && payouts.length > 0 ? (
-              <Card className="overflow-hidden border-slate-800 bg-slate-900 shadow-sm">
+              <Card className="overflow-hidden border-slate-800 bg-slate-900">
                 <Table>
                   <TableHeader className="border-b border-slate-800 bg-slate-800/60">
                     <TableRow className="border-slate-800 hover:bg-transparent">

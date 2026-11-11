@@ -404,21 +404,21 @@ function AdminProductsInner() {
             variant="outline"
             onClick={() => refetch()}
             disabled={isFetching}
-            className="text-xs gap-1.5 cursor-pointer shadow-xs"
+            className="text-xs gap-1.5 cursor-pointer"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin text-brand" : "text-muted-foreground"}`} />
             <span>Refresh</span>
           </Button>
 
           <Link href="/admin/products/attributes">
-            <Button size="sm" variant="outline" className="gap-1.5 text-xs cursor-pointer shadow-xs">
+            <Button size="sm" variant="outline" className="gap-1.5 text-xs cursor-pointer">
               <SlidersHorizontal className="h-3.5 w-3.5" />
               <span>Attributes</span>
             </Button>
           </Link>
 
           <Link href="/admin/products/new">
-            <Button size="sm" variant="brand" className="text-xs gap-1.5 font-bold cursor-pointer shadow-xs">
+            <Button size="sm" variant="brand" className="text-xs gap-1.5 font-bold cursor-pointer">
               <Plus className="h-3.5 w-3.5" />
               <span>Create Product</span>
             </Button>
@@ -429,52 +429,52 @@ function AdminProductsInner() {
       {/* Filter Tabs & Search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Tab Pills */}
-        <div className="flex flex-wrap items-center bg-card border border-border rounded-lg p-1 text-xs font-semibold gap-1 shadow-xs">
+        <div className="flex flex-wrap items-center bg-card border border-border rounded-lg p-1 text-xs font-semibold gap-1">
           <button
             onClick={() => handleTabChange("all")}
             className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
-              activeTab === "all"
-                ? "bg-brand text-white shadow-xs"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
-            }`}
+ activeTab === "all"
+ ? "bg-brand text-white "
+ : "text-muted-foreground hover:text-foreground hover:bg-muted"
+ }`}
           >
             All Products ({allCount})
           </button>
           <button
             onClick={() => handleTabChange("platform")}
             className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
-              activeTab === "platform"
-                ? "bg-brand text-white shadow-xs"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
-            }`}
+ activeTab === "platform"
+ ? "bg-brand text-white "
+ : "text-muted-foreground hover:text-foreground hover:bg-muted"
+ }`}
           >
             Shopora Direct ({platformCount})
           </button>
           <button
             onClick={() => handleTabChange("vendor")}
             className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
-              activeTab === "vendor"
-                ? "bg-brand text-white shadow-xs"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
-            }`}
+ activeTab === "vendor"
+ ? "bg-brand text-white "
+ : "text-muted-foreground hover:text-foreground hover:bg-muted"
+ }`}
           >
             Vendor Products ({vendorCount})
           </button>
           <button
             onClick={() => handleTabChange("pending")}
             className={`px-3 py-1.5 rounded-md transition flex items-center gap-1.5 cursor-pointer ${
-              activeTab === "pending"
-                ? "bg-amber-500 text-slate-950 font-bold shadow-xs"
-                : "text-amber-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-500/10"
-            }`}
+ activeTab === "pending"
+ ? "bg-amber-500 text-slate-950 font-bold "
+ : "text-amber-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-500/10"
+ }`}
           >
             <span>Pending Review</span>
             <span
               className={`h-4 px-1.5 rounded-full text-[10px] font-bold ${
-                activeTab === "pending"
-                  ? "bg-slate-950/20 text-slate-950"
-                  : "bg-amber-500/15 text-amber-500 dark:text-amber-400"
-              }`}
+ activeTab === "pending"
+ ? "bg-slate-950/20 text-slate-950"
+ : "bg-amber-500/15 text-amber-500 dark:text-amber-400"
+ }`}
             >
               {pendingCount}
             </span>
@@ -482,18 +482,18 @@ function AdminProductsInner() {
           <button
             onClick={() => handleTabChange("low_stock")}
             className={`px-3 py-1.5 rounded-md transition flex items-center gap-1.5 cursor-pointer ${
-              activeTab === "low_stock"
-                ? "bg-rose-600 text-white shadow-xs"
-                : "text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-500/10"
-            }`}
+ activeTab === "low_stock"
+ ? "bg-rose-600 text-white "
+ : "text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-500/10"
+ }`}
           >
             <span>Low Stock</span>
             <span
               className={`h-4 px-1.5 rounded-full text-[10px] font-bold ${
-                activeTab === "low_stock"
-                  ? "bg-white/20 text-white"
-                  : "bg-rose-500/15 text-rose-500 dark:text-rose-400"
-              }`}
+ activeTab === "low_stock"
+ ? "bg-white/20 text-white"
+ : "bg-rose-500/15 text-rose-500 dark:text-rose-400"
+ }`}
             >
               {lowStockCount}
             </span>
@@ -508,7 +508,7 @@ function AdminProductsInner() {
             placeholder="Search products or SKU..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-card border border-border rounded-lg pl-9 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand shadow-xs transition"
+            className="w-full bg-card border border-border rounded-lg pl-9 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand transition"
           />
         </div>
       </div>

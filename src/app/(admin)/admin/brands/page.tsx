@@ -242,7 +242,7 @@ export default function AdminBrandsPage() {
             variant="outline"
             onClick={() => refetch()}
             disabled={loading || isFetching}
-            className="text-xs gap-1.5 cursor-pointer shadow-xs"
+            className="text-xs gap-1.5 cursor-pointer"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin text-brand" : "text-muted-foreground"}`} />
             <span>Refresh</span>
@@ -252,7 +252,7 @@ export default function AdminBrandsPage() {
             size="sm"
             variant="brand"
             onClick={handleOpenCreate}
-            className="gap-1.5 text-xs font-bold cursor-pointer shadow-xs"
+            className="gap-1.5 text-xs font-bold cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             <span>Add Brand</span>
@@ -262,34 +262,34 @@ export default function AdminBrandsPage() {
 
       {/* Filter Tabs & Search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center bg-card border border-border rounded-lg p-1 text-xs font-semibold gap-1 shadow-xs">
+        <div className="flex items-center bg-card border border-border rounded-lg p-1 text-xs font-semibold gap-1">
           <button
             onClick={() => handleStatusFilterChange("all")}
             className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
-              statusFilter === "all"
-                ? "bg-brand text-white shadow-xs"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
-            }`}
+ statusFilter === "all"
+ ? "bg-brand text-white "
+ : "text-muted-foreground hover:text-foreground hover:bg-muted"
+ }`}
           >
             All Brands ({counts?.all !== undefined ? counts.all : totalItems})
           </button>
           <button
             onClick={() => handleStatusFilterChange("active")}
             className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
-              statusFilter === "active"
-                ? "bg-brand text-white shadow-xs"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
-            }`}
+ statusFilter === "active"
+ ? "bg-brand text-white "
+ : "text-muted-foreground hover:text-foreground hover:bg-muted"
+ }`}
           >
             Active {counts?.active !== undefined ? `(${counts.active})` : ""}
           </button>
           <button
             onClick={() => handleStatusFilterChange("inactive")}
             className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
-              statusFilter === "inactive"
-                ? "bg-brand text-white shadow-xs"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
-            }`}
+ statusFilter === "inactive"
+ ? "bg-brand text-white "
+ : "text-muted-foreground hover:text-foreground hover:bg-muted"
+ }`}
           >
             Inactive {counts?.inactive !== undefined ? `(${counts.inactive})` : ""}
           </button>
@@ -302,7 +302,7 @@ export default function AdminBrandsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search brand name, slug..."
-            className="w-full h-9 rounded-lg border border-border bg-card pl-9 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand shadow-xs transition"
+            className="w-full h-9 rounded-lg border border-border bg-card pl-9 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand transition"
           />
         </div>
       </div>

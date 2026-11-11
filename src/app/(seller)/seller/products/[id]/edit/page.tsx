@@ -34,7 +34,7 @@ function SellerEditProductInner() {
 
   if (isError || !product) {
     return (
-      <div className="p-8 text-center bg-card border border-border rounded-2xl space-y-3 max-w-lg mx-auto my-12 shadow-xs">
+      <div className="p-8 text-center bg-card border border-border rounded-2xl space-y-3 max-w-lg mx-auto my-12">
         <p className="text-sm font-bold text-foreground">Product not found</p>
         <p className="text-xs text-muted-foreground">
           The requested product ID does not exist, belongs to another merchant, or has been removed.
@@ -51,7 +51,7 @@ function SellerEditProductInner() {
   // Security guard: Ensure product belongs to this seller
   if (profile && product.sellerId && product.sellerId !== profile.id) {
     return (
-      <div className="p-8 text-center bg-card border border-rose-500/30 rounded-2xl space-y-3 max-w-lg mx-auto my-12 shadow-xs">
+      <div className="p-8 text-center bg-card border border-rose-500/30 rounded-2xl space-y-3 max-w-lg mx-auto my-12">
         <ShieldAlert className="h-10 w-10 text-rose-500 mx-auto" />
         <h3 className="text-base font-bold text-foreground">Access Denied</h3>
         <p className="text-xs text-muted-foreground">

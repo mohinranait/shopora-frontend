@@ -57,7 +57,7 @@ function StatCard({
   tone: string;
 }) {
   return (
-    <Card className="border-border bg-card shadow-xs">
+    <Card className="border-border bg-card">
       <CardContent className="flex items-center gap-3.5 p-4 sm:p-5">
         <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tone}`}>
           {icon}
@@ -112,7 +112,7 @@ export default function CustomerProfilePage({
 
   if (isError || !data?.user) {
     return (
-      <Card className="mx-auto max-w-lg border-rose-500/20 bg-rose-500/10 p-8 text-center text-rose-500 shadow-xs">
+      <Card className="mx-auto max-w-lg border-rose-500/20 bg-rose-500/10 p-8 text-center text-rose-500">
         <AlertCircle className="mx-auto mb-3 h-10 w-10 text-rose-500" />
         <h2 className="text-lg font-bold text-foreground">Customer Not Found</h2>
         <p className="mt-1 text-xs text-muted-foreground">
@@ -174,12 +174,12 @@ export default function CustomerProfilePage({
       </div>
 
       {/* Customer Header Card */}
-      <Card className="border-border bg-card shadow-xs">
+      <Card className="border-border bg-card">
         <CardContent className="p-5 sm:p-6">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
               {/* Avatar */}
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-deep to-sky-600 text-2xl font-black text-white ring-4 ring-black/5 dark:ring-white/10 shadow-sm">
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-deep to-sky-600 text-2xl font-black text-white ring-4 ring-black/5 dark:ring-white/10">
                 {user.avatar ? (
                   <img
                     src={user.avatar}
@@ -244,10 +244,10 @@ export default function CustomerProfilePage({
                 onClick={handleToggleStatus}
                 disabled={isToggling}
                 className={`gap-2 font-bold transition ${
-                  user.isActive
-                    ? "border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20"
-                    : "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
-                }`}
+ user.isActive
+ ? "border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20"
+ : "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
+ }`}
               >
                 {isToggling ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -296,7 +296,7 @@ export default function CustomerProfilePage({
         {/* Left Column (1 / 3): Customer Info & Addresses */}
         <div className="space-y-6 lg:col-span-1">
           {/* Account Meta Card */}
-          <Card className="border-border bg-card shadow-sm">
+          <Card className="border-border bg-card">
             <CardHeader className="p-5 pb-0">
               <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Account Overview
@@ -339,7 +339,7 @@ export default function CustomerProfilePage({
           </Card>
 
           {/* Saved Addresses Card */}
-          <Card className="border-border bg-card shadow-sm">
+          <Card className="border-border bg-card">
             <CardHeader className="p-5 pb-3">
               <CardTitle className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 <MapPin className="h-4 w-4 text-brand" />
@@ -384,7 +384,7 @@ export default function CustomerProfilePage({
 
           {/* Product Reviews Card (if any) */}
           {reviews.length > 0 && (
-            <Card className="border-border bg-card shadow-sm">
+            <Card className="border-border bg-card">
               <CardHeader className="p-5 pb-3">
                 <CardTitle className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   <Star className="h-4 w-4 text-amber-500" />
@@ -416,7 +416,7 @@ export default function CustomerProfilePage({
 
         {/* Right Column (2 / 3): Order History */}
         <div className="space-y-6 lg:col-span-2">
-          <Card className="border-border bg-card shadow-sm">
+          <Card className="border-border bg-card">
             <CardHeader className="flex flex-row items-center justify-between border-b border-border p-5">
               <div>
                 <CardTitle className="text-base font-bold text-foreground">Order History</CardTitle>

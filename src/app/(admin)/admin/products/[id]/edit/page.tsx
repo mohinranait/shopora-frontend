@@ -29,7 +29,7 @@ function EditProductInner() {
 
   if (isError || !product) {
     return (
-      <div className="p-8 text-center bg-card border border-border rounded-2xl space-y-2 shadow-xs">
+      <div className="p-8 text-center bg-card border border-border rounded-2xl space-y-2">
         <p className="text-sm font-bold text-foreground">Product not found</p>
         <p className="text-xs text-muted-foreground">
           The requested product ID does not exist or has been removed.

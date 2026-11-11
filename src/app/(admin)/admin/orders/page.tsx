@@ -104,7 +104,7 @@ export default function AdminOrdersPage() {
           variant="outline"
           onClick={() => refetch()}
           disabled={isFetching}
-          className="text-xs gap-1.5 cursor-pointer shadow-xs self-start sm:self-auto"
+          className="text-xs gap-1.5 cursor-pointer self-start sm:self-auto"
         >
           <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin text-brand" : "text-muted-foreground"}`} />
           <span>Refresh</span>
@@ -133,12 +133,12 @@ export default function AdminOrdersPage() {
                     setPage(1);
                   }}
                   className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 transition cursor-pointer ${
-                    active
-                      ? t.value === "CANCELLED"
-                        ? "bg-rose-600 text-white shadow-xs"
-                        : "bg-brand text-white shadow-xs"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
+ active
+ ? t.value === "CANCELLED"
+ ? "bg-rose-600 text-white "
+ : "bg-brand text-white "
+ : "text-muted-foreground hover:text-foreground"
+ }`}
                 >
                   {t.label}
                   <span className={`rounded px-1.5 text-[10px] ${active ? "bg-white/20 text-white" : "bg-muted text-muted-foreground"}`}>{count}</span>

@@ -214,7 +214,7 @@ export function AdminSidebar({  onMobileClose }: AdminSidebarProps = {}) {
             onClick={handleNavClick}
             className="flex items-center gap-2.5 overflow-hidden min-w-0 group-data-[collapsible=icon]:hidden"
           >
-            <div className="h-9 w-9 shrink-0 rounded-xl bg-linear-to-br from-brand to-brand-deep flex items-center justify-center text-white shadow-md">
+            <div className="h-9 w-9 shrink-0 rounded-xl bg-linear-to-br from-brand to-brand-deep flex items-center justify-center text-white">
               <Sparkles className="h-5 w-5" />
             </div>
             <div className="flex flex-col min-w-0">
@@ -249,12 +249,12 @@ export function AdminSidebar({  onMobileClose }: AdminSidebarProps = {}) {
                 <button
                   type="button"
                   onClick={toggleSidebar}
-                  className="hidden group-data-[collapsible=icon]:flex items-center justify-center h-10 w-10 rounded-xl bg-linear-to-br from-brand to-brand-deep text-white shadow-md hover:ring-2 hover:ring-brand/50 transition cursor-pointer relative group/collapse-btn"
+                  className="hidden group-data-[collapsible=icon]:flex items-center justify-center h-10 w-10 rounded-xl bg-linear-to-br from-brand to-brand-deep text-white hover:ring-2 hover:ring-brand/50 transition cursor-pointer relative group/collapse-btn"
                 />
               }
             >
               <Sparkles className="h-5 w-5 transition group-hover/collapse-btn:scale-110" />
-              <span className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-sidebar border border-sidebar-border flex items-center justify-center text-muted-foreground group-hover/collapse-btn:text-sidebar-foreground shadow-sm">
+              <span className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-sidebar border border-sidebar-border flex items-center justify-center text-muted-foreground group-hover/collapse-btn:text-sidebar-foreground">
                 <ChevronRight className="h-2.5 w-2.5" />
               </span>
             </TooltipTrigger>

@@ -166,7 +166,7 @@ export function SellerSidebar() {
             onClick={handleNavClick}
             className="flex items-center gap-3 min-w-0 group-data-[collapsible=icon]:hidden select-none"
           >
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand to-indigo-600 flex items-center justify-center text-white font-black text-lg shadow-md shrink-0 ring-2 ring-brand/20">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand to-indigo-600 flex items-center justify-center text-white font-black text-lg shrink-0 ring-2 ring-brand/20">
               {profile?.storeName ? profile.storeName[0].toUpperCase() : "S"}
             </div>
             <div className="min-w-0">
@@ -203,12 +203,12 @@ export function SellerSidebar() {
                 <button
                   type="button"
                   onClick={toggleSidebar}
-                  className="hidden group-data-[collapsible=icon]:flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-brand to-brand-deep text-white shadow-md hover:ring-2 hover:ring-brand/50 transition cursor-pointer relative group/collapse-btn mx-auto"
+                  className="hidden group-data-[collapsible=icon]:flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-brand to-brand-deep text-white hover:ring-2 hover:ring-brand/50 transition cursor-pointer relative group/collapse-btn mx-auto"
                 />
               }
             >
               <Store className="h-5 w-5 transition group-hover/collapse-btn:scale-110" />
-              <span className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-sidebar border border-sidebar-border flex items-center justify-center text-muted-foreground group-hover/collapse-btn:text-sidebar-foreground shadow-xs">
+              <span className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-sidebar border border-sidebar-border flex items-center justify-center text-muted-foreground group-hover/collapse-btn:text-sidebar-foreground">
                 <ChevronRight className="h-2.5 w-2.5" />
               </span>
             </TooltipTrigger>
@@ -264,7 +264,7 @@ export function SellerSidebar() {
                       className={cn(
                         "h-9 px-3 text-xs font-semibold rounded-lg transition-all relative group-data-[collapsible=icon]:size-9 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:mx-auto",
                         isActive
-                          ? "bg-gradient-to-r from-brand to-brand-deep text-white font-bold shadow-xs"
+                          ? "bg-gradient-to-r from-brand to-brand-deep text-white font-bold "
                           : "text-sidebar-foreground/75 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent"
                       )}
                     >
@@ -316,7 +316,7 @@ export function SellerSidebar() {
           <Link
             href="/seller/products/new"
             onClick={handleNavClick}
-            className="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-sm group-data-[collapsible=icon]:size-9 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:mx-auto"
+            className="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all group-data-[collapsible=icon]:size-9 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:mx-auto"
             title="Add New Product"
           >
             <PlusCircle className="h-4 w-4 shrink-0" />

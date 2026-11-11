@@ -200,12 +200,12 @@ export default function SellerNotificationsPage() {
                 setPage(1);
               }}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
-                filterType === tab.id
-                  ? tab.id === "SYSTEM"
-                    ? "bg-amber-500 text-black font-bold"
-                    : "bg-brand-600 text-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
-              }`}
+ filterType === tab.id
+ ? tab.id === "SYSTEM"
+ ? "bg-amber-500 text-black font-bold"
+ : "bg-brand-600 text-foreground"
+ : "text-muted-foreground hover:text-foreground hover:bg-muted"
+ }`}
             >
               <span>{tab.label}</span>
             </button>
@@ -222,10 +222,10 @@ export default function SellerNotificationsPage() {
                 setPage(1);
               }}
               className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
-                readFilter === r
-                  ? "bg-muted text-foreground shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+ readFilter === r
+ ? "bg-muted text-foreground "
+ : "text-muted-foreground hover:text-foreground"
+ }`}
             >
               {r === "ALL" ? "All" : r === "UNREAD" ? "Unread" : "Read"}
             </button>
@@ -234,7 +234,7 @@ export default function SellerNotificationsPage() {
       </div>
 
       {/* Notification List Container */}
-      <div className="rounded-2xl bg-card border border-border overflow-hidden shadow-sm">
+      <div className="rounded-2xl bg-card border border-border overflow-hidden">
         {isLoading ? (
           <div className="p-16 text-center text-muted-foreground text-xs">
             <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-brand-500" />
@@ -260,20 +260,20 @@ export default function SellerNotificationsPage() {
                 <div
                   key={item.id}
                   className={`p-4 sm:p-5 transition-colors flex flex-col sm:flex-row items-start justify-between gap-4 ${
-                    !item.isRead
-                      ? isSystemNotice
-                        ? "bg-amber-500/10 border-l-4 border-amber-500"
-                        : "bg-muted/50 border-l-4 border-brand-500"
-                      : "hover:bg-muted/20"
-                  }`}
+ !item.isRead
+ ? isSystemNotice
+ ? "bg-amber-500/10 border-l-4 border-amber-500"
+ : "bg-muted/50 border-l-4 border-brand-500"
+ : "hover:bg-muted/20"
+ }`}
                 >
                   <div className="flex items-start gap-3.5 min-w-0 flex-1">
                     <div
                       className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
-                        isSystemNotice
-                          ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                          : "bg-muted text-brand-400 border border-border"
-                      }`}
+ isSystemNotice
+ ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+ : "bg-muted text-brand-400 border border-border"
+ }`}
                     >
                       <Icon className="h-5 w-5" />
                     </div>
@@ -282,8 +282,8 @@ export default function SellerNotificationsPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <h3
                           className={`text-sm font-bold ${
-                            isSystemNotice ? "text-amber-300" : "text-foreground"
-                          }`}
+ isSystemNotice ? "text-amber-300" : "text-foreground"
+ }`}
                         >
                           {item.title}
                         </h3>

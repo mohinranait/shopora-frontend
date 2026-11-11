@@ -204,10 +204,10 @@ export default function AdminNotificationsPage() {
               setPage(1);
             }}
             className={`px-3 py-1.5 rounded-lg font-semibold transition ${
-              readFilter === "ALL"
-                ? "bg-brand text-white shadow-xs"
-                : "text-slate-400 hover:text-white"
-            }`}
+ readFilter === "ALL"
+ ? "bg-brand text-white "
+ : "text-slate-400 hover:text-white"
+ }`}
           >
             All Updates
           </button>
@@ -217,10 +217,10 @@ export default function AdminNotificationsPage() {
               setPage(1);
             }}
             className={`px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1.5 ${
-              readFilter === "UNREAD"
-                ? "bg-brand text-white shadow-xs"
-                : "text-slate-400 hover:text-white"
-            }`}
+ readFilter === "UNREAD"
+ ? "bg-brand text-white "
+ : "text-slate-400 hover:text-white"
+ }`}
           >
             <span>Unread</span>
             {meta && meta.unreadCount > 0 && (
@@ -235,10 +235,10 @@ export default function AdminNotificationsPage() {
               setPage(1);
             }}
             className={`px-3 py-1.5 rounded-lg font-semibold transition ${
-              readFilter === "READ"
-                ? "bg-brand text-white shadow-xs"
-                : "text-slate-400 hover:text-white"
-            }`}
+ readFilter === "READ"
+ ? "bg-brand text-white "
+ : "text-slate-400 hover:text-white"
+ }`}
           >
             Read
           </button>
@@ -261,10 +261,10 @@ export default function AdminNotificationsPage() {
                 setPage(1);
               }}
               className={`px-3 py-1.5 rounded-lg border transition whitespace-nowrap cursor-pointer ${
-                filterType === cat.value
-                  ? "border-sky-500 bg-sky-500/10 text-sky-400 font-bold"
-                  : "border-slate-800 bg-slate-900 text-slate-400 hover:text-white hover:border-slate-700"
-              }`}
+ filterType === cat.value
+ ? "border-sky-500 bg-sky-500/10 text-sky-400 font-bold"
+ : "border-slate-800 bg-slate-900 text-slate-400 hover:text-white hover:border-slate-700"
+ }`}
             >
               {cat.label}
             </button>
@@ -296,8 +296,8 @@ export default function AdminNotificationsPage() {
                 <div
                   key={item.id}
                   className={`p-4 sm:p-5 flex items-start gap-4 transition hover:bg-slate-900/60 ${
-                    !item.isRead ? "bg-slate-900/40" : "opacity-80"
-                  }`}
+ !item.isRead ? "bg-slate-900/40" : "opacity-80"
+ }`}
                 >
                   <div className="h-10 w-10 rounded-xl bg-slate-800 flex items-center justify-center shrink-0 mt-0.5 border border-slate-700/80">
                     {getNotificationIcon(item.type)}

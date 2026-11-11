@@ -249,7 +249,7 @@ export default function AdminSlidersPage() {
             size="sm"
             variant="brand"
             onClick={handleOpenCreate}
-            className="gap-1.5 text-xs font-bold shadow-md shadow-brand/20"
+            className="gap-1.5 text-xs font-bold"
           >
             <Plus className="h-4 w-4" />
             <span>Add Slider</span>
@@ -259,7 +259,7 @@ export default function AdminSlidersPage() {
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <Card className="bg-card border-border shadow-xs">
+        <Card className="bg-card border-border">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
@@ -273,7 +273,7 @@ export default function AdminSlidersPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border shadow-xs">
+        <Card className="bg-card border-border">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-[11px] font-medium text-purple-400 uppercase tracking-wider">
@@ -287,7 +287,7 @@ export default function AdminSlidersPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border shadow-xs">
+        <Card className="bg-card border-border">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-[11px] font-medium text-sky-400 uppercase tracking-wider">
@@ -301,7 +301,7 @@ export default function AdminSlidersPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border shadow-xs">
+        <Card className="bg-card border-border">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-[11px] font-medium text-emerald-400 uppercase tracking-wider">
@@ -318,36 +318,36 @@ export default function AdminSlidersPage() {
 
       {/* Filter Tabs & Search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center bg-card border border-border rounded-lg p-1 text-xs font-semibold gap-1 overflow-x-auto shadow-xs">
+        <div className="flex items-center bg-card border border-border rounded-lg p-1 text-xs font-semibold gap-1 overflow-x-auto">
           <button
             onClick={() => setTypeFilter("ALL")}
             className={`px-3 py-1.5 rounded-md transition whitespace-nowrap ${
-              typeFilter === "ALL" ? "bg-brand text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
+ typeFilter === "ALL" ? "bg-brand text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+ }`}
           >
             All Variants ({sliders.length})
           </button>
           <button
             onClick={() => setTypeFilter("IMAGE_BG_CONTENT")}
             className={`px-3 py-1.5 rounded-md transition whitespace-nowrap ${
-              typeFilter === "IMAGE_BG_CONTENT" ? "bg-brand text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
+ typeFilter === "IMAGE_BG_CONTENT" ? "bg-brand text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+ }`}
           >
             Bg Image + Content ({imageBgCount})
           </button>
           <button
             onClick={() => setTypeFilter("IMAGE_ONLY")}
             className={`px-3 py-1.5 rounded-md transition whitespace-nowrap ${
-              typeFilter === "IMAGE_ONLY" ? "bg-brand text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
+ typeFilter === "IMAGE_ONLY" ? "bg-brand text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+ }`}
           >
             Image Only ({imageOnlyCount})
           </button>
           <button
             onClick={() => setTypeFilter("CONTENT_ONLY")}
             className={`px-3 py-1.5 rounded-md transition whitespace-nowrap ${
-              typeFilter === "CONTENT_ONLY" ? "bg-brand text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
+ typeFilter === "CONTENT_ONLY" ? "bg-brand text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+ }`}
           >
             Content Only ({contentOnlyCount})
           </button>
@@ -360,19 +360,19 @@ export default function AdminSlidersPage() {
             placeholder="Search slides..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-9 pl-9 pr-3 text-xs bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand shadow-xs"
+            className="w-full h-9 pl-9 pr-3 text-xs bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand"
           />
         </div>
       </div>
 
       {/* Sliders Grid */}
       {loading ? (
-        <Card className="p-12 text-center text-muted-foreground bg-card border-border shadow-xs">
+        <Card className="p-12 text-center text-muted-foreground bg-card border-border">
           <Loader2 className="h-6 w-6 text-sky-400 animate-spin mx-auto mb-2" />
           Loading hero sliders...
         </Card>
       ) : filteredSliders.length === 0 ? (
-        <Card className="p-12 text-center text-muted-foreground bg-card border-border shadow-xs">
+        <Card className="p-12 text-center text-muted-foreground bg-card border-border">
           No hero sliders found. Click &quot;Add Slider&quot; to create your first slide.
         </Card>
       ) : (
@@ -383,7 +383,7 @@ export default function AdminSlidersPage() {
             return (
               <div
                 key={slider.id}
-                className="group relative rounded-2xl border border-border bg-card overflow-hidden hover:border-border/80 transition flex flex-col justify-between shadow-xs"
+                className="group relative rounded-2xl border border-border bg-card overflow-hidden hover:border-border/80 transition flex flex-col justify-between"
               >
                 {/* Visual Preview Box */}
                 <div className="relative h-48 w-full overflow-hidden bg-muted flex items-center justify-center">
@@ -445,12 +445,12 @@ export default function AdminSlidersPage() {
                     </Badge>
                     <span
                       className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        slider.type === "IMAGE_BG_CONTENT"
-                          ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                          : slider.type === "IMAGE_ONLY"
-                          ? "bg-sky-500/20 text-sky-300 border border-sky-500/30"
-                          : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                      }`}
+ slider.type === "IMAGE_BG_CONTENT"
+ ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
+ : slider.type === "IMAGE_ONLY"
+ ? "bg-sky-500/20 text-sky-300 border border-sky-500/30"
+ : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+ }`}
                     >
                       {slider.type === "IMAGE_BG_CONTENT"
                         ? "Bg Image + Text"
@@ -555,10 +555,10 @@ export default function AdminSlidersPage() {
                   type="button"
                   onClick={() => setFormType("IMAGE_BG_CONTENT")}
                   className={`p-3 rounded-xl border text-left transition flex flex-col justify-between cursor-pointer ${
-                    formType === "IMAGE_BG_CONTENT"
-                      ? "bg-purple-950/20 border-purple-500 ring-1 ring-purple-500/50"
-                      : "bg-card border-border hover:border-border/80"
-                  }`}
+ formType === "IMAGE_BG_CONTENT"
+ ? "bg-purple-950/20 border-purple-500 ring-1 ring-purple-500/50"
+ : "bg-card border-border hover:border-border/80"
+ }`}
                 >
                   <div className="flex items-center justify-between">
                     <Sparkles className="h-4 w-4 text-purple-500" />
@@ -574,10 +574,10 @@ export default function AdminSlidersPage() {
                   type="button"
                   onClick={() => setFormType("IMAGE_ONLY")}
                   className={`p-3 rounded-xl border text-left transition flex flex-col justify-between cursor-pointer ${
-                    formType === "IMAGE_ONLY"
-                      ? "bg-sky-950/20 border-sky-500 ring-1 ring-sky-500/50"
-                      : "bg-card border-border hover:border-border/80"
-                  }`}
+ formType === "IMAGE_ONLY"
+ ? "bg-sky-950/20 border-sky-500 ring-1 ring-sky-500/50"
+ : "bg-card border-border hover:border-border/80"
+ }`}
                 >
                   <div className="flex items-center justify-between">
                     <ImageIcon className="h-4 w-4 text-brand" />
@@ -593,10 +593,10 @@ export default function AdminSlidersPage() {
                   type="button"
                   onClick={() => setFormType("CONTENT_ONLY")}
                   className={`p-3 rounded-xl border text-left transition flex flex-col justify-between cursor-pointer ${
-                    formType === "CONTENT_ONLY"
-                      ? "bg-emerald-950/20 border-emerald-500 ring-1 ring-emerald-500/50"
-                      : "bg-card border-border hover:border-border/80"
-                  }`}
+ formType === "CONTENT_ONLY"
+ ? "bg-emerald-950/20 border-emerald-500 ring-1 ring-emerald-500/50"
+ : "bg-card border-border hover:border-border/80"
+ }`}
                 >
                   <div className="flex items-center justify-between">
                     <Flame className="h-4 w-4 text-emerald-500" />
@@ -707,10 +707,10 @@ export default function AdminSlidersPage() {
                       type="button"
                       onClick={() => setFormBgGradient(p.value)}
                       className={`h-11 rounded-lg bg-gradient-to-r ${p.value} p-2 text-left flex items-center justify-between border transition cursor-pointer ${
-                        formBgGradient === p.value
-                          ? "border-white ring-2 ring-brand"
-                          : "border-border/60 opacity-80 hover:opacity-100"
-                      }`}
+ formBgGradient === p.value
+ ? "border-white ring-2 ring-brand"
+ : "border-border/60 opacity-80 hover:opacity-100"
+ }`}
                     >
                       <span className="text-[11px] font-bold text-white">
                         {p.label}

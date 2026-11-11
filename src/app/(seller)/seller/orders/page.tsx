@@ -97,10 +97,10 @@ export default function SellerOrdersPage() {
               key={tab.id}
               onClick={() => setFilterStatus(tab.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
-                filterStatus === tab.id
-                  ? "bg-brand-600 text-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
-              }`}
+ filterStatus === tab.id
+ ? "bg-brand-600 text-foreground"
+ : "text-muted-foreground hover:text-foreground hover:bg-muted"
+ }`}
             >
               <span>{tab.label}</span>
               <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-muted border border-border text-foreground">
@@ -123,7 +123,7 @@ export default function SellerOrdersPage() {
       </div>
 
       {/* Orders Table */}
-      <div className="rounded-2xl bg-card border border-border overflow-hidden shadow-sm">
+      <div className="rounded-2xl bg-card border border-border overflow-hidden">
         {isLoading ? (
           <div className="p-12 text-center text-muted-foreground text-xs">
             <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2 text-brand-500" />

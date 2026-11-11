@@ -134,7 +134,7 @@ export default function SellerSettingsPage() {
       </div>
 
       {/* Vacation / Holiday Mode Card */}
-      <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-amber-950/20 border border-border shadow-sm space-y-4">
+      <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-amber-950/20 border border-border space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
             <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 shrink-0">

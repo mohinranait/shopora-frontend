@@ -162,7 +162,7 @@ export default function AdminCustomersPage() {
             variant="outline"
             onClick={() => refetch()}
             disabled={isFetching}
-            className="text-xs gap-1.5 cursor-pointer shadow-xs"
+            className="text-xs gap-1.5 cursor-pointer"
           >
             <RefreshCw
               className={`h-3.5 w-3.5 ${isFetching ? "animate-spin text-brand" : "text-muted-foreground"}`}
@@ -233,10 +233,10 @@ export default function AdminCustomersPage() {
                 setPage(1);
               }}
               className={`rounded-md px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
-                filterTab === tab.value
-                  ? "bg-brand text-white shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+ filterTab === tab.value
+ ? "bg-brand text-white "
+ : "text-muted-foreground hover:text-foreground"
+ }`}
             >
               {tab.label}
             </button>
@@ -296,7 +296,7 @@ export default function AdminCustomersPage() {
                   {/* 1. Customer Name & Avatar */}
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-brand-deep to-sky-600 font-bold text-white shadow-xs">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-brand-deep to-sky-600 font-bold text-white">
                         {c.avatar ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img

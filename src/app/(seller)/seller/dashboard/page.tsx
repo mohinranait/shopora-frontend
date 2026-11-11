@@ -101,7 +101,7 @@ export default function SellerDashboardPage() {
           {adminNotices.map((notice) => (
             <Card
               key={notice.id}
-              className="border-2 border-amber-500/40 bg-amber-500/10 shadow-lg shadow-amber-500/5 animate-in fade-in"
+              className="border-2 border-amber-500/40 bg-amber-500/10 animate-in fade-in"
             >
               <CardContent className="p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-start gap-3.5 min-w-0">
@@ -197,7 +197,7 @@ export default function SellerDashboardPage() {
       )}
 
       {/* Hero Welcome & Quick Actions */}
-      <Card className="border-border bg-card shadow-xs overflow-hidden">
+      <Card className="border-border bg-card overflow-hidden">
         <CardContent className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -235,7 +235,7 @@ export default function SellerDashboardPage() {
 
           <div className="flex flex-wrap items-center gap-2.5">
             <Link href="/seller/products/new">
-              <Button size="sm" variant="brand" className="gap-1.5 text-xs font-bold shadow-xs">
+              <Button size="sm" variant="brand" className="gap-1.5 text-xs font-bold">
                 <Plus className="h-4 w-4" />
                 Add Product
               </Button>
@@ -260,7 +260,7 @@ export default function SellerDashboardPage() {
       {/* Financial Investment & Profit Intelligence */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Active Stock Investment */}
-        <Card className="border-border bg-card shadow-xs hover:border-brand/40 transition-colors">
+        <Card className="border-border bg-card hover:border-brand/40 transition-colors">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -283,7 +283,7 @@ export default function SellerDashboardPage() {
         </Card>
 
         {/* Gross Sales Revenue */}
-        <Card className="border-border bg-card shadow-xs hover:border-purple-500/40 transition-colors">
+        <Card className="border-border bg-card hover:border-purple-500/40 transition-colors">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -308,7 +308,7 @@ export default function SellerDashboardPage() {
         </Card>
 
         {/* Realized Net Profit */}
-        <Card className="border-emerald-500/30 bg-emerald-500/5 shadow-xs hover:border-emerald-500/50 transition-colors">
+        <Card className="border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-500/50 transition-colors">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
@@ -336,7 +336,7 @@ export default function SellerDashboardPage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Available Balance */}
-        <Card className="border-border bg-card shadow-xs hover:border-border/80 transition-colors">
+        <Card className="border-border bg-card hover:border-border/80 transition-colors">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-muted-foreground">Available Balance</span>
@@ -362,7 +362,7 @@ export default function SellerDashboardPage() {
         </Card>
 
         {/* 7-Day Escrow Balance */}
-        <Card className="border-border bg-card shadow-xs hover:border-border/80 transition-colors">
+        <Card className="border-border bg-card hover:border-border/80 transition-colors">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-muted-foreground">7-Day Escrow Hold</span>
@@ -388,7 +388,7 @@ export default function SellerDashboardPage() {
         </Card>
 
         {/* Total Orders */}
-        <Card className="border-border bg-card shadow-xs hover:border-border/80 transition-colors">
+        <Card className="border-border bg-card hover:border-border/80 transition-colors">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-muted-foreground">Shipments & Orders</span>
@@ -416,7 +416,7 @@ export default function SellerDashboardPage() {
         </Card>
 
         {/* Active Products */}
-        <Card className="border-border bg-card shadow-xs hover:border-border/80 transition-colors">
+        <Card className="border-border bg-card hover:border-border/80 transition-colors">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-muted-foreground">Catalog Products</span>
@@ -447,7 +447,7 @@ export default function SellerDashboardPage() {
       {/* Operational Highlights: Courier Logistics & Vacation Quick Switch */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Logistics Automation Card */}
-        <Card className="border-border bg-card shadow-xs md:col-span-2 flex flex-col justify-between">
+        <Card className="border-border bg-card md:col-span-2 flex flex-col justify-between">
           <CardContent className="p-5">
             <div>
               <div className="flex items-center gap-2.5">
@@ -489,7 +489,7 @@ export default function SellerDashboardPage() {
         </Card>
 
         {/* Store Autonomy & Holiday Mode */}
-        <Card className="border-border bg-card shadow-xs flex flex-col justify-between">
+        <Card className="border-border bg-card flex flex-col justify-between">
           <CardContent className="p-5">
             <div>
               <div className="flex items-center gap-2.5">
@@ -527,7 +527,7 @@ export default function SellerDashboardPage() {
       </div>
 
       {/* Recent SubOrders Table */}
-      <Card className="border-border bg-card shadow-xs overflow-hidden">
+      <Card className="border-border bg-card overflow-hidden">
         <CardHeader className="p-5 border-b border-border flex flex-row items-center justify-between space-y-0 bg-muted/20">
           <div>
             <CardTitle className="text-base font-bold text-foreground">Recent Orders</CardTitle>

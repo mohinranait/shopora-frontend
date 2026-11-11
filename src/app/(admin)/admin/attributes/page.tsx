@@ -388,7 +388,7 @@ export default function AdminAttributesPage() {
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-card border-border shadow-xs">
+        <Card className="bg-card border-border">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
@@ -402,7 +402,7 @@ export default function AdminAttributesPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border shadow-xs">
+        <Card className="bg-card border-border">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
@@ -416,7 +416,7 @@ export default function AdminAttributesPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border shadow-xs">
+        <Card className="bg-card border-border">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
@@ -456,12 +456,12 @@ export default function AdminAttributesPage() {
 
           {/* Attributes Scrollable Stack */}
           {loading ? (
-            <div className="p-8 text-center bg-card rounded-2xl border border-border shadow-xs">
+            <div className="p-8 text-center bg-card rounded-2xl border border-border">
               <Loader2 className="h-6 w-6 text-sky-400 animate-spin mx-auto" />
               <p className="text-xs text-muted-foreground mt-2">Loading attributes...</p>
             </div>
           ) : filteredAttributes.length === 0 ? (
-            <div className="p-8 text-center bg-card rounded-2xl border border-border shadow-xs space-y-2">
+            <div className="p-8 text-center bg-card rounded-2xl border border-border space-y-2">
               <Layers className="h-8 w-8 text-muted-foreground/60 mx-auto" />
               <p className="text-xs font-medium text-muted-foreground">No attributes found</p>
               <p className="text-[11px] text-muted-foreground">
@@ -477,10 +477,10 @@ export default function AdminAttributesPage() {
                     key={attr.id}
                     onClick={() => setSelectedAttributeId(attr.id)}
                     className={`p-3.5 rounded-xl border transition-all cursor-pointer select-none group ${
-                      isSelected
-                        ? "bg-brand/10 border-brand shadow-xs"
-                        : "bg-card hover:bg-muted/40 border-border hover:border-border/80 shadow-xs"
-                    }`}
+ isSelected
+ ? "bg-brand/10 border-brand "
+ : "bg-card hover:bg-muted/40 border-border hover:border-border/80 "
+ }`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0">
@@ -523,8 +523,8 @@ export default function AdminAttributesPage() {
                         </button>
                         <ChevronRight
                           className={`h-4 w-4 transition-transform ${
-                            isSelected ? "text-brand translate-x-0.5" : "text-muted-foreground/60"
-                          }`}
+ isSelected ? "text-brand translate-x-0.5" : "text-muted-foreground/60"
+ }`}
                         />
                       </div>
                     </div>
@@ -563,7 +563,7 @@ export default function AdminAttributesPage() {
         {/* Right Column: Values Workspace for Selected Attribute (7 Cols) */}
         <div className="lg:col-span-7">
           {selectedAttribute ? (
-            <Card className="bg-card border-border overflow-hidden shadow-xs">
+            <Card className="bg-card border-border overflow-hidden">
               <CardHeader className="bg-muted/30 border-b border-border p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">

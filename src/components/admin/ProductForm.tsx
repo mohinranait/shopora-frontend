@@ -761,7 +761,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* SECTION 1: Product Type Toggle (Simple vs Variable)               */}
       {/* ================================================================= */}
-      <Card className="bg-card border-border overflow-hidden shadow-xs">
+      <Card className="bg-card border-border overflow-hidden">
         <CardHeader className="bg-muted/30 p-4 border-b border-border">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
             <Layers className="h-4 w-4 text-brand" />
@@ -836,7 +836,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* SECTION 2: General Information                                    */}
       {/* ================================================================= */}
-      <Card className="bg-card border-border overflow-hidden shadow-xs">
+      <Card className="bg-card border-border overflow-hidden">
         <CardHeader className="bg-muted/30 p-4 border-b border-border">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
             <Info className="h-4 w-4 text-sky-400" />
@@ -999,7 +999,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* SECTION 3: Media & Gallery                                        */}
       {/* ================================================================= */}
-      <Card className="bg-card border-border overflow-hidden shadow-xs">
+      <Card className="bg-card border-border overflow-hidden">
         <CardHeader className="bg-muted/30 p-4 border-b border-border">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
             <ImageIcon className="h-4 w-4 text-emerald-400" />
@@ -1124,7 +1124,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* SECTION 4: SIMPLE PRODUCT PRICING & INVENTORY                     */}
       {/* ================================================================= */}
       {productType === "SIMPLE" && (
-        <Card className="bg-card border-border overflow-hidden shadow-xs">
+        <Card className="bg-card border-border overflow-hidden">
           <CardHeader className="bg-muted/30 p-4 border-b border-border">
             <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-emerald-400" />
@@ -1280,7 +1280,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* SECTION 5: VARIABLE PRODUCT (Attributes Selection & Matrix Table)  */}
       {/* ================================================================= */}
       {productType === "VARIABLE" && (
-        <Card className="bg-card border-purple-500/30 overflow-hidden shadow-xs">
+        <Card className="bg-card border-purple-500/30 overflow-hidden">
           <CardHeader className="bg-purple-950/40 p-4 border-b border-purple-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <CardTitle className="text-sm font-bold uppercase tracking-wider text-purple-200 flex items-center gap-2">
@@ -1551,7 +1551,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                 </div>
 
                 {/* Table */}
-                <div className="rounded-xl border border-border overflow-x-auto shadow-inner">
+                <div className="rounded-xl border border-border overflow-x-auto">
                   <Table className="w-full text-left text-xs min-w-237.5">
                     <TableHeader className="bg-muted/40 border-b border-border">
                       <TableRow className="border-border hover:bg-transparent">
@@ -1895,7 +1895,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* SECTION 6: Shipping & Logistics                                   */}
       {/* ================================================================= */}
-      <Card className="bg-card border-border overflow-hidden shadow-xs">
+      <Card className="bg-card border-border overflow-hidden">
         <CardHeader className="bg-muted/30 p-4 border-b border-border">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
             <Truck className="h-4 w-4 text-sky-400" />
@@ -1975,7 +1975,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* SECTION 6: Frequently Bought Together (Bundle Recommendations)    */}
       {/* ================================================================= */}
-      <Card className="bg-card border-border overflow-hidden shadow-xs">
+      <Card className="bg-card border-border overflow-hidden">
         <CardHeader className="bg-muted/30 p-4 border-b border-border">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-indigo-400" />
@@ -2127,7 +2127,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* SECTION 7: SEO Friendly Metadata & Live Google Preview            */}
       {/* ================================================================= */}
-      <Card className="bg-card border-border overflow-hidden shadow-xs">
+      <Card className="bg-card border-border overflow-hidden">
         <CardHeader className="bg-muted/30 p-4 border-b border-border">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
             <Globe className="h-4 w-4 text-emerald-400" />
@@ -2204,7 +2204,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* SECTION 8: Visibility & Flags                                     */}
       {/* ================================================================= */}
-      <Card className="bg-card border-border overflow-hidden shadow-xs">
+      <Card className="bg-card border-border overflow-hidden">
         <CardHeader className="bg-muted/30 p-4 border-b border-border">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-brand" />
@@ -2260,7 +2260,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       {/* ================================================================= */}
       {/* Bottom Sticky Action Bar                                          */}
       {/* ================================================================= */}
-      <div className="sticky bottom-4 z-30 p-3 sm:p-4 rounded-2xl bg-card/90 backdrop-blur-md border border-border shadow-lg flex items-center justify-between gap-4">
+      <div className="sticky bottom-4 z-30 p-3 sm:p-4 rounded-2xl bg-card/90 backdrop-blur-md border border-border flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
           <span>Ready to save changes</span>

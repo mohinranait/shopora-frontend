@@ -226,7 +226,7 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps = {}) {
           </Button>
 
           {createOpen && (
-            <div className="absolute right-0 mt-2 w-48 rounded-xl bg-popover border border-border py-1 text-xs z-50 shadow-lg animate-in fade-in zoom-in-95 duration-100">
+            <div className="absolute right-0 mt-2 w-48 rounded-xl bg-popover border border-border py-1 text-xs z-50 animate-in fade-in zoom-in-95 duration-100">
               <Link
                 href="/admin/products/new"
                 onClick={() => setCreateOpen(false)}
@@ -307,7 +307,7 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps = {}) {
           </button>
 
           {notificationOpen && (
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-xl bg-popover border border-border text-xs z-50 shadow-lg overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-xl bg-popover border border-border text-xs z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
               <div className="flex items-center justify-between p-3.5 border-b border-border bg-muted/40">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-foreground">Notifications</span>
@@ -349,8 +349,8 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps = {}) {
                         key={item.id}
                         onClick={() => handleNotificationClick(item)}
                         className={`p-3 flex items-start gap-3 hover:bg-accent/60 transition cursor-pointer ${
-                          !item.isRead ? "bg-accent/30" : "opacity-80"
-                        }`}
+ !item.isRead ? "bg-accent/30" : "opacity-80"
+ }`}
                       >
                         <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center text-brand shrink-0 mt-0.5">
                           <Icon className="h-4 w-4" />
@@ -424,7 +424,7 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps = {}) {
           </button>
 
           {profileOpen && (
-            <div className="absolute right-0 mt-2 w-64 rounded-xl bg-popover border border-border py-2 text-xs z-50 shadow-lg animate-in fade-in zoom-in-95 duration-100">
+            <div className="absolute right-0 mt-2 w-64 rounded-xl bg-popover border border-border py-2 text-xs z-50 animate-in fade-in zoom-in-95 duration-100">
               {/* Dynamic User Header */}
               <div className="px-4 py-3 border-b border-border">
                 <p className="font-bold text-foreground text-sm truncate">{user?.name || "Super Admin"}</p>

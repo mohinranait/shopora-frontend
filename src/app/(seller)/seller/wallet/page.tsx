@@ -128,7 +128,7 @@ export default function SellerWalletPage() {
       {/* Financial Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Available for Withdrawal */}
-        <div className="p-5 rounded-2xl bg-card border border-border shadow-sm relative overflow-hidden">
+        <div className="p-5 rounded-2xl bg-card border border-border relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-muted-foreground">Available to Withdraw</span>
             <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
@@ -153,7 +153,7 @@ export default function SellerWalletPage() {
         </div>
 
         {/* 7-Day Escrow Hold */}
-        <div className="p-5 rounded-2xl bg-card border border-border shadow-sm relative overflow-hidden">
+        <div className="p-5 rounded-2xl bg-card border border-border relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-muted-foreground">7-Day Escrow Protection</span>
             <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
@@ -172,7 +172,7 @@ export default function SellerWalletPage() {
         </div>
 
         {/* Escrow Policy Summary */}
-        <div className="p-5 rounded-2xl bg-card border border-border shadow-sm flex flex-col justify-between sm:col-span-2 lg:col-span-1">
+        <div className="p-5 rounded-2xl bg-card border border-border flex flex-col justify-between sm:col-span-2 lg:col-span-1">
           <div>
             <div className="flex items-center gap-2 text-xs font-bold text-foreground">
               <ShieldCheck className="h-4 w-4 text-emerald-400" />
@@ -189,7 +189,7 @@ export default function SellerWalletPage() {
       </div>
 
       {/* Active Escrow Holdings Table */}
-      <div className="rounded-2xl bg-card border border-border overflow-hidden shadow-sm">
+      <div className="rounded-2xl bg-card border border-border overflow-hidden">
         <div className="p-5 border-b border-border flex items-center justify-between">
           <div>
             <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
@@ -260,7 +260,7 @@ export default function SellerWalletPage() {
       </div>
 
       {/* Payout History Table */}
-      <div className="rounded-2xl bg-card border border-border overflow-hidden shadow-sm">
+      <div className="rounded-2xl bg-card border border-border overflow-hidden">
         <div className="p-5 border-b border-border flex items-center justify-between">
           <div>
             <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
@@ -333,7 +333,7 @@ export default function SellerWalletPage() {
       {/* Payout Request Modal */}
       {showPayoutModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-card border border-border text-foreground rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+          <div className="bg-card border border-border text-foreground rounded-2xl p-6 max-w-md w-full space-y-4">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <div className="font-bold text-base text-foreground">Request Wallet Payout</div>
               <button
@@ -383,10 +383,10 @@ export default function SellerWalletPage() {
                       type="button"
                       onClick={() => setPaymentMethod(m.id)}
                       className={`py-2 rounded-xl text-xs font-bold border transition-colors ${
-                        paymentMethod === m.id
-                          ? "bg-brand-600 border-brand-500 text-foreground"
-                          : "bg-background border-border text-muted-foreground hover:text-foreground"
-                      }`}
+ paymentMethod === m.id
+ ? "bg-brand-600 border-brand-500 text-foreground"
+ : "bg-background border-border text-muted-foreground hover:text-foreground"
+ }`}
                     >
                       {m.label}
                     </button>

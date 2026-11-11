@@ -262,10 +262,10 @@ export default function AdminDashboardPage() {
                 key={range}
                 onClick={() => setTimeRange(range)}
                 className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
-                  timeRange === range
-                    ? "bg-brand text-white shadow-xs"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+ timeRange === range
+ ? "bg-brand text-white "
+ : "text-muted-foreground hover:text-foreground"
+ }`}
               >
                 {range === "today"
                   ? "Today"
@@ -283,7 +283,7 @@ export default function AdminDashboardPage() {
             size="sm"
             variant="outline"
             onClick={handleRefresh}
-            className="text-xs gap-1.5 cursor-pointer shadow-xs"
+            className="text-xs gap-1.5 cursor-pointer"
             disabled={isRefreshing}
           >
             <RefreshCw
@@ -292,7 +292,7 @@ export default function AdminDashboardPage() {
             <span className="hidden sm:inline">Refresh</span>
           </Button>
 
-          <Button size="sm" variant="outline" className="text-xs gap-1.5 cursor-pointer shadow-xs">
+          <Button size="sm" variant="outline" className="text-xs gap-1.5 cursor-pointer">
             <Download className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="hidden sm:inline">Export Report</span>
           </Button>
@@ -446,8 +446,8 @@ export default function AdminDashboardPage() {
                 <button
                   onClick={() => setChartType("bar")}
                   className={`p-1.5 rounded cursor-pointer transition ${
-                    chartType === "bar" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
-                  }`}
+ chartType === "bar" ? "bg-background text-foreground " : "text-muted-foreground hover:text-foreground"
+ }`}
                   title="Bar View"
                 >
                   <BarChart3 className="h-3.5 w-3.5" />
@@ -455,8 +455,8 @@ export default function AdminDashboardPage() {
                 <button
                   onClick={() => setChartType("area")}
                   className={`p-1.5 rounded cursor-pointer transition ${
-                    chartType === "area" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
-                  }`}
+ chartType === "area" ? "bg-background text-foreground " : "text-muted-foreground hover:text-foreground"
+ }`}
                   title="Area View"
                 >
                   <LineChartIcon className="h-3.5 w-3.5" />
@@ -849,7 +849,7 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Link
           href="/admin/products/new"
-          className="p-4 rounded-xl border border-border bg-card hover:border-brand/40 hover:shadow-xs transition flex items-center gap-3.5 group"
+          className="p-4 rounded-xl border border-border bg-card hover:border-brand/40 hover: transition flex items-center gap-3.5 group"
         >
           <div className="h-10 w-10 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-brand">
             <Package className="h-5 w-5" />
@@ -862,7 +862,7 @@ export default function AdminDashboardPage() {
 
         <Link
           href="/admin/attributes"
-          className="p-4 rounded-xl border border-border bg-card hover:border-brand/40 hover:shadow-xs transition flex items-center gap-3.5 group"
+          className="p-4 rounded-xl border border-border bg-card hover:border-brand/40 hover: transition flex items-center gap-3.5 group"
         >
           <div className="h-10 w-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500">
             <SlidersHorizontal className="h-5 w-5" />
@@ -875,7 +875,7 @@ export default function AdminDashboardPage() {
 
         <Link
           href="/admin/sellers"
-          className="p-4 rounded-xl border border-border bg-card hover:border-brand/40 hover:shadow-xs transition flex items-center gap-3.5 group"
+          className="p-4 rounded-xl border border-border bg-card hover:border-brand/40 hover: transition flex items-center gap-3.5 group"
         >
           <div className="h-10 w-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
             <ShieldCheck className="h-5 w-5" />
@@ -888,7 +888,7 @@ export default function AdminDashboardPage() {
 
         <Link
           href="/admin/payouts"
-          className="p-4 rounded-xl border border-border bg-card hover:border-brand/40 hover:shadow-xs transition flex items-center gap-3.5 group"
+          className="p-4 rounded-xl border border-border bg-card hover:border-brand/40 hover: transition flex items-center gap-3.5 group"
         >
           <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500">
             <CreditCard className="h-5 w-5" />

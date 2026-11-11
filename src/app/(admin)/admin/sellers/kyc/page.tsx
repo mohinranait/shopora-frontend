@@ -394,7 +394,7 @@ export default function AdminSellersKycPage() {
 
       {/* Metrics Banner */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="border-border bg-card p-4 shadow-xs">
+        <Card className="border-border bg-card p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">Pending Verification</span>
             <span className="rounded-lg bg-amber-500/10 p-2 text-amber-600 dark:text-amber-400">
@@ -405,7 +405,7 @@ export default function AdminSellersKycPage() {
           <p className="text-[11px] text-muted-foreground mt-0.5">Awaiting compliance review</p>
         </Card>
 
-        <Card className="border-border bg-card p-4 shadow-xs">
+        <Card className="border-border bg-card p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Verified Merchants</span>
             <span className="rounded-lg bg-emerald-500/10 p-2 text-emerald-600 dark:text-emerald-400">
@@ -416,7 +416,7 @@ export default function AdminSellersKycPage() {
           <p className="text-[11px] text-muted-foreground mt-0.5">Full compliance verified</p>
         </Card>
 
-        <Card className="border-border bg-card p-4 shadow-xs">
+        <Card className="border-border bg-card p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-rose-600 dark:text-rose-400">Rejected / Deficient</span>
             <span className="rounded-lg bg-rose-500/10 p-2 text-rose-600 dark:text-rose-400">
@@ -429,7 +429,7 @@ export default function AdminSellersKycPage() {
       </div>
 
       {/* Controls: Tabs & Search */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-3 sm:flex-row sm:items-center sm:justify-between shadow-xs">
+      <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-1.5">
           <Button
             type="button"
@@ -503,13 +503,13 @@ export default function AdminSellersKycPage() {
           </Button>
         </Card>
       ) : filteredSellers.length === 0 ? (
-        <Card className="border-border bg-card p-12 text-center text-muted-foreground shadow-xs">
+        <Card className="border-border bg-card p-12 text-center text-muted-foreground">
           <ShieldCheck className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
           <p className="text-sm font-bold text-foreground">No KYC applications in this queue</p>
           <p className="text-xs text-muted-foreground mt-1">All merchant documents are up-to-date.</p>
         </Card>
       ) : (
-        <Card className="overflow-hidden border-border bg-card shadow-xs">
+        <Card className="overflow-hidden border-border bg-card">
           <Table>
             <TableHeader className="border-b border-border bg-muted/50">
               <TableRow className="border-border hover:bg-transparent">
