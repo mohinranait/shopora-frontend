@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Star, ShoppingBag, Heart, Check, Store } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
@@ -19,22 +20,20 @@ interface ProductCardProps {
  * Helper to safely resolve the primary product image URL from Prisma relational data or API payload
  */
 function resolveProductImageUrl(product: IProductItem): string {
-  // 1. Check mainImage relation (UseMedia object with media.url) or direct URL string
-  if (product.mainImage) {
-    if (typeof product.mainImage === "object" && product.mainImage.media?.url) {
-      return product.mainImage.media.url;
-    }
+  // 1. Check mainImage relation (UseMedia object with media.url)
+  if (product.mainImage?.media?.url) {
+    return product.mainImage.media.url;
   }
 
   // 2. Check product gallery images list
   if (product.images && product.images.length > 0) {
     const firstImg = product.images[0];
-    if (firstImg) {
-      if (firstImg.image?.media?.url) return firstImg.image.media.url;
+    if (firstImg?.image?.media?.url) {
+      return firstImg.image.media.url;
     }
   }
 
-  return "/images/placeholder-product.png";
+  return "/images/placeholder-product.svg";
 }
 
 /**
@@ -72,7 +71,7 @@ export function ProductCardSkeleton() {
  * Storefront Product Card
  * Strictly typed with DB schema relations (Product, UseMedia, SellerProfile, Category)
  */
-export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+export const ProductCard = React.memo<ProductCardProps>(function ProductCard({ product }) {
   const { isWishlisted: checkWishlist, toggleWishlist, isToggling } = useWishlist();
   const isWishlisted = checkWishlist(product.id);
   const [isAdded, setIsAdded] = useState(false);
@@ -194,15 +193,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <Heart className={`h-4 w-4 transition-colors ${isWishlisted ? "fill-rose-500 text-rose-500" : ""}`} />
         </button>
 
-        {/* Product Image */}
+        {/* Product Image with Next.js optimized Image */}
         <Link
           href={`/products/${product.slug}`}
-          className="h-full w-full flex items-center justify-center"
+          className="relative h-full w-full flex items-center justify-center"
         >
-          <img
+          <Image
             src={imageUrl}
             alt={product.name}
-            className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 260px"
+            className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
           />
         </Link>
@@ -306,4 +307,4 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
     </div>
   );
-};
+});

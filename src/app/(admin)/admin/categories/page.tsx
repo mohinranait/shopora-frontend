@@ -33,7 +33,7 @@ import {
   useDeleteCategoryMutation,
 } from "@/redux";
 import { getApiErrorMessage } from "@/services/api";
-import { ICategory, ImageValue } from "@/types";
+import { ICategory, ImageValue, getCategoryImageUrl } from "@/types";
 import { toast } from "sonner";
 import { ImageUploadField } from "@/components/media/ImageUploadField";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -105,7 +105,7 @@ export default function AdminCategoriesPage() {
 
     if (cat.image || cat.useMedia) {
       setFormImage({
-        url: cat.image?.media?.url || "",
+        url: getCategoryImageUrl(cat) || "",
         useMediaId: cat.imageId ?? cat.useMediaId ?? undefined,
         alt: cat.useMedia?.alt || `${cat.name} Category`,
         description: cat.useMedia?.description || "",

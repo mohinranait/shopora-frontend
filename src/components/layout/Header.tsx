@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -24,8 +26,18 @@ import {
   Package,
   Loader2,
 } from "lucide-react";
-import { CartDrawer } from "../cart/CartDrawer";
-import { MobileNavDrawer } from "./MobileNavDrawer";
+
+// Code-split heavy interactive drawers so they do not block initial homepage render
+const MobileNavDrawer = dynamic(
+  () => import("./MobileNavDrawer").then((mod) => mod.MobileNavDrawer),
+  { ssr: false }
+);
+
+const CartDrawer = dynamic(
+  () => import("../cart/CartDrawer").then((mod) => mod.CartDrawer),
+  { ssr: false }
+);
+
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useCart } from "@/context/CartContext";
@@ -84,7 +96,7 @@ export const Header: React.FC = () => {
         setIsScrolled(false);
       }
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -138,10 +150,13 @@ export const Header: React.FC = () => {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0 group">
             {settings?.site_logo && settings.site_logo !== "/logo.png" ? (
-              <img
+              <Image
                 src={settings.site_logo}
                 alt={settings?.site_name || "Shopora"}
-                className="h-9 max-w-[140px] object-contain group-hover:scale-105 transition-transform"
+                width={140}
+                height={36}
+                priority
+                className="h-9 max-w-[140px] w-auto object-contain group-hover:scale-105 transition-transform"
               />
             ) : (
               <div className="h-9 w-9 rounded-lg bg-linear-to-tr from-brand-deep to-brand flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
@@ -207,10 +222,13 @@ export const Header: React.FC = () => {
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors"
                           >
                             <div className="h-10 w-10 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden shrink-0 relative flex items-center justify-center">
-                              {((p.mainImage as any)?.media?.url || (typeof p.mainImage === "string" ? p.mainImage : null)) ? (
-                                <img
-                                  src={((p.mainImage as any)?.media?.url || (typeof p.mainImage === "string" ? p.mainImage : "")) as string}
+                              {((typeof p.mainImage === "string" ? p.mainImage : p.mainImage?.media?.url)) ? (
+                                <Image
+                                  src={typeof p.mainImage === "string" ? p.mainImage : p.mainImage?.media?.url || ""}
                                   alt={p.name}
+                                  width={40}
+                                  height={40}
+                                  sizes="40px"
                                   className="h-full w-full object-cover"
                                 />
                               ) : (
@@ -592,14 +610,18 @@ export const Header: React.FC = () => {
         </div>
       </header>
 
-      {/* Slide-over Mobile Navigation Drawer */}
-      <MobileNavDrawer
-        isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
-      />
+      {/* Slide-over Mobile Navigation Drawer (mounted on demand) */}
+      {isMobileMenuOpen && (
+        <MobileNavDrawer
+          isOpen={isMobileMenuOpen}
+          onClose={() => setIsMobileMenuOpen(false)}
+        />
+      )}
 
-      {/* Slide-over Cart Drawer */}
-      <CartDrawer isOpen={isDrawerOpen} onClose={closeDrawer} />
+      {/* Slide-over Cart Drawer (mounted on demand) */}
+      {isDrawerOpen && (
+        <CartDrawer isOpen={isDrawerOpen} onClose={closeDrawer} />
+      )}
     </>
   );
 };

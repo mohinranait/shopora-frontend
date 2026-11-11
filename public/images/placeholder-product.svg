@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400" fill="none">
+  <rect width="400" height="400" fill="#F1F5F9"/>
+  <path d="M200 150L260 185V255L200 290L140 255V185L200 150Z" stroke="#94A3B8" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M200 150V290" stroke="#94A3B8" stroke-width="8"/>
+  <path d="M140 185L200 220L260 185" stroke="#94A3B8" stroke-width="8" stroke-linejoin="round"/>
+  <text x="200" y="325" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600" fill="#94A3B8">Shopora Product</text>
+</svg>

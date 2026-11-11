@@ -37,7 +37,7 @@ function CategoriesSkeleton() {
             <div className="h-4 w-2/3 rounded bg-slate-200" />
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
               {[1, 2, 3].map((j) => (
-                <div key={j} className="h-[68px] rounded-2xl bg-slate-100" />
+                <div key={j} className="h-17 rounded-2xl bg-slate-100" />
               ))}
             </div>
           </div>
@@ -103,7 +103,7 @@ export default function CategoriesPage() {
   return (
     <div className="pb-16">
       {/* Page header */}
-      <section className="border-b border-slate-200 bg-gradient-to-b from-brand-light/70 to-white">
+      <section className="border-b border-slate-200 bg-linear-to-b from-brand-light/70 to-white">
         <div className="mx-auto max-w-7xl px-4 pb-8 pt-6 sm:px-6 lg:px-8">
           <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-slate-500">
             <Link href="/" className="transition hover:text-brand">

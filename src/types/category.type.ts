@@ -1,11 +1,17 @@
 import { IUseMediaItem } from "./media.type";
 
+/**
+ * Category Image can be a Prisma relational UseMedia object (with media relation),
+ * a direct image URL string, or null.
+ */
+export type ICategoryImage = IUseMediaItem | string | null;
+
 export interface ICategory {
   id: string;
   name: string;
   slug: string;
   description?: string | null;
-  image?: IUseMediaItem | null;
+  image?: ICategoryImage;
   imageId?: string | null;
   icon?: string | null;
   useMediaId?: string | null;
@@ -17,6 +23,23 @@ export interface ICategory {
   displayOrder: number;
   createdAt?: string;
   _count?: { products: number };
+}
+
+/**
+ * Type-safe helper to safely resolve the primary Category image URL
+ * from Prisma relational UseMedia or direct string. Strictly typed with zero `any`.
+ */
+export function getCategoryImageUrl(cat: ICategory): string | null {
+  if (typeof cat.image === "string" && cat.image.trim().length > 0) {
+    return cat.image;
+  }
+  if (cat.image && typeof cat.image === "object" && cat.image.media?.url) {
+    return cat.image.media.url;
+  }
+  if (cat.useMedia?.media?.url) {
+    return cat.useMedia.media.url;
+  }
+  return null;
 }
 
 export interface ICreateCategoryPayload {

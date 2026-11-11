@@ -1,32 +1,29 @@
-
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { fetchData } from "@/lib/fetchData";
-import { ICategory } from "@/types";
+import { ICategory, getCategoryImageUrl } from "@/types";
 
-/**
- * Skeleton Loader shown during Server-Side Category Data Fetching
- */
 export function CategorySectionSkeleton() {
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header Skeleton */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <div className="h-5 w-40 bg-slate-200 rounded-md animate-pulse mb-1" />
+          <div className="h-4 w-32 bg-slate-200 rounded-md animate-pulse mb-1" />
+          <div className="h-6 w-44 bg-slate-200 rounded-md animate-pulse mb-1" />
           <div className="h-3 w-56 bg-slate-100 rounded-md animate-pulse" />
         </div>
         <div className="h-4 w-24 bg-slate-200 rounded-md animate-pulse" />
       </div>
 
-      {/* Grid Cards Skeleton */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3.5">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
+      {/* Grid Cards Skeleton with consistent responsive grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => (
           <div
             key={i}
             className="flex flex-col items-center text-center p-4 rounded-2xl border border-slate-200/80 bg-white/60 shadow-xs animate-pulse"
           >
-            <div className="h-14 w-14 rounded-full bg-slate-200 mb-3" />
+            <div className="h-14 w-14 rounded-2xl bg-slate-200 mb-3" />
             <div className="h-3.5 w-20 bg-slate-200 rounded-md mb-1.5" />
             <div className="h-2.5 w-12 bg-slate-100 rounded-md" />
           </div>
@@ -47,29 +44,20 @@ const CATEGORY_COLORS = [
   "from-slate-700 to-slate-900 text-white",
 ];
 
+export interface CategorySectionProps {
+  initialCategories?: ICategory[];
+}
+
 /**
- * Dynamic Server-Side Category Section
+ * Pre-rendered Synchronous Category Section (Zero Streaming Delay, Zero CLS)
  */
-export async function CategorySection() {
-  let categories: ICategory[] = [];
-
-  try {
-    const data = await fetchData<ICategory[]>("/categories", {
-      revalidate: 60, // Next.js ISR: Cache and revalidate every 60 seconds
-      tags: ["categories"],
-    });
-    categories = Array.isArray(data) ? data.filter((c) => c.isActive) : [];
-  } catch (error) {
-    console.error("[CategorySection] Failed to load categories:", error);
-    categories = [];
-  }
-
-  if (categories.length === 0) {
+export function CategorySection({ initialCategories = [] }: CategorySectionProps) {
+  if (!initialCategories || initialCategories.length === 0) {
     return null;
   }
 
-  // Display top root or main categories (limit to 6 or 12 for clean responsive grid)
-  const displayCategories = categories.slice(0, 12);
+  // Display top root or main categories (limit to 12 for clean responsive grid)
+  const displayCategories = initialCategories.slice(0, 12);
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -100,7 +88,7 @@ export async function CategorySection() {
       {/* Dynamic Categories Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
         {displayCategories.map((cat, idx) => {
-          const imageUrl = (cat.image as any)?.media?.url || cat.useMedia?.media?.url || (typeof cat.image === "string" ? cat.image : null);
+          const imageUrl = getCategoryImageUrl(cat);
           const gradient = CATEGORY_COLORS[idx % CATEGORY_COLORS.length];
 
           return (
@@ -112,11 +100,14 @@ export async function CategorySection() {
               {/* Category Thumbnail / Avatar */}
               <div className="relative h-14 w-14 rounded-2xl overflow-hidden mb-3 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-xs">
                 {imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={imageUrl}
                     alt={cat.useMedia?.alt || cat.name}
+                    width={56}
+                    height={56}
+                    sizes="56px"
                     className="w-full h-full object-cover object-center"
+                    loading="lazy"
                   />
                 ) : (
                   <div

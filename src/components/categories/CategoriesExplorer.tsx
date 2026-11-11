@@ -3,13 +3,13 @@
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ChevronRight, Layers, PackageSearch, Search, X } from "lucide-react";
-import { ICategory } from "@/types";
+import { ICategory, getCategoryImageUrl } from "@/types";
 import { CATEGORY_ACCENTS, CategoryIcon } from "./categoryIcons";
 
 const categoryHref = (cat: ICategory) =>
   `/products?category=${encodeURIComponent(cat.slug || String(cat.id))}`;
 
-const getImage = (cat: ICategory) => (cat.image as any)?.media?.url || cat.useMedia?.media?.url || (typeof cat.image === "string" ? cat.image : null);
+const getImage = (cat: ICategory) => getCategoryImageUrl(cat);
 
 const countDescendants = (cat: ICategory): number =>
   (cat.children ?? []).reduce((sum, child) => sum + 1 + countDescendants(child), 0);
@@ -72,7 +72,7 @@ export function CategoriesExplorer({ categories }: { categories: ICategory[] }) 
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search categories, e.g. “headphones”"
             aria-label="Search categories"
-            className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-11 pr-11 text-sm text-slate-900 shadow-xs outline-none transition placeholder:text-slate-400 focus:border-brand focus:ring-4 focus:ring-brand/15 [&::-webkit-search-cancel-button]:hidden"
+            className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-11 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-brand focus:ring-4 focus:ring-brand/15 [&::-webkit-search-cancel-button]:hidden"
           />
           {search && (
             <button
@@ -178,13 +178,13 @@ function DepartmentCard({
   return (
     <section
       id={`category-${category.slug}`}
-      className="scroll-mt-24 md:scroll-mt-36 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs transition hover:shadow-md"
+      className="scroll-mt-24 md:scroll-mt-36 overflow-hidden rounded-xl border border-slate-200 bg-white transition "
     >
       <div className="grid md:grid-cols-[minmax(0,320px)_1fr]">
         {/* Cover */}
         <Link
           href={categoryHref(category)}
-          className="group relative flex min-h-[180px] flex-col justify-end overflow-hidden p-6 md:min-h-[260px]"
+          className="group relative flex min-h-45 flex-col justify-end overflow-hidden p-6 md:min-h-65"
         >
           {image ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -194,11 +194,11 @@ function DepartmentCard({
               className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className={`absolute inset-0 bg-gradient-to-br ${accent.gradient}`}>
+            <div className={`absolute inset-0 bg-linear-to-br ${accent.gradient}`}>
               <CategoryIcon icon={category.icon} className="absolute -right-6 -top-6 h-40 w-40 text-white/10" strokeWidth={1.25} />
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-slate-950/85 via-slate-950/35 to-transparent" />
 
           <div className="relative space-y-2 text-white">
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 backdrop-blur-sm">
@@ -267,7 +267,7 @@ function SubCategoryTile({
   const grandChildren = category.children ?? [];
 
   return (
-    <li className="rounded-2xl border border-slate-200 bg-white transition hover:border-brand/50 hover:shadow-sm">
+    <li className="rounded-xl border border-slate-200 bg-white transition hover:border-brand/50 ">
       <Link href={categoryHref(category)} className="group flex items-center gap-3 p-3">
         <span
           className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl ring-1 ${accentSoft}`}

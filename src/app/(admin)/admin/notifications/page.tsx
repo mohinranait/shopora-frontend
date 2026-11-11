@@ -106,19 +106,19 @@ export default function AdminNotificationsPage() {
   const getNotificationIcon = (type: string) => {
     switch (type?.toUpperCase()) {
       case "ORDER":
-        return <Package className="h-5 w-5 text-sky-400" />;
+        return <Package className="h-5 w-5 text-sky-500 dark:text-sky-400" />;
       case "ORDER_STATUS":
-        return <Truck className="h-5 w-5 text-purple-400" />;
+        return <Truck className="h-5 w-5 text-purple-500 dark:text-purple-400" />;
       case "KYC":
-        return <Shield className="h-5 w-5 text-emerald-400" />;
+        return <Shield className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />;
       case "LOW_STOCK":
-        return <AlertTriangle className="h-5 w-5 text-amber-400" />;
+        return <AlertTriangle className="h-5 w-5 text-amber-500 dark:text-amber-400" />;
       case "PAYOUT":
-        return <DollarSign className="h-5 w-5 text-emerald-400" />;
+        return <DollarSign className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />;
       case "PRODUCT_APPROVAL":
-        return <CheckCircle2 className="h-5 w-5 text-sky-400" />;
+        return <CheckCircle2 className="h-5 w-5 text-sky-500 dark:text-sky-400" />;
       default:
-        return <Bell className="h-5 w-5 text-slate-400" />;
+        return <Bell className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
@@ -145,13 +145,13 @@ export default function AdminNotificationsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-5">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
-            <Bell className="h-6 w-6 text-sky-400" />
+          <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
+            <Bell className="h-6 w-6 text-sky-500 dark:text-sky-400" />
             <span>Notifications & Operational Alerts</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Real-time multi-vendor broadcasts, order alerts, merchant verification updates, and inventory warnings.
           </p>
         </div>
@@ -197,7 +197,7 @@ export default function AdminNotificationsPage() {
       {/* Filter Tabs */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Status Tab (All / Unread / Read) */}
-        <div className="inline-flex items-center rounded-xl border border-slate-800 bg-slate-900/80 p-1 text-xs">
+        <div className="inline-flex items-center rounded-xl border border-border bg-muted/40 p-1 text-xs">
           <button
             onClick={() => {
               setReadFilter("ALL");
@@ -206,7 +206,7 @@ export default function AdminNotificationsPage() {
             className={`px-3 py-1.5 rounded-lg font-semibold transition ${
  readFilter === "ALL"
  ? "bg-brand text-white "
- : "text-slate-400 hover:text-white"
+ : "text-muted-foreground hover:text-foreground"
  }`}
           >
             All Updates
@@ -219,7 +219,7 @@ export default function AdminNotificationsPage() {
             className={`px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1.5 ${
  readFilter === "UNREAD"
  ? "bg-brand text-white "
- : "text-slate-400 hover:text-white"
+ : "text-muted-foreground hover:text-foreground"
  }`}
           >
             <span>Unread</span>
@@ -237,7 +237,7 @@ export default function AdminNotificationsPage() {
             className={`px-3 py-1.5 rounded-lg font-semibold transition ${
  readFilter === "READ"
  ? "bg-brand text-white "
- : "text-slate-400 hover:text-white"
+ : "text-muted-foreground hover:text-foreground"
  }`}
           >
             Read
@@ -262,8 +262,8 @@ export default function AdminNotificationsPage() {
               }}
               className={`px-3 py-1.5 rounded-lg border transition whitespace-nowrap cursor-pointer ${
  filterType === cat.value
- ? "border-sky-500 bg-sky-500/10 text-sky-400 font-bold"
- : "border-slate-800 bg-slate-900 text-slate-400 hover:text-white hover:border-slate-700"
+ ? "border-sky-500/40 bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold"
+ : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted"
  }`}
             >
               {cat.label}
@@ -276,37 +276,37 @@ export default function AdminNotificationsPage() {
       <Card>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="py-20 text-center text-slate-400 flex flex-col items-center justify-center gap-3">
-              <Loader2 className="h-8 w-8 animate-spin text-sky-400" />
+            <div className="py-20 text-center text-muted-foreground flex flex-col items-center justify-center gap-3">
+              <Loader2 className="h-8 w-8 animate-spin text-sky-500 dark:text-sky-400" />
               <p className="text-sm font-medium">Loading notifications from server...</p>
             </div>
           ) : notifications.length === 0 ? (
-            <div className="py-20 text-center text-slate-400 flex flex-col items-center justify-center gap-3">
-              <div className="h-16 w-16 rounded-2xl bg-slate-800/80 flex items-center justify-center text-slate-500">
+            <div className="py-20 text-center text-muted-foreground flex flex-col items-center justify-center gap-3">
+              <div className="h-16 w-16 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground/60 border border-border">
                 <Inbox className="h-8 w-8" />
               </div>
-              <p className="text-sm font-bold text-slate-200">No notifications found</p>
-              <p className="text-xs text-slate-500 max-w-sm">
+              <p className="text-sm font-bold text-foreground">No notifications found</p>
+              <p className="text-xs text-muted-foreground max-w-sm">
                 You are all caught up! When new orders are placed, KYC applications are submitted, or products require review, alerts will appear here.
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-800">
+            <div className="divide-y divide-border">
               {notifications.map((item: INotification) => (
                 <div
                   key={item.id}
-                  className={`p-4 sm:p-5 flex items-start gap-4 transition hover:bg-slate-900/60 ${
- !item.isRead ? "bg-slate-900/40" : "opacity-80"
+                  className={`p-4 sm:p-5 flex items-start gap-4 transition hover:bg-muted/40 ${
+ !item.isRead ? "bg-muted/30" : "opacity-80"
  }`}
                 >
-                  <div className="h-10 w-10 rounded-xl bg-slate-800 flex items-center justify-center shrink-0 mt-0.5 border border-slate-700/80">
+                  <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center shrink-0 mt-0.5 border border-border">
                     {getNotificationIcon(item.type)}
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 flex-wrap">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-bold text-white">
+                        <h3 className="text-sm font-bold text-foreground">
                           {item.title}
                         </h3>
                         {!item.isRead && (
@@ -316,12 +316,12 @@ export default function AdminNotificationsPage() {
                           {item.type}
                         </Badge>
                       </div>
-                      <span className="text-xs text-slate-400 whitespace-nowrap">
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
                         {formatRelativeTime(item.createdAt)}
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
+                    <p className="text-xs text-foreground mt-1.5 leading-relaxed">
                       {item.message}
                     </p>
 
@@ -332,7 +332,7 @@ export default function AdminNotificationsPage() {
                           onClick={() => {
                             if (!item.isRead) markAsRead(item.id);
                           }}
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-sky-400 hover:text-sky-300 hover:underline"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-sky-600 dark:text-sky-400 hover:underline"
                         >
                           <span>Go to link</span>
                           <ExternalLink className="h-3 w-3" />
@@ -343,7 +343,7 @@ export default function AdminNotificationsPage() {
                         <button
                           onClick={() => handleMarkRead(item.id)}
                           disabled={isMarking}
-                          className="text-xs text-slate-400 hover:text-white transition"
+                          className="text-xs text-muted-foreground hover:text-foreground transition"
                         >
                           Mark as read
                         </button>
@@ -352,7 +352,7 @@ export default function AdminNotificationsPage() {
                       <button
                         onClick={() => handleDelete(item.id)}
                         disabled={isDeleting}
-                        className="text-xs text-slate-500 hover:text-rose-400 transition ml-auto"
+                        className="text-xs text-muted-foreground hover:text-rose-500 transition ml-auto"
                         title="Delete notification"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -366,7 +366,7 @@ export default function AdminNotificationsPage() {
 
           {/* Pagination */}
           {meta && meta.totalPages > 1 && (
-            <div className="p-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <div className="p-4 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
               <span>
                 Showing page {meta.page} of {meta.totalPages} ({meta.total} total)
               </span>

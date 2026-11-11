@@ -4,6 +4,7 @@ import React from "react";
 import { useGetWebsiteSettingsQuery } from "@/redux";
 import { useIsClient } from "@/hooks/useIsClient";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ShoppingBag,
   Mail,
@@ -74,10 +75,13 @@ export const Footer: React.FC = () => {
           <div className="lg:col-span-2">
             <Link href="/" className="inline-flex items-center gap-2 mb-4">
               {settings?.site_logo && settings.site_logo !== "/logo.png" ? (
-                <img
+                <Image
                   src={settings.site_logo}
                   alt={settings?.site_name || "Shopora"}
-                  className="h-9 max-w-[140px] object-contain"
+                  width={140}
+                  height={36}
+                  loading="lazy"
+                  className="h-9 max-w-[140px] w-auto object-contain"
                 />
               ) : (
                 <div className="h-9 w-9 rounded-lg bg-brand-deep flex items-center justify-center text-white">
