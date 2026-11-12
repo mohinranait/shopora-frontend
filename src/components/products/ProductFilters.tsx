@@ -5,7 +5,7 @@ import { Check, ChevronDown, Search, Star } from "lucide-react";
 import type { IFacetCategory, IProductFacets } from "@/lib/products/data";
 import { useProductsQuery } from "./ProductsQueryProvider";
 
-const formatTaka = (n: number) => `৳${n.toLocaleString("en-US")}`;
+import { formatTaka } from "@/lib/money";
 
 function FilterGroup({
   title,

@@ -22,7 +22,21 @@ import {
   useRequestPayoutMutation,
 } from "@/redux";
 import { getApiErrorMessage } from "@/services/api";
+import { formatTaka, sumTaka, toPaisa } from "@/lib/money";
+import type { PayoutMethod } from "@/types";
 import { toast } from "sonner";
+
+const MIN_PAYOUT = 500;
+/** Requests the backend still holds money for */
+const OPEN_PAYOUT_STATUSES = ["PENDING", "APPROVED"];
+
+const TRANSACTION_LABELS: Record<string, string> = {
+  ORDER_EARNING: "Earning (in escrow)",
+  ESCROW_RELEASE: "Escrow released",
+  PAYOUT_WITHDRAWAL: "Withdrawal",
+  REFUND_REVERSAL: "Return reversal",
+  COMMISSION_DEDUCTION: "Commission",
+};
 
 export default function SellerWalletPage() {
   const {
@@ -41,13 +55,19 @@ export default function SellerWalletPage() {
 
   const [showPayoutModal, setShowPayoutModal] = useState(false);
   const [amount, setAmount] = useState<number | "">("");
-  const [paymentMethod, setPaymentMethod] = useState("BKASH");
+  const [paymentMethod, setPaymentMethod] = useState<PayoutMethod>("BKASH");
   const [accountDetails, setAccountDetails] = useState("");
 
   const availableBalance = walletData?.wallet?.balance ?? escrowData?.availableBalance ?? 0;
   const pendingBalance = walletData?.wallet?.pendingBalance ?? escrowData?.pendingBalance ?? 0;
   const heldShipments = escrowData?.heldShipments || [];
   const payouts = walletData?.payouts || [];
+  const transactions = walletData?.transactions || [];
+  // Money already promised to open requests can't be requested again (the API enforces the same rule)
+  const reservedForPayouts = sumTaka(payouts.filter((p) => OPEN_PAYOUT_STATUSES.includes(p.status)).map((p) => p.amount));
+  const withdrawable = Math.max(0, (toPaisa(availableBalance) - toPaisa(reservedForPayouts)) / 100);
+  const canWithdraw = withdrawable >= MIN_PAYOUT;
+  const isInDebt = availableBalance < 0;
 
   const handlePayoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,8 +75,8 @@ export default function SellerWalletPage() {
       toast.error("Please enter a valid payout amount");
       return;
     }
-    if (Number(amount) > availableBalance) {
-      toast.error("Requested amount exceeds available balance");
+    if (toPaisa(amount) > toPaisa(withdrawable)) {
+      toast.error(`You can withdraw up to ${formatTaka(withdrawable)} right now`);
       return;
     }
     if (!accountDetails.trim()) {
@@ -65,10 +85,12 @@ export default function SellerWalletPage() {
     }
 
     try {
+      const details = accountDetails.trim();
       await requestPayout({
-        amount: Number(amount),
+        amount: toPaisa(amount) / 100,
         paymentMethod,
-        accountDetails: accountDetails.trim(),
+        // Shape the admin payout screen reads: a mobile wallet number or bank account details
+        accountDetails: paymentMethod === "BANK" ? { accountNumber: details } : { number: details, mfsProvider: paymentMethod },
       }).unwrap();
       toast.success("Payout request submitted successfully!");
       setShowPayoutModal(false);
@@ -116,7 +138,7 @@ export default function SellerWalletPage() {
             size="sm"
             variant="brand"
             onClick={() => setShowPayoutModal(true)}
-            disabled={availableBalance < 500}
+            disabled={!canWithdraw}
             className="gap-1.5 text-xs font-bold h-9"
           >
             <ArrowUpRight className="h-4 w-4" />
@@ -136,14 +158,24 @@ export default function SellerWalletPage() {
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-black text-foreground">
-              ৳{availableBalance.toLocaleString()}
+            <div className={`text-2xl sm:text-3xl font-black ${isInDebt ? "text-red-400" : "text-foreground"}`}>
+              {formatTaka(withdrawable)}
             </div>
+            {isInDebt ? (
+              <p className="mt-1 text-[11px] text-red-400">
+                Balance {formatTaka(availableBalance)}: a returned order reversed earnings you had already withdrawn.
+                It is settled from your next earnings.
+              </p>
+            ) : reservedForPayouts > 0 ? (
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Balance {formatTaka(availableBalance)}, of which {formatTaka(reservedForPayouts)} is in pending payout requests.
+              </p>
+            ) : null}
             <div className="flex items-center justify-between mt-2 pt-2 border-t border-border text-[11px] text-muted-foreground">
-              <span>Min. payout: ৳500</span>
+              <span>Min. payout: {formatTaka(MIN_PAYOUT)}</span>
               <button
                 onClick={() => setShowPayoutModal(true)}
-                disabled={availableBalance < 500}
+                disabled={!canWithdraw}
                 className="text-emerald-400 font-bold hover:underline disabled:text-muted-foreground/60 disabled:no-underline"
               >
                 Withdraw Funds
@@ -162,7 +194,7 @@ export default function SellerWalletPage() {
           </div>
           <div className="mt-3">
             <div className="text-2xl sm:text-3xl font-black text-amber-300">
-              ৳{pendingBalance.toLocaleString()}
+              {formatTaka(pendingBalance)}
             </div>
             <div className="flex items-center justify-between mt-2 pt-2 border-t border-border text-[11px] text-muted-foreground">
               <span>{heldShipments.length} delivered shipment(s)</span>
@@ -244,7 +276,7 @@ export default function SellerWalletPage() {
                       </span>
                     </td>
                     <td className="px-5 py-3.5 font-bold text-emerald-400">
-                      ৳{h.sellerEarnings ? h.sellerEarnings.toLocaleString() : 0}
+                      {formatTaka(h.sellerEarnings)}
                     </td>
                     <td className="px-5 py-3.5">
                       <Badge variant="outline" className="text-amber-400 border-amber-500/30 bg-amber-500/10 text-[10px]">
@@ -290,7 +322,7 @@ export default function SellerWalletPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800 text-foreground">
-                {payouts.map((p: any) => (
+                {payouts.map((p) => (
                   <tr key={p.id} className="hover:bg-muted/40 transition-colors">
                     <td className="px-5 py-3.5 text-muted-foreground">
                       {new Date(p.createdAt).toLocaleDateString("en-US", {
@@ -300,7 +332,7 @@ export default function SellerWalletPage() {
                       })}
                     </td>
                     <td className="px-5 py-3.5 font-bold text-foreground">
-                      ৳{p.amount.toLocaleString()}
+                      {formatTaka(p.amount)}
                     </td>
                     <td className="px-5 py-3.5 font-semibold text-foreground">
                       {p.paymentMethod}
@@ -308,7 +340,7 @@ export default function SellerWalletPage() {
                     <td className="px-5 py-3.5">
                       <Badge
                         variant={
-                          p.status === "PAID" || p.status === "PROCESSED"
+                          p.status === "PAID"
                             ? "success"
                             : p.status === "REJECTED"
                             ? "destructive"
@@ -321,6 +353,53 @@ export default function SellerWalletPage() {
                     </td>
                     <td className="px-5 py-3.5 text-muted-foreground font-mono text-[11px]">
                       {p.transactionReference || p.id.slice(0, 10)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Wallet Ledger: every credit and debit, including return reversals */}
+      <div className="rounded-2xl bg-card border border-border overflow-hidden">
+        <div className="p-5 border-b border-border">
+          <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
+            <CreditCard className="h-4 w-4 text-brand-500" />
+            Wallet Activity
+          </h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Earnings, escrow releases, withdrawals and return reversals on your wallet
+          </p>
+        </div>
+
+        {transactions.length === 0 ? (
+          <div className="p-12 text-center text-muted-foreground text-xs">No wallet activity yet.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-muted/40 text-muted-foreground uppercase tracking-wider text-[10px] border-b border-border">
+                <tr>
+                  <th className="px-5 py-3">Date</th>
+                  <th className="px-5 py-3">Type</th>
+                  <th className="px-5 py-3">Details</th>
+                  <th className="px-5 py-3 text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800 text-foreground">
+                {transactions.map((t) => (
+                  <tr key={t.id} className="hover:bg-muted/40 transition-colors">
+                    <td className="px-5 py-3.5 text-muted-foreground whitespace-nowrap">
+                      {new Date(t.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    </td>
+                    <td className="px-5 py-3.5 font-semibold whitespace-nowrap">
+                      {TRANSACTION_LABELS[t.type] ?? t.type}
+                    </td>
+                    <td className="px-5 py-3.5 text-muted-foreground">{t.description}</td>
+                    <td className={`px-5 py-3.5 text-right font-bold whitespace-nowrap ${t.amount < 0 ? "text-red-400" : "text-emerald-400"}`}>
+                      {t.amount > 0 ? "+" : ""}
+                      {formatTaka(t.amount)}
                     </td>
                   </tr>
                 ))}
@@ -346,10 +425,8 @@ export default function SellerWalletPage() {
 
             <form onSubmit={handlePayoutSubmit} className="space-y-4">
               <div className="p-3 rounded-xl bg-background border border-border text-xs space-y-1">
-                <div className="text-muted-foreground">Current Available Balance:</div>
-                <div className="text-xl font-bold text-emerald-400">
-                  ৳{availableBalance.toLocaleString()}
-                </div>
+                <div className="text-muted-foreground">You can withdraw up to:</div>
+                <div className="text-xl font-bold text-emerald-400">{formatTaka(withdrawable)}</div>
               </div>
 
               <div>
@@ -358,8 +435,9 @@ export default function SellerWalletPage() {
                 </label>
                 <input
                   type="number"
-                  min="500"
-                  max={availableBalance}
+                  min={MIN_PAYOUT}
+                  max={withdrawable}
+                  step="0.01"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value ? Number(e.target.value) : "")}
                   placeholder="e.g. 2500"
@@ -373,11 +451,11 @@ export default function SellerWalletPage() {
                   Payment Method
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  {[
+                  {([
                     { id: "BKASH", label: "bKash" },
                     { id: "NAGAD", label: "Nagad" },
-                    { id: "BANK_TRANSFER", label: "Bank" },
-                  ].map((m) => (
+                    { id: "BANK", label: "Bank" },
+                  ] as const).map((m) => (
                     <button
                       key={m.id}
                       type="button"
@@ -396,7 +474,7 @@ export default function SellerWalletPage() {
 
               <div>
                 <label className="block text-xs font-semibold text-foreground mb-1.5">
-                  {paymentMethod === "BANK_TRANSFER"
+                  {paymentMethod === "BANK"
                     ? "Bank Account Number & Routing Details"
                     : "Mobile Wallet Account Number (Personal/Agent)"}
                 </label>
@@ -405,7 +483,7 @@ export default function SellerWalletPage() {
                   value={accountDetails}
                   onChange={(e) => setAccountDetails(e.target.value)}
                   placeholder={
-                    paymentMethod === "BANK_TRANSFER"
+                    paymentMethod === "BANK"
                       ? "Bank Name, Branch, Account Number, Account Name"
                       : "017XXXXXXXX / 018XXXXXXXX"
                   }
@@ -426,7 +504,7 @@ export default function SellerWalletPage() {
                 <Button
                   type="submit"
                   variant="brand"
-                  disabled={isRequesting || !amount || Number(amount) < 500}
+                  disabled={isRequesting || !amount || Number(amount) < MIN_PAYOUT}
                   className="text-xs font-bold"
                 >
                   {isRequesting ? "Submitting..." : "Submit Withdrawal"}

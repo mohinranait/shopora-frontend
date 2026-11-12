@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useGetProductBundleQuery, useAppDispatch, addToCart, openCartDrawer } from "@/redux";
 import { toast } from "sonner";
+import { formatTaka } from "@/lib/money";
 
 interface ProductBundleCardProps {
   productId: string;
@@ -136,7 +137,7 @@ export function ProductBundleCard({ productId }: ProductBundleCardProps) {
               </span>
             </div>
             <span className="text-[11px] font-bold text-slate-800 mt-1.5 max-w-[90px] truncate text-center">
-              ৳{mainProduct.basePrice.toLocaleString()}
+              {formatTaka(mainProduct.basePrice)}
             </span>
           </div>
 
@@ -179,7 +180,7 @@ export function ProductBundleCard({ productId }: ProductBundleCardProps) {
                     </div>
                   </div>
                   <span className="text-[11px] font-bold text-slate-800 mt-1.5 max-w-[90px] truncate text-center">
-                    ৳{companion.basePrice.toLocaleString()}
+                    {formatTaka(companion.basePrice)}
                   </span>
                 </div>
               </React.Fragment>
@@ -193,18 +194,18 @@ export function ProductBundleCard({ productId }: ProductBundleCardProps) {
             <div className="text-xs text-slate-500 font-medium">Bundle Price:</div>
             <div className="flex items-baseline gap-2 mt-0.5">
               <span className="text-2xl font-black text-brand-deep">
-                ৳{finalPrice.toLocaleString()}
+                {formatTaka(finalPrice)}
               </span>
               {hasBundleDiscount && bundleSavings > 0 && (
                 <span className="text-xs text-slate-400 line-through">
-                  ৳{rawSubtotal.toLocaleString()}
+                  {formatTaka(rawSubtotal)}
                 </span>
               )}
             </div>
 
             {hasBundleDiscount && bundleSavings > 0 && (
               <div className="text-[11px] font-bold text-emerald-600 mt-1">
-                Save ৳{bundleSavings.toLocaleString()} ({bundleDiscountPercent}% off)
+                Save {formatTaka(bundleSavings)} ({bundleDiscountPercent}% off)
               </div>
             )}
           </div>

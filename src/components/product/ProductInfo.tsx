@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { IProductItem, IProductVariantItem } from "@/types";
+import { formatTaka } from "@/lib/money";
 
 interface ProductInfoProps {
   product: IProductItem;
@@ -277,12 +278,12 @@ export function ProductInfo({
       <div className="rounded-2xl bg-gradient-to-br from-slate-50 to-sky-50/30 p-4 sm:p-5 border border-slate-200/80">
         <div className="flex flex-wrap items-baseline gap-3">
           <span className="text-3xl sm:text-4xl font-black text-brand-deep tracking-tight">
-            ৳{currentPrice.toLocaleString()}
+            {formatTaka(currentPrice)}
           </span>
 
           {currentComparePrice && currentComparePrice > currentPrice && (
             <span className="text-base sm:text-lg text-slate-400 line-through">
-              ৳{currentComparePrice.toLocaleString()}
+              {formatTaka(currentComparePrice)}
             </span>
           )}
 
@@ -295,7 +296,7 @@ export function ProductInfo({
 
         {savings > 0 && (
           <p className="mt-1.5 text-xs font-semibold text-emerald-600">
-            You save ৳{savings.toLocaleString()} on this order
+            You save {formatTaka(savings)} on this order
           </p>
         )}
 

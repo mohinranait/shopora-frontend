@@ -65,7 +65,7 @@ export function TrackOrderClient({ initialOrderNumber = "" }: { initialOrderNumb
           <input
             value={orderNumber}
             onChange={(e) => setOrderNumber(e.target.value)}
-            placeholder="e.g. SHO-20261027-1234"
+            placeholder="e.g. SHO-20261027-7KX4QM"
             className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 font-mono text-sm uppercase outline-none placeholder:font-sans placeholder:normal-case focus:border-brand focus:ring-4 focus:ring-brand/10"
             required
           />

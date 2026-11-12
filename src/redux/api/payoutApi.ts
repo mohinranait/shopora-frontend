@@ -3,6 +3,10 @@ import type {
   IApiResponse,
   IPayoutRequest,
   IProcessPayoutPayload,
+  IRequestPayoutPayload,
+  ISellerWalletResponse,
+  ISellerWalletBalances,
+  IWalletTransaction,
 } from "@/types";
 
 export const payoutApiSlice = baseApi.injectEndpoints({
@@ -28,16 +32,20 @@ export const payoutApiSlice = baseApi.injectEndpoints({
       invalidatesTags: ["Payouts", "Payout", "Sellers"],
     }),
 
-    getSellerWallet: builder.query<{ wallet: any; payouts: IPayoutRequest[] }, void>({
+    getSellerWallet: builder.query<ISellerWalletResponse, void>({
       query: () => "/payouts/wallet",
-      transformResponse: (res: IApiResponse<{ wallet: any; payouts: IPayoutRequest[] }>) => res.data,
+      // The API names the list `payoutRequests`
+      transformResponse: (
+        res: IApiResponse<{ wallet: ISellerWalletBalances; transactions?: IWalletTransaction[]; payoutRequests?: IPayoutRequest[] }>
+      ) => ({
+        wallet: res.data.wallet,
+        transactions: res.data.transactions ?? [],
+        payouts: res.data.payoutRequests ?? [],
+      }),
       providesTags: ["Payouts", "Seller"],
     }),
 
-    requestPayout: builder.mutation<
-      IPayoutRequest,
-      { amount: number; paymentMethod: string; accountDetails?: string }
-    >({
+    requestPayout: builder.mutation<IPayoutRequest, IRequestPayoutPayload>({
       query: (body) => ({
         url: "/payouts/request",
         method: "POST",

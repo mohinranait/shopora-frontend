@@ -7,7 +7,7 @@ import { SORT_OPTIONS, ProductSort, countActiveFilters } from "@/lib/products/qu
 import { useProductsQuery } from "./ProductsQueryProvider";
 import { ProductFilters, ProductFiltersSkeleton } from "./ProductFilters";
 
-const formatTaka = (n: number) => `৳${n.toLocaleString("en-US")}`;
+import { formatTaka } from "@/lib/money";
 const prettifySlug = (slug: string) => slug.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 function findCategoryName(nodes: IFacetCategory[], slug: string): string | undefined {

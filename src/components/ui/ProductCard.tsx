@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import type { IProductItem } from "@/types";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/hooks/useWishlist";
+import { formatTaka } from "@/lib/money";
 
 export type ProductCardData = IProductItem;
 
@@ -257,17 +258,17 @@ export const ProductCard = React.memo<ProductCardProps>(function ProductCard({ p
           <div className="flex items-baseline justify-between mb-2.5">
             <div>
               <span className="text-base font-extrabold text-brand-deep">
-                ৳{basePrice.toLocaleString()}
+                {formatTaka(basePrice)}
               </span>
               {comparePrice && comparePrice > basePrice && (
                 <span className="ml-2 text-xs text-slate-400 line-through">
-                  ৳{comparePrice.toLocaleString()}
+                  {formatTaka(comparePrice)}
                 </span>
               )}
             </div>
             {savings > 0 && (
               <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
-                Save ৳{savings.toLocaleString()}
+                Save {formatTaka(savings)}
               </span>
             )}
           </div>

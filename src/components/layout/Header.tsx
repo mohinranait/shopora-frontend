@@ -46,6 +46,7 @@ import {
   useGetAutocompleteSuggestionsQuery,
 } from "@/redux";
 import { useIsClient } from "@/hooks/useIsClient";
+import { formatTaka } from "@/lib/money";
 
 
 export const Header: React.FC = () => {
@@ -240,7 +241,7 @@ export const Header: React.FC = () => {
                                 {p.name}
                               </div>
                               <div className="text-xs font-semibold text-brand mt-0.5">
-                                ৳{p.basePrice.toLocaleString()}
+                                {formatTaka(p.basePrice)}
                               </div>
                             </div>
                           </Link>

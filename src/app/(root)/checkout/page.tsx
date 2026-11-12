@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
-import { cartApi } from "@/lib/cart/api";
+import { CartApiError, cartApi } from "@/lib/cart/api";
 import { useOrderQuote } from "@/lib/cart/useOrderQuote";
 import { formatTaka } from "@/components/cart/CartParts";
 import { CouponField, OrderTotals, TrustBadges } from "@/components/cart/OrderSummary";
@@ -226,6 +226,10 @@ export default function CheckoutPage() {
       router.replace(`/checkout/success?order=${encodeURIComponent(order.orderNumber)}`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Couldn't place your order");
+      // The coupon ran out between quote and checkout: drop it so the next attempt can go through
+      if (error instanceof CartApiError && error.status === 409 && /coupon/i.test(error.message)) {
+        removeCoupon();
+      }
       void refresh();
     } finally {
       setSubmitting(false);

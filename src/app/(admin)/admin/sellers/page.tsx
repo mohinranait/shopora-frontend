@@ -55,6 +55,8 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { roundTaka } from "@/lib/money";
+import { formatTaka } from "@/lib/money";
 
 interface ReviewModalState {
   isOpen: boolean;
@@ -84,7 +86,8 @@ function ReviewSellerModal({
         id: seller.id,
         data: {
           status,
-          commissionRate,
+          // The API accepts 0–100 with at most 2 decimals
+          commissionRate: roundTaka(Math.min(100, Math.max(0, commissionRate || 0))),
           isVerified,
           rejectionReason: status === "REJECTED" ? rejectionReason : undefined,
         },
@@ -343,7 +346,7 @@ export default function AdminSellersPage() {
             </span>
           </div>
           <p className="mt-2 text-2xl font-black text-foreground font-mono">
-            ৳{Math.round(metrics.totalBalances).toLocaleString("en-US")}
+            {formatTaka(metrics.totalBalances)}
           </p>
           <p className="text-[11px] text-muted-foreground mt-0.5">Combined seller wallet reserves</p>
         </Card>
@@ -528,10 +531,10 @@ export default function AdminSellersPage() {
                     {/* Wallet Balance */}
                     <TableCell>
                       <p className="font-bold text-foreground font-mono">
-                        ৳{Math.round(seller.wallet?.balance || 0).toLocaleString("en-US")}
+                        {formatTaka(seller.wallet?.balance || 0)}
                       </p>
                       <p className="text-[11px] text-muted-foreground">
-                        Earned: ৳{Math.round(seller.wallet?.totalEarnings || 0).toLocaleString("en-US")}
+                        Earned: {formatTaka(seller.wallet?.totalEarnings || 0)}
                       </p>
                     </TableCell>
 

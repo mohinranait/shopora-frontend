@@ -41,6 +41,7 @@ import { getApiErrorMessage } from "@/services/api";
 import { IProductItem } from "@/types";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { formatTaka } from "@/lib/money";
 
 type TabType = "all" | "platform" | "vendor" | "pending" | "low_stock";
 
@@ -281,11 +282,11 @@ function AdminProductsInner() {
           return (
             <div>
               <p className="font-bold text-foreground">
-                ৳ {prod.basePrice.toLocaleString()}
+                {formatTaka(prod.basePrice)}
               </p>
               {prod.comparePrice && prod.comparePrice > prod.basePrice && (
                 <p className="text-[10px] text-muted-foreground line-through">
-                  ৳ {prod.comparePrice.toLocaleString()}
+                  {formatTaka(prod.comparePrice)}
                 </p>
               )}
             </div>

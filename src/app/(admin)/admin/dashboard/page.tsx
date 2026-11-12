@@ -71,6 +71,7 @@ import {
   useGetAdminAnalyticsQuery,
 } from "@/redux";
 import { toast } from "sonner";
+import { formatTaka } from "@/lib/money";
 
 const chartConfig: ChartConfig = {
   gmv: {
@@ -314,18 +315,18 @@ export default function AdminDashboardPage() {
             </div>
             <div className="mt-2">
               <p className="text-2xl font-black text-foreground tracking-tight">
-                ৳ {(analytics?.revenue?.grossSales ?? 0).toLocaleString()}
+                {formatTaka(analytics?.revenue?.grossSales ?? 0)}
               </p>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="text-xs font-bold text-emerald-500 flex items-center">
-                  Direct: ৳ {(analytics?.revenue?.directSalesRevenue ?? 0).toLocaleString()}
+                  Direct: {formatTaka(analytics?.revenue?.directSalesRevenue ?? 0)}
                 </span>
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-[11px]">
               <span className="text-muted-foreground">Platform Commission:</span>
               <span className="font-bold text-brand">
-                ৳ {(analytics?.revenue?.platformCommission ?? 0).toLocaleString()}
+                {formatTaka(analytics?.revenue?.platformCommission ?? 0)}
               </span>
             </div>
           </CardContent>
@@ -344,7 +345,7 @@ export default function AdminDashboardPage() {
             </div>
             <div className="mt-2">
               <p className="text-2xl font-black text-foreground tracking-tight">
-                ৳ {(analytics?.revenue?.netPlatformProfit ?? 0).toLocaleString()}
+                {formatTaka(analytics?.revenue?.netPlatformProfit ?? 0)}
               </p>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="text-xs font-bold text-emerald-500 flex items-center">
@@ -357,7 +358,7 @@ export default function AdminDashboardPage() {
             <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-[11px]">
               <span className="text-muted-foreground">Direct Retail Profit:</span>
               <span className="font-bold text-emerald-500">
-                ৳ {(analytics?.revenue?.directSalesProfit ?? 0).toLocaleString()}
+                {formatTaka(analytics?.revenue?.directSalesProfit ?? 0)}
               </span>
             </div>
           </CardContent>
@@ -387,7 +388,7 @@ export default function AdminDashboardPage() {
             <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-[11px]">
               <span className="text-muted-foreground">Total Ecosystem Capital:</span>
               <span className="font-bold text-brand">
-                ৳ {(analytics?.revenue?.totalCatalogInvestment ?? 0).toLocaleString()}
+                {formatTaka(analytics?.revenue?.totalCatalogInvestment ?? 0)}
               </span>
             </div>
           </CardContent>
@@ -573,8 +574,8 @@ export default function AdminDashboardPage() {
                 <div className="h-full bg-purple-500" style={{ width: `${vendorPercent}%` }} />
               </div>
               <div className="flex justify-between text-[11px] text-muted-foreground mt-1 font-mono">
-                <span>৳ {directSales.toLocaleString()} ({directPercent}%)</span>
-                <span>৳ {vendorSales.toLocaleString()} ({vendorPercent}%)</span>
+                <span>{formatTaka(directSales)} ({directPercent}%)</span>
+                <span>{formatTaka(vendorSales)} ({vendorPercent}%)</span>
               </div>
             </div>
 
@@ -706,7 +707,7 @@ export default function AdminDashboardPage() {
                     <TableCell className="text-muted-foreground">{prod.category?.name || "General"}</TableCell>
                     <TableCell>
                       <p className="font-bold text-foreground">
-                        ৳ {prod.basePrice.toLocaleString()}
+                        {formatTaka(prod.basePrice)}
                       </p>
                     </TableCell>
                     <TableCell className="text-muted-foreground font-mono text-[11px]">
@@ -797,7 +798,7 @@ export default function AdminDashboardPage() {
                     )}
                   </TableCell>
                   <TableCell className="font-bold text-foreground font-mono">
-                    ৳ {ord.total.toLocaleString()}
+                    {formatTaka(ord.total)}
                   </TableCell>
                   <TableCell>
                     <div className="space-y-0.5">

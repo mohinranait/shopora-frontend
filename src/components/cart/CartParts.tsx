@@ -9,7 +9,9 @@ import { useCart } from "@/context/CartContext";
 export const SHIPPING_FREE_THRESHOLD = 1500;
 export const SHIPPING_FLAT_FEE = 70;
 
-export const formatTaka = (n: number) => `৳${Math.round(n).toLocaleString("en-US")}`;
+import { formatTaka } from "@/lib/money";
+
+export { formatTaka };
 
 /** Mirrors the backend rule; the quote endpoint stays the source of truth at checkout */
 export const estimateShipping = (subtotal: number, items: ICartItem[]) => {

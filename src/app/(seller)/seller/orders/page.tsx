@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useGetSellerSubOrdersQuery } from "@/redux";
 import { ISubOrder } from "@/types";
+import { formatTaka } from "@/lib/money";
 
 export default function SellerOrdersPage() {
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
@@ -177,20 +178,20 @@ export default function SellerOrdersPage() {
                     {/* Order Total & Split Shipping Fee */}
                     <td className="px-5 py-3.5">
                       <div className="font-bold text-foreground">
-                        ৳{order.totalAmount.toLocaleString()}
+                        {formatTaka(order.totalAmount)}
                       </div>
                       <div className="text-[10px] text-muted-foreground">
-                        Ship: ৳{(order.shippingCost || order.shippingFee || 0).toLocaleString()}
+                        Ship: {formatTaka(order.shippingCost || order.shippingFee || 0)}
                       </div>
                     </td>
 
                     {/* Net Seller Earnings */}
                     <td className="px-5 py-3.5">
                       <div className="font-bold text-emerald-400">
-                        ৳{order.sellerEarnings.toLocaleString()}
+                        {formatTaka(order.sellerEarnings)}
                       </div>
                       <div className="text-[10px] text-muted-foreground">
-                        Fee: ৳{order.commissionAmount.toLocaleString()}
+                        Fee: {formatTaka(order.commissionAmount)}
                       </div>
                     </td>
 

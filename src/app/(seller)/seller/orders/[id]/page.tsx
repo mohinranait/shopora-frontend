@@ -38,6 +38,7 @@ import {
   OrderStatus,
 } from "@/types";
 import { toast } from "sonner";
+import { formatTaka } from "@/lib/money";
 
 const STATUS_STEPS: { status: OrderStatus; label: string; action: string; description: string }[] = [
   { status: "PENDING", label: "Pending", action: "Order Placed", description: "Customer placed the order" },
@@ -275,7 +276,7 @@ function SellerSubOrderDetailInner() {
                 Package Items ({subOrder.items?.length || 0})
               </h2>
               <span className="text-xs text-muted-foreground">
-                Package Subtotal: ৳{packageTotal.toLocaleString()}
+                Package Subtotal: {formatTaka(packageTotal)}
               </span>
             </div>
 
@@ -316,14 +317,14 @@ function SellerSubOrderDetailInner() {
                           </p>
                         )}
                         <div className="text-[11px] text-muted-foreground mt-0.5">
-                          ৳{itemPrice.toLocaleString()} × {itemQty} qty
+                          {formatTaka(itemPrice)} × {itemQty} qty
                         </div>
                       </div>
                     </div>
 
                     <div className="text-right shrink-0">
                       <div className="font-bold text-foreground text-xs">
-                        ৳{lineTotal.toLocaleString()}
+                        {formatTaka(lineTotal)}
                       </div>
                     </div>
                   </div>
@@ -371,7 +372,7 @@ function SellerSubOrderDetailInner() {
                   </span>
                 </div>
                 <span className="font-bold text-amber-300">
-                  ৳{netEarnings.toLocaleString()}
+                  {formatTaka(netEarnings)}
                 </span>
               </div>
             )}
@@ -502,7 +503,7 @@ function SellerSubOrderDetailInner() {
             <div className="space-y-2 text-xs pt-1">
               <div className="flex justify-between text-muted-foreground">
                 <span>Items Subtotal:</span>
-                <span className="text-foreground font-medium">৳{packageTotal.toLocaleString()}</span>
+                <span className="text-foreground font-medium">{formatTaka(packageTotal)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
                 <span>Package Shipping Fee:</span>
@@ -513,12 +514,12 @@ function SellerSubOrderDetailInner() {
               <div className="flex justify-between text-muted-foreground">
                 <span>Platform Commission:</span>
                 <span className="text-rose-400 font-medium">
-                  -৳{commission.toLocaleString()}
+                  -{formatTaka(commission)}
                 </span>
               </div>
               <div className="pt-2 border-t border-border flex justify-between text-sm font-bold">
                 <span className="text-foreground">Net Seller Payout:</span>
-                <span className="text-emerald-400">৳{netEarnings.toLocaleString()}</span>
+                <span className="text-emerald-400">{formatTaka(netEarnings)}</span>
               </div>
             </div>
           </div>
@@ -578,7 +579,7 @@ function SellerSubOrderDetailInner() {
 
               <div className="flex justify-between font-bold text-xs">
                 <span>COLLECT ON DELIVERY:</span>
-                <span>৳{(packagingSlip.financials?.codAmount ?? packagingSlip.amountToCollectCOD ?? 0).toLocaleString()}</span>
+                <span>{formatTaka(packagingSlip.financials?.codAmount ?? packagingSlip.amountToCollectCOD ?? 0)}</span>
               </div>
 
               <div className="text-center pt-2 text-[10px] font-bold text-slate-700">

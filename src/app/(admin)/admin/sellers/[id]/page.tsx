@@ -71,6 +71,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { roundTaka } from "@/lib/money";
+import { formatTaka } from "@/lib/money";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -155,7 +157,8 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
         id: seller.id,
         data: {
           status: editStatus,
-          commissionRate: editCommission,
+          // The API accepts 0–100 with at most 2 decimals
+          commissionRate: roundTaka(Math.min(100, Math.max(0, editCommission || 0))),
           isVerified: editVerified,
           rejectionReason: editStatus === "REJECTED" ? editReason : undefined,
         },
@@ -335,7 +338,7 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
         <Card className="border-slate-800 bg-slate-900/80 p-3.5">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Revenue</span>
           <div className="text-lg font-black text-white mt-1">
-            ৳{Math.round(performance.grossSales).toLocaleString()}
+            {formatTaka(performance.grossSales)}
           </div>
           <span className="text-[11px] text-emerald-400 flex items-center gap-1 mt-0.5">
             <TrendingUp className="h-3 w-3" />
@@ -623,7 +626,7 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
                         </div>
                       </TableCell>
                       <TableCell className="font-mono text-slate-400">{p.sku || "N/A"}</TableCell>
-                      <TableCell className="font-bold text-white">৳{p.basePrice.toLocaleString()}</TableCell>
+                      <TableCell className="font-bold text-white">{formatTaka(p.basePrice)}</TableCell>
                       <TableCell>
                         <span className={p.stock <= 5 ? "font-bold text-rose-400" : "text-slate-300"}>
                           {p.stock} units
@@ -705,9 +708,9 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
                         </Link>
                       </TableCell>
                       <TableCell className="text-slate-300 font-medium">{so.customerName || "Customer"}</TableCell>
-                      <TableCell className="font-bold text-white">৳{so.totalAmount.toLocaleString()}</TableCell>
-                      <TableCell className="text-amber-400 font-mono">৳{so.commissionAmount.toLocaleString()}</TableCell>
-                      <TableCell className="text-emerald-400 font-mono font-bold">৳{so.sellerEarnings.toLocaleString()}</TableCell>
+                      <TableCell className="font-bold text-white">{formatTaka(so.totalAmount)}</TableCell>
+                      <TableCell className="text-amber-400 font-mono">{formatTaka(so.commissionAmount)}</TableCell>
+                      <TableCell className="text-emerald-400 font-mono font-bold">{formatTaka(so.sellerEarnings)}</TableCell>
                       <TableCell>
                         <Badge
                           variant="outline"
@@ -748,7 +751,7 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
             <Card className="border-slate-800 bg-slate-900 p-4">
               <span className="text-xs font-bold uppercase text-slate-400">Available For Payout</span>
               <div className="text-2xl font-black text-white mt-2">
-                ৳{Math.round(wallet?.balance || 0).toLocaleString()}
+                {formatTaka(wallet?.balance || 0)}
               </div>
               <p className="text-[11px] text-slate-500 mt-1">Cleared balance ready to be transferred</p>
             </Card>
@@ -756,7 +759,7 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
             <Card className="border-slate-800 bg-slate-900 p-4">
               <span className="text-xs font-bold uppercase text-slate-400">Pending In Escrow</span>
               <div className="text-2xl font-black text-amber-400 mt-2">
-                ৳{Math.round(wallet?.pendingBalance || 0).toLocaleString()}
+                {formatTaka(wallet?.pendingBalance || 0)}
               </div>
               <p className="text-[11px] text-slate-500 mt-1">Held until return window completes</p>
             </Card>
@@ -764,7 +767,7 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
             <Card className="border-slate-800 bg-slate-900 p-4">
               <span className="text-xs font-bold uppercase text-slate-400">Total Lifetime Withdrawn</span>
               <div className="text-2xl font-black text-emerald-400 mt-2">
-                ৳{Math.round(wallet?.totalWithdrawn || 0).toLocaleString()}
+                {formatTaka(wallet?.totalWithdrawn || 0)}
               </div>
               <p className="text-[11px] text-slate-500 mt-1">Total successfully settled payouts</p>
             </Card>
@@ -790,7 +793,7 @@ export default function AdminSellerDetailsPage({ params }: PageProps) {
                     {payouts.map((pay) => (
                       <TableRow key={pay.id} className="border-slate-800 hover:bg-slate-800/40">
                         <TableCell className="font-mono font-bold text-white">#{pay.id}</TableCell>
-                        <TableCell className="font-bold text-white">৳{pay.amount.toLocaleString()}</TableCell>
+                        <TableCell className="font-bold text-white">{formatTaka(pay.amount)}</TableCell>
                         <TableCell className="uppercase font-semibold text-slate-400">{pay.paymentMethod}</TableCell>
                         <TableCell className="font-mono text-slate-400">{pay.transactionReference || "Pending"}</TableCell>
                         <TableCell>

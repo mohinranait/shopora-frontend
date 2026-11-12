@@ -62,6 +62,7 @@ import {
 import { MediaLibraryModal } from "@/components/media/MediaLibraryModal";
 import { CategoryTreeSelector } from "./CategoryTreeSelector";
 import { toast } from "sonner";
+import { formatTaka, roundTaka } from "@/lib/money";
 
 /* ========================================================================== */
 /* UI Helper Interfaces                                                       */
@@ -447,8 +448,8 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       toast.error("Please enter a valid price amount");
       return;
     }
-    setVariantRows((prev) => prev.map((r) => ({ ...r, price: num })));
-    toast.success(`Updated price to ৳${num} on all ${variantRows.length} variants.`);
+    setVariantRows((prev) => prev.map((r) => ({ ...r, price: roundTaka(num) })));
+    toast.success(`Updated price to ${formatTaka(num)} on all ${variantRows.length} variants.`);
     setBulkPrice("");
   };
 
@@ -471,8 +472,8 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
       toast.error("Please enter a valid cost price");
       return;
     }
-    setVariantRows((prev) => prev.map((r) => ({ ...r, costPrice: num })));
-    toast.success(`Updated cost price to ৳${num} on all ${variantRows.length} variants.`);
+    setVariantRows((prev) => prev.map((r) => ({ ...r, costPrice: roundTaka(num) })));
+    toast.success(`Updated cost price to ${formatTaka(num)} on all ${variantRows.length} variants.`);
     setBulkCostPrice("");
   };
 
@@ -612,9 +613,10 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
         brandId: brandId ? String(brandId) : null,
         sku: sku.trim() || undefined,
         productType,
-        basePrice: finalBasePrice,
-        comparePrice: typeof comparePrice === "number" ? comparePrice : null,
-        costPrice: typeof costPrice === "number" ? costPrice : null,
+        // Prices go to the API with at most 2 decimals
+        basePrice: roundTaka(finalBasePrice),
+        comparePrice: typeof comparePrice === "number" ? roundTaka(comparePrice) : null,
+        costPrice: typeof costPrice === "number" ? roundTaka(costPrice) : null,
         stock: finalStock,
         lowStockThreshold: typeof lowStockThreshold === "number" ? lowStockThreshold : 5,
         mainImage: mainImageUrl,
@@ -625,14 +627,14 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
           productType === "VARIABLE"
             ? variantRows.map((v) => ({
                 ...v,
-                price: Number(v.price) || 0,
+                price: roundTaka(Number(v.price) || 0),
                 comparePrice:
                   typeof v.comparePrice === "number" && !isNaN(v.comparePrice)
-                    ? v.comparePrice
+                    ? roundTaka(v.comparePrice)
                     : null,
                 costPrice:
                   typeof v.costPrice === "number" && !isNaN(v.costPrice)
-                    ? v.costPrice
+                    ? roundTaka(v.costPrice)
                     : null,
                 stock: Math.max(0, parseInt(String(v.stock), 10) || 0),
                 lowStockThreshold:
@@ -1145,7 +1147,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                   <input
                     type="number"
                     min={0}
-                    step="any"
+                    step="0.01"
                     required
                     placeholder="2500"
                     value={basePrice}
@@ -1167,7 +1169,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                   <input
                     type="number"
                     min={0}
-                    step="any"
+                    step="0.01"
                     placeholder="2990"
                     value={comparePrice}
                     onChange={(e) => setComparePrice(e.target.value ? Number(e.target.value) : "")}
@@ -1195,7 +1197,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                   <input
                     type="number"
                     min={0}
-                    step="any"
+                    step="0.01"
                     placeholder="1800"
                     value={costPrice}
                     onChange={(e) => setCostPrice(e.target.value ? Number(e.target.value) : "")}
@@ -1628,7 +1630,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                               <input
                                 type="number"
                                 min={0}
-                                step="any"
+                                step="0.01"
                                 placeholder="Cost ৳"
                                 value={v.costPrice ?? ""}
                                 onChange={(e) =>
@@ -1653,7 +1655,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                               <input
                                 type="number"
                                 min={0}
-                                step="any"
+                                step="0.01"
                                 required
                                 placeholder="Price ৳"
                                 value={v.price}
@@ -1675,7 +1677,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                               <input
                                 type="number"
                                 min={0}
-                                step="any"
+                                step="0.01"
                                 placeholder="Optional"
                                 value={v.comparePrice ?? ""}
                                 onChange={(e) =>
@@ -2025,7 +2027,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                             {pItem?.name || pId}
                           </p>
                           <p className="text-[11px] text-muted-foreground">
-                            ৳{pItem?.basePrice?.toLocaleString()} {pItem?.sku ? `• SKU: ${pItem.sku}` : ""}
+                            {formatTaka(pItem?.basePrice)} {pItem?.sku ? `• SKU: ${pItem.sku}` : ""}
                           </p>
                         </div>
                       </div>
@@ -2099,7 +2101,7 @@ export function ProductForm({ initialData, isEdit = false, backUrl = "/admin/pro
                               {item.name}
                             </p>
                             <p className="text-[10px] text-muted-foreground">
-                              ৳{item.basePrice.toLocaleString()} {item.sku ? `• ${item.sku}` : ""}
+                              {formatTaka(item.basePrice)} {item.sku ? `• ${item.sku}` : ""}
                             </p>
                           </div>
                         </div>

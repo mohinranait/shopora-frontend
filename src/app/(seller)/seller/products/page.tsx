@@ -28,6 +28,7 @@ import { IProductItem } from "@/types";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Pagination } from "@/components/ui/Pagination";
+import { formatTaka } from "@/lib/money";
 
 export default function SellerProductsPage() {
   const [search, setSearch] = useState("");
@@ -276,10 +277,10 @@ export default function SellerProductsPage() {
 
                       {/* Price */}
                       <td className="px-5 py-3.5 font-bold text-foreground">
-                        ৳{p.basePrice.toLocaleString()}
+                        {formatTaka(p.basePrice)}
                         {p.comparePrice && p.comparePrice > p.basePrice && (
                           <span className="block text-[10px] text-muted-foreground line-through font-normal">
-                            ৳{p.comparePrice.toLocaleString()}
+                            {formatTaka(p.comparePrice)}
                           </span>
                         )}
                       </td>

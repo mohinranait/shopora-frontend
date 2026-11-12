@@ -3,6 +3,7 @@
  * `x-session-id`; logged-in users by their bearer token (the backend merges a
  * guest cart into the user's cart on the first request after login).
  */
+import { clearSession, getAccessToken, refreshAccessToken } from "@/lib/auth/session";
 import type { ICart, ICheckoutPayload, IOrder, IOrderQuote, IPaginationMeta, IPlacedOrder } from "@/types";
 
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1").replace(/\/+$/, "");
@@ -32,34 +33,52 @@ export class CartApiError extends Error {
   }
 }
 
+/**
+ * Send a request with the guest session id and, when logged in, the bearer token.
+ * An expired access token is refreshed once and the request retried; if the session can't be
+ * refreshed it is cleared and the request retried as a guest (the cart lives on the session id).
+ */
+/** The backend's response envelope */
+interface IApiEnvelope {
+  data?: unknown;
+  meta?: IPaginationMeta;
+  message?: string;
+  errorSources?: { message: string }[];
+}
+
+async function send(path: string, init: RequestInit = {}): Promise<{ res: Response; json: IApiEnvelope | null }> {
+  const attempt = async (token: string | null) => {
+    const headers = new Headers(init.headers);
+    headers.set("x-session-id", getCartSessionId());
+    if (init.body) headers.set("Content-Type", "application/json");
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+    let res: Response;
+    try {
+      res = await fetch(`${API_BASE_URL}${path}`, { ...init, headers });
+    } catch {
+      throw new CartApiError("Network error. Please check your connection.", 0);
+    }
+    const json: IApiEnvelope | null = await res.json().catch(() => null);
+    return { res, json };
+  };
+
+  const token = getAccessToken();
+  let result = await attempt(token);
+  if (result.res.status === 401 && token) {
+    const fresh = await refreshAccessToken();
+    if (!fresh) clearSession();
+    result = await attempt(fresh);
+  }
+  return result;
+}
+
+const errorMessage = (res: Response, json: IApiEnvelope | null) =>
+  json?.errorSources?.[0]?.message || json?.message || `Request failed (${res.status})`;
+
 /** Authenticated (or guest-session) JSON request to the API; returns `data` */
 export async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const headers = new Headers(init.headers);
-  headers.set("x-session-id", getCartSessionId());
-  if (init.body) headers.set("Content-Type", "application/json");
-  try {
-    const token = localStorage.getItem("shopora_token");
-    if (token) headers.set("Authorization", `Bearer ${token}`);
-  } catch {
-    // storage unavailable: continue as guest
-  }
-
-  let res: Response;
-  try {
-    res = await fetch(`${API_BASE_URL}${path}`, { ...init, headers });
-  } catch {
-    throw new CartApiError("Network error. Please check your connection.", 0);
-  }
-  const json = await res.json().catch(() => null);
-  if (!res.ok) {
-    if (res.status === 401) {
-      try {
-        localStorage.removeItem("shopora_token");
-      } catch {}
-    }
-    const message = json?.errorSources?.[0]?.message || json?.message || `Request failed (${res.status})`;
-    throw new CartApiError(message, res.status);
-  }
+  const { res, json } = await send(path, init);
+  if (!res.ok) throw new CartApiError(errorMessage(res, json), res.status);
   return json?.data as T;
 }
 
@@ -84,18 +103,8 @@ export const cartApi = {
 };
 
 async function requestWithMeta<T>(path: string): Promise<{ data: T; meta?: IPaginationMeta }> {
-  const headers = new Headers({ "x-session-id": getCartSessionId() });
-  try {
-    const token = localStorage.getItem("shopora_token");
-    if (token) headers.set("Authorization", `Bearer ${token}`);
-  } catch {
-    // storage unavailable
-  }
-  const res = await fetch(`${API_BASE_URL}${path}`, { headers }).catch(() => {
-    throw new CartApiError("Network error. Please check your connection.", 0);
-  });
-  const json = await res.json().catch(() => null);
-  if (!res.ok) throw new CartApiError(json?.message || `Request failed (${res.status})`, res.status);
+  const { res, json } = await send(path);
+  if (!res.ok) throw new CartApiError(errorMessage(res, json), res.status);
   return { data: json?.data as T, meta: json?.meta };
 }
 

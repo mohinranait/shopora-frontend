@@ -18,6 +18,7 @@ import {
   useProcessPayoutMutation,
 } from "@/redux";
 import type { IPayoutRequest } from "@/types";
+import { formatTaka, sumTaka } from "@/lib/money";
 import {
   Dialog,
   DialogContent,
@@ -88,16 +89,19 @@ function ProcessPayoutModal({
 
       toast.success(
         isPay
-          ? `Payout of ৳${payout.amount} marked as PAID. Wallet balance deducted.`
-          : `Payout request of ৳${payout.amount} rejected.`
+          ? `Payout of ${formatTaka(payout.amount)} marked as PAID. Wallet balance deducted.`
+          : `Payout request of ${formatTaka(payout.amount)} rejected.`
       );
       onUpdated();
       onClose();
     } catch (err: unknown) {
-      const msg =
-        (err as { data?: { message?: string } })?.data?.message ||
-        "Failed to process payout";
-      toast.error(msg);
+      const e = err as { status?: number; data?: { message?: string } };
+      toast.error(e?.data?.message || "Failed to process payout");
+      // Another admin already processed it: show the current state instead of the stale row
+      if (e?.status === 409) {
+        onUpdated();
+        onClose();
+      }
     }
   };
 
@@ -135,7 +139,7 @@ function ProcessPayoutModal({
           <div className="flex justify-between py-1 border-b border-border">
             <span className="text-muted-foreground">Withdrawal Amount:</span>
             <span className="font-bold text-emerald-500 text-sm font-mono">
-              ৳{Math.round(payout.amount).toLocaleString("en-US")}
+              {formatTaka(payout.amount)}
             </span>
           </div>
           <div className="flex justify-between py-1 border-b border-border">
@@ -173,7 +177,7 @@ function ProcessPayoutModal({
                 className="font-mono"
               />
               <p className="text-[11px] text-muted-foreground">
-                Deducts ৳{Math.round(payout.amount).toLocaleString("en-US")} from the vendor&apos;s available wallet and records an immutable ledger withdrawal.
+                Deducts {formatTaka(payout.amount)} from the vendor&apos;s available wallet and records an immutable ledger withdrawal.
               </p>
             </div>
           ) : (
@@ -246,25 +250,32 @@ export default function AdminPayoutsPage() {
   }, [payouts, search]);
 
   const metrics = useMemo(() => {
-    let pendingSum = 0;
-    let paidSum = 0;
+    const pendingAmounts: number[] = [];
+    const paidAmounts: number[] = [];
     let pendingCount = 0;
     let paidCount = 0;
     let rejectedCount = 0;
 
     payouts.forEach((p) => {
-      if (p.status === "PENDING") {
-        pendingSum += p.amount;
+      // Approved-but-unpaid requests still hold the seller's money, like pending ones
+      if (p.status === "PENDING" || p.status === "APPROVED") {
+        pendingAmounts.push(p.amount);
         pendingCount += 1;
       } else if (p.status === "PAID") {
-        paidSum += p.amount;
+        paidAmounts.push(p.amount);
         paidCount += 1;
       } else if (p.status === "REJECTED") {
         rejectedCount += 1;
       }
     });
 
-    return { pendingSum, paidSum, pendingCount, paidCount, rejectedCount };
+    return {
+      pendingSum: sumTaka(pendingAmounts),
+      paidSum: sumTaka(paidAmounts),
+      pendingCount,
+      paidCount,
+      rejectedCount,
+    };
   }, [payouts]);
 
   return (
@@ -301,7 +312,7 @@ export default function AdminPayoutsPage() {
             </span>
           </div>
           <p className="mt-2 text-2xl font-black text-foreground font-mono">
-            ৳{Math.round(metrics.pendingSum).toLocaleString("en-US")}
+            {formatTaka(metrics.pendingSum)}
           </p>
           <p className="text-[11px] text-muted-foreground mt-0.5">
             {metrics.pendingCount} requests awaiting bank transfer
@@ -316,7 +327,7 @@ export default function AdminPayoutsPage() {
             </span>
           </div>
           <p className="mt-2 text-2xl font-black text-foreground font-mono">
-            ৳{Math.round(metrics.paidSum).toLocaleString("en-US")}
+            {formatTaka(metrics.paidSum)}
           </p>
           <p className="text-[11px] text-muted-foreground mt-0.5">
             {metrics.paidCount} successfully disbursed payouts
@@ -412,7 +423,8 @@ export default function AdminPayoutsPage() {
             </TableHeader>
             <TableBody>
               {filteredPayouts.map((payout) => {
-                const isPending = payout.status === "PENDING";
+                // Approved requests can still be paid or rejected; PAID and REJECTED are final
+                const isPending = payout.status === "PENDING" || payout.status === "APPROVED";
                 const isPaid = payout.status === "PAID";
                 const isRejected = payout.status === "REJECTED";
 
@@ -462,7 +474,7 @@ export default function AdminPayoutsPage() {
                     {/* Amount */}
                     <TableCell>
                       <span className="text-sm font-extrabold text-foreground font-mono">
-                        ৳{Math.round(payout.amount).toLocaleString("en-US")}
+                        {formatTaka(payout.amount)}
                       </span>
                     </TableCell>
 

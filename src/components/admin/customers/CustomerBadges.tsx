@@ -75,7 +75,6 @@ export function formatCustomerDate(dateStr?: string | null): string {
   }
 }
 
-export function formatTaka(n?: number | null): string {
-  const amount = Number(n) || 0;
-  return `৳${Math.round(amount).toLocaleString("en-US")}`;
-}
+import { formatTaka } from "@/lib/money";
+
+export { formatTaka };

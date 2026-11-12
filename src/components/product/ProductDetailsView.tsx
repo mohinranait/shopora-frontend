@@ -9,6 +9,7 @@ import { ProductInfo } from "./ProductInfo";
 import { ProductDetailsTabs } from "./ProductDetailsTabs";
 import { ProductBundleCard } from "./ProductBundleCard";
 import { RelatedProducts } from "./RelatedProducts";
+import { formatTaka } from "@/lib/money";
 
 interface ProductDetailsViewProps {
   product: IProductItem;
@@ -91,7 +92,7 @@ export function ProductDetailsView({
         <div>
           <span className="text-xs text-slate-500 font-medium">Total Price:</span>
           <div className="text-lg font-black text-brand-deep">
-            ৳{currentPrice.toLocaleString()}
+            {formatTaka(currentPrice)}
           </div>
         </div>
 
