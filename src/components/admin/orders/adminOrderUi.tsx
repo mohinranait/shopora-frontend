@@ -1,6 +1,7 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import type { OrderStatus, PaymentStatus } from "@/types";
+import { formatTaka } from "@/lib/money";
 
 type Variant = "default" | "secondary" | "destructive" | "outline" | "success" | "warning" | "brand" | "purple";
 
@@ -62,7 +63,9 @@ export const NEXT_ACTION_LABEL: Partial<Record<OrderStatus, string>> = {
   SHIPPED: "Mark delivered",
 };
 
-export const taka = (n: number) => `৳${Math.round(n).toLocaleString("en-US")}`;
+
+/** Exact taka amount (keeps paisa, e.g. commission ৳172.43) */
+export const taka = (n: number) => formatTaka(n);
 
 export const relativeTime = (value: string) => {
   const d = new Date(value.replace(" ", "T").replace(/([+-]\d{2})$/, "$1:00"));

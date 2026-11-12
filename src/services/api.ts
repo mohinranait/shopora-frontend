@@ -52,8 +52,20 @@ export function getApiErrorMessage(error: unknown): string {
     }
     return error.message;
   }
+  // RTK Query errors: { status, data: { message, errorSources } } or { status: "FETCH_ERROR", error }
+  if (error && typeof error === "object" && "status" in error) {
+    const { status, data } = error as { status: unknown; data?: { message?: string; errorSources?: IErrorSource[] } };
+    const firstSource = data?.errorSources?.[0]?.message;
+    if (firstSource) return firstSource;
+    if (data?.message) return data.message;
+    if (status === "FETCH_ERROR") return "Network error. Please check your connection.";
+    if (status === 429) return "Too many requests. Please wait a moment and try again.";
+  }
   if (error instanceof Error) {
     return error.message;
+  }
+  if (error && typeof error === "object" && "message" in error && typeof (error as { message: unknown }).message === "string") {
+    return (error as { message: string }).message;
   }
   if (typeof error === "string") {
     return error;

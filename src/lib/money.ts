@@ -11,10 +11,16 @@ export const toPaisa = (taka: number | string | null | undefined): number => Mat
 export const sumTaka = (values: Array<number | string | null | undefined>): number =>
   values.reduce<number>((sum, v) => sum + toPaisa(v), 0) / 100;
 
-/** "৳1,250" for whole amounts, "৳19.99" when there are paisa, "-৳52.47" for negatives */
+/** "৳1,250" for whole amounts, "৳19.99" / "৳1,500.50" when there are paisa, "-৳52.47" for negatives */
 export const formatTaka = (n?: number | string | null): string => {
   const amount = Number(n) || 0;
-  const text = Math.abs(amount).toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  const abs = Math.abs(amount);
+  // Whole amounts stay "৳1,250"; any paisa always shows both digits ("৳1,500.50")
+  const hasPaisa = Math.round(abs * 100) % 100 !== 0;
+  const text = abs.toLocaleString("en-US", {
+    minimumFractionDigits: hasPaisa ? 2 : 0,
+    maximumFractionDigits: hasPaisa ? 2 : 0,
+  });
   return amount < 0 ? `-৳${text}` : `৳${text}`;
 };
 

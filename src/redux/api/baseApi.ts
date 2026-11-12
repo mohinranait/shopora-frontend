@@ -30,7 +30,11 @@ const baseQueryWithReauth: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   let result = await rawBaseQuery(args, api, extraOptions);
 
-  if (result.error && result.error.status === 401 && typeof window !== "undefined") {
+  // A 401 from the auth endpoints themselves means bad credentials, not an expired session
+  const url = typeof args === "string" ? args : args.url;
+  const isAuthCall = /\/auth\/(login|register|refresh-token)/.test(url);
+
+  if (result.error && result.error.status === 401 && !isAuthCall && typeof window !== "undefined") {
     const newAccessToken = await refreshAccessToken();
 
     if (newAccessToken) {

@@ -43,6 +43,7 @@ import {
 } from "@/redux";
 import { INotification } from "@/types";
 import { toast } from "sonner";
+import { formatTaka } from "@/lib/money";
 
 interface SellerHeaderProps {
   onMobileToggle?: () => void;
@@ -209,7 +210,7 @@ export function SellerHeader({ onMobileToggle }: SellerHeaderProps = {}) {
           <Wallet className="h-3.5 w-3.5 text-emerald-500" />
           <span className="text-muted-foreground hidden sm:inline">Available:</span>
           <span className="text-emerald-600 dark:text-emerald-400 font-bold">
-            ৳{metrics?.availableBalance ? metrics.availableBalance.toLocaleString() : 0}
+            {formatTaka(metrics?.availableBalance)}
           </span>
         </Link>
 
@@ -439,13 +440,13 @@ export function SellerHeader({ onMobileToggle }: SellerHeaderProps = {}) {
                 <div>
                   <span className="text-[10px] text-muted-foreground block">Available:</span>
                   <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                    ৳{metrics?.availableBalance ? metrics.availableBalance.toLocaleString() : 0}
+                    {formatTaka(metrics?.availableBalance)}
                   </span>
                 </div>
                 <div>
                   <span className="text-[10px] text-muted-foreground block">Escrow Hold:</span>
                   <span className="text-xs font-bold text-amber-500">
-                    ৳{metrics?.pendingBalance ? metrics.pendingBalance.toLocaleString() : 0}
+                    {formatTaka(metrics?.pendingBalance)}
                   </span>
                 </div>
               </div>
@@ -478,7 +479,7 @@ export function SellerHeader({ onMobileToggle }: SellerHeaderProps = {}) {
                 </Link>
                 {profile?.storeSlug && (
                   <Link
-                    href={`/stores/${profile.storeSlug}`}
+                    href={`/vendors/${profile.storeSlug}`}
                     target="_blank"
                     onClick={() => setProfileOpen(false)}
                     className="flex items-center justify-between px-4 py-2 text-popover-foreground hover:bg-accent transition"

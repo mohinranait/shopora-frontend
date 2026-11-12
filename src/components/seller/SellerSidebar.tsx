@@ -142,7 +142,7 @@ export function SellerSidebar() {
           ? [
               {
                 label: "View Public Store",
-                href: `/stores/${profile.storeSlug}`,
+                href: `/vendors/${profile.storeSlug}`,
                 icon: ExternalLink,
                 target: "_blank",
               },
@@ -333,7 +333,7 @@ export function SellerSidebar() {
             <TooltipTrigger
               render={
                 <Link
-                  href={`/stores/${profile.storeSlug}`}
+                  href={`/vendors/${profile.storeSlug}`}
                   target="_blank"
                   className="flex items-center gap-2.5 rounded-lg border border-sidebar-border bg-sidebar-accent/50 px-3 py-2 text-xs font-medium text-sidebar-foreground/80 hover:text-sidebar-foreground hover:border-brand/50 hover:bg-sidebar-accent transition group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:size-9 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:mx-auto"
                 />

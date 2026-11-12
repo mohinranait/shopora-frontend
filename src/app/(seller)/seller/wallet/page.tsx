@@ -215,7 +215,7 @@ export default function SellerWalletPage() {
             </p>
           </div>
           <div className="text-[10px] text-muted-foreground pt-2 border-t border-border">
-            Automated settlement occurs daily at midnight BST.
+            Matured holdings are released to your balance automatically (checked every hour).
           </div>
         </div>
       </div>

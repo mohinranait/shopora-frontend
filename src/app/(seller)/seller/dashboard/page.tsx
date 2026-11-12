@@ -45,6 +45,7 @@ import {
   useGetNotificationsQuery,
 } from "@/redux";
 import { toast } from "sonner";
+import { formatTaka } from "@/lib/money";
 
 export default function SellerDashboardPage() {
   const { data: dashboard, isLoading, refetch } = useGetSellerDashboardStatsQuery();
@@ -246,7 +247,7 @@ export default function SellerDashboardPage() {
               </Button>
             </Link>
             {profile?.storeSlug && (
-              <Link href={`/stores/${profile.storeSlug}`} target="_blank">
+              <Link href={`/vendors/${profile.storeSlug}`} target="_blank">
                 <Button size="sm" variant="ghost" className="text-xs text-muted-foreground hover:text-foreground gap-1">
                   Storefront
                   <ExternalLink className="h-3.5 w-3.5" />
@@ -346,7 +347,7 @@ export default function SellerDashboardPage() {
             </div>
             <div className="mt-3">
               <div className="text-2xl font-black text-foreground">
-                ৳{metrics?.availableBalance ? metrics.availableBalance.toLocaleString() : 0}
+                {formatTaka(metrics?.availableBalance)}
               </div>
               <div className="flex items-center justify-between mt-2 pt-2 border-t border-border">
                 <span className="text-[11px] text-muted-foreground">Ready for payout</span>
@@ -372,7 +373,7 @@ export default function SellerDashboardPage() {
             </div>
             <div className="mt-3">
               <div className="text-2xl font-black text-amber-600 dark:text-amber-400">
-                ৳{metrics?.pendingBalance ? metrics.pendingBalance.toLocaleString() : 0}
+                {formatTaka(metrics?.pendingBalance)}
               </div>
               <div className="flex items-center justify-between mt-2 pt-2 border-t border-border">
                 <span className="text-[11px] text-muted-foreground">Maturing orders</span>
@@ -571,7 +572,7 @@ export default function SellerDashboardPage() {
                         {order.customerName || "Customer"}
                       </TableCell>
                       <TableCell className="font-bold text-emerald-600 dark:text-emerald-400">
-                        ৳{order.sellerEarnings ? order.sellerEarnings.toLocaleString() : 0}
+                        {formatTaka(order.sellerEarnings)}
                       </TableCell>
                       <TableCell>
                         <Badge

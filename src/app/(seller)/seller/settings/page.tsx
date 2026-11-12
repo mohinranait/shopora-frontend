@@ -211,7 +211,7 @@ export default function SellerSettingsPage() {
 
             <div>
               <label className="block text-xs font-semibold text-foreground mb-1">
-                Store URL Slug (shopora.com/stores/slug)
+                Store URL Slug (shopora.com/vendors/slug)
               </label>
               <input
                 type="text"

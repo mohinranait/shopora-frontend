@@ -350,7 +350,7 @@ export const Header: React.FC = () => {
               </div>
               <div className="text-left hidden lg:block">
                 <p className="text-[10px] uppercase font-semibold text-slate-400 leading-none">Cart</p>
-                <p className="text-xs font-extrabold text-slate-900 leading-tight" suppressHydrationWarning>৳{isClient ? Math.round(subtotal).toLocaleString("en-US") : "0"}</p>
+                <p className="text-xs font-extrabold text-slate-900 leading-tight" suppressHydrationWarning>{isClient ? formatTaka(subtotal) : "৳0"}</p>
               </div>
             </button>
 

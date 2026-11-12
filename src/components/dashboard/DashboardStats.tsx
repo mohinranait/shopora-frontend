@@ -8,6 +8,7 @@ import {
   CreditCard,
   ArrowRight,
 } from "lucide-react";
+import { formatTaka } from "@/lib/money";
 
 interface DashboardStatsProps {
   totalOrders: number;
@@ -57,7 +58,7 @@ export function DashboardStats({
     },
     {
       title: "Total Spent",
-      value: `৳${Math.round(totalSpent).toLocaleString("en-US")}`,
+      value: formatTaka(totalSpent),
       desc: "Paid purchases",
       icon: CreditCard,
       iconColor: "text-emerald-600",
