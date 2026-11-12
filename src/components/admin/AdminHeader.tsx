@@ -11,6 +11,7 @@ import {
   ExternalLink,
   ChevronDown,
   User,
+  Key,
   Settings,
   Shield,
   LogOut,
@@ -44,6 +45,20 @@ import { useSidebar } from "@/components/ui/sidebar";
 
 interface AdminHeaderProps {
   onMobileToggle?: () => void;
+}
+
+function formatRelativeTime(dateStr: string) {
+  try {
+    const d = new Date(dateStr.replace(" ", "T"));
+    const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (isNaN(diff) || diff < 60) return "Just now";
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  } catch {
+    return "Recently";
+  }
 }
 
 export function AdminHeader({ onMobileToggle }: AdminHeaderProps = {}) {
@@ -131,20 +146,6 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps = {}) {
         return CheckCircle2;
       default:
         return Bell;
-    }
-  };
-
-  const formatRelativeTime = (dateStr: string) => {
-    try {
-      const d = new Date(dateStr.replace(" ", "T"));
-      const diff = Math.floor((Date.now() - d.getTime()) / 1000);
-      if (isNaN(diff) || diff < 60) return "Just now";
-      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-      if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
-      return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-    } catch {
-      return "Recently";
     }
   };
 
@@ -398,6 +399,7 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps = {}) {
           >
             <div className="relative">
               {user?.avatar ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={user.avatar}
                   alt={user.name}
@@ -450,28 +452,28 @@ export function AdminHeader({ onMobileToggle }: AdminHeaderProps = {}) {
                   Administrator Profile
                 </Link>
                 <Link
+                  href="/admin/profile?tab=security"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2 text-popover-foreground/80 hover:text-popover-foreground hover:bg-accent transition"
+                >
+                  <Key className="h-4 w-4 text-muted-foreground" />
+                  Security & Password
+                </Link>
+                <Link
+                  href="/admin/profile?tab=activity"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2 text-popover-foreground/80 hover:text-popover-foreground hover:bg-accent transition"
+                >
+                  <Activity className="h-4 w-4 text-muted-foreground" />
+                  Activity & Audit Trail
+                </Link>
+                <Link
                   href="/admin/settings"
                   onClick={() => setProfileOpen(false)}
                   className="flex items-center gap-2.5 px-4 py-2 text-popover-foreground/80 hover:text-popover-foreground hover:bg-accent transition"
                 >
                   <Settings className="h-4 w-4 text-muted-foreground" />
                   Store & Commission Settings
-                </Link>
-                <Link
-                  href="/admin/security"
-                  onClick={() => setProfileOpen(false)}
-                  className="flex items-center gap-2.5 px-4 py-2 text-popover-foreground/80 hover:text-popover-foreground hover:bg-accent transition"
-                >
-                  <Shield className="h-4 w-4 text-muted-foreground" />
-                  Security & Audit Logs
-                </Link>
-                <Link
-                  href="/admin/activity"
-                  onClick={() => setProfileOpen(false)}
-                  className="flex items-center gap-2.5 px-4 py-2 text-popover-foreground/80 hover:text-popover-foreground hover:bg-accent transition"
-                >
-                  <Activity className="h-4 w-4 text-muted-foreground" />
-                  Live System Activity
                 </Link>
               </div>
 

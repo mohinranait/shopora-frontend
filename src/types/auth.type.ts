@@ -8,6 +8,13 @@ export interface IAuthUser {
   phone?: string | null;
   avatar?: string | null;
   avatarId?: string | null;
+  avatarUseMediaId?: string | null;
+  avatarUseMedia?: any;
+  isActive?: boolean;
+  isVerified?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  addresses?: any[];
   sellerId?: string | null;
   sellerProfile?: {
     id: string;

@@ -46,6 +46,18 @@ export const authApiSlice = baseApi.injectEndpoints({
       transformResponse: (res: IApiResponse<IAuthUser>) => res.data,
       providesTags: ["Auth"],
     }),
+
+    changePassword: builder.mutation<
+      { message: string },
+      { oldPassword: string; newPassword: string }
+    >({
+      query: (body) => ({
+        url: "/auth/change-password",
+        method: "POST",
+        body,
+      }),
+      transformResponse: (res: IApiResponse<{ message: string }>) => res.data,
+    }),
   }),
 });
 
@@ -54,4 +66,5 @@ export const {
   useRegisterCustomerMutation,
   useRegisterSellerMutation,
   useGetMeQuery,
+  useChangePasswordMutation,
 } = authApiSlice;

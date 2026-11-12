@@ -70,6 +70,23 @@ export const notificationApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Notifications", "NotificationCount"],
     }),
+
+    createNotification: builder.mutation<
+      INotification,
+      { title: string; message: string; type?: string; link?: string }
+    >({
+      query: (body) => ({
+        url: "/notifications",
+        method: "POST",
+        body,
+      }),
+      transformResponse: (response: {
+        success: boolean;
+        message: string;
+        data: INotification;
+      }) => response.data,
+      invalidatesTags: ["Notifications", "NotificationCount"],
+    }),
   }),
 });
 
@@ -80,4 +97,5 @@ export const {
   useMarkAllNotificationsAsReadMutation,
   useDeleteNotificationMutation,
   useClearReadNotificationsMutation,
+  useCreateNotificationMutation,
 } = notificationApi;
